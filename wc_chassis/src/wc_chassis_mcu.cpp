@@ -18,8 +18,9 @@
 #define SPEED_TH	        (MOTOR_SPEED_RATIO)	
 #define SPEED_V_TH		(0.6)
 #define SPEED_W_TH		(0.7)
-#define DELTA_SPEED_V_TH	(0.05)
-#define DELTA_SPEED_W_TH	(0.04) 
+#define DELTA_SPEED_V_INC_TH  (0.06)
+#define DELTA_SPEED_V_DEC_TH  (-0.18)
+#define DELTA_SPEED_W_TH	    (0.08) 
 #define DT (0.1)
 
 extern double ACC_LIM_TH;
@@ -199,6 +200,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     odom_a_ += (temp_dtheta / 10.0) / 180.0 * M_PI;
 		odom_a_gyro_ = odom_a_; 
   }
+
   while (odom_a_ <= - M_PI) {
     odom_a_ += M_PI*2;
   }
@@ -531,7 +533,18 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   
   float delta_speed_v = speed_v - last_speed_v_;
   float delta_speed_w = speed_w - last_speed_w_;  
-  speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;  
+  // speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;  
+  if(delta_speed_v > 0.0) { 
+    speed_v = delta_speed_v > DELTA_SPEED_V_INC_TH ? (last_speed_v_ + DELTA_SPEED_V_INC_TH) : speed_v;  
+	} else {
+    speed_v = delta_speed_v < DELTA_SPEED_V_DEC_TH ? (last_speed_v_ + DELTA_SPEED_V_DEC_TH) : speed_v;  
+  }
+/*  if(delta_speed_w > 0.0) { 
+    speed_w = delta_speed_w > DELTA_SPEED_W_INC_TH ? (last_speed_w_ + DELTA_SPEED_W_INC_TH) : speed_w;  
+	} else {
+    speed_w = delta_speed_w < DELTA_SPEED_W_DEC_TH ? (last_speed_w_ + DELTA_SPEED_W_DEC_TH) : speed_w;  
+  }
+*/
   speed_w = fabs(delta_speed_w) > DELTA_SPEED_W_TH ? (last_speed_w_ + sign(delta_speed_w) * DELTA_SPEED_W_TH) : speed_w;  
 
   // calculate angle and speed
