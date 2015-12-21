@@ -18,8 +18,8 @@
 #define SPEED_TH	        (MOTOR_SPEED_RATIO)	
 #define SPEED_V_TH		(0.6)
 #define SPEED_W_TH		(0.7)
-#define DELTA_SPEED_V_INC_TH  (0.06)
-#define DELTA_SPEED_V_DEC_TH  (-0.18)
+#define DELTA_SPEED_V_INC_TH  (0.025)
+#define DELTA_SPEED_V_DEC_TH  (-0.12)
 #define DELTA_SPEED_W_TH	    (0.08) 
 #define DT (0.1)
 

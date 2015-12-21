@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(lms1xx)
 
 set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC -O3")
 
 # Build ROS-independent library.
 find_package(console_bridge REQUIRED)

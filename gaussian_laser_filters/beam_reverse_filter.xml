@@ -1,0 +1,5 @@
+<library path="lib/libbeam_reverse_filter">
+    <class name="gaussian_laser_filters/BeamReverseFilter" type="gaussian_laser_filters::BeamReverseFilter" base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+        <description>This is a laser filter that reverse laser beams.</description>
+    </class>
+</library>

@@ -1,0 +1,5 @@
+<library path="lib/libfront_safe_filter">
+    <class name="gaussian_laser_filters/FrontSafeFilter" type="gaussian_laser_filters::FrontSafeFilter" base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+        <description>This is a plugin that publish front safe topic.</description>
+    </class>
+</library>
