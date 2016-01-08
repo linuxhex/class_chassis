@@ -17,10 +17,10 @@
 
 namespace gaussian_laser_filters {
 
-class SingleScanFilter : public filters::FilterBase<sensor_msgs::LaserScan> {
+class SingleLaserFilter : public filters::FilterBase<sensor_msgs::LaserScan> {
  public:
-  SingleScanFilter();
-  ~SingleScanFilter();
+  SingleLaserFilter();
+  ~SingleLaserFilter();
 
   /**
    * @brief configure function
@@ -39,7 +39,7 @@ class SingleScanFilter : public filters::FilterBase<sensor_msgs::LaserScan> {
   bool update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out);  // NOLINT
 
  private:
-  double distance_min_;       /* range to replace 0.0 range */
+  double distance_min_;       /* min distance to determain as single */
 };
 
 };  // namespace gaussian_laser_filters

@@ -38,5 +38,5 @@ target_link_libraries(angle_limit_filter ${catkin_LIBRARIES})
 add_library(lms1xx_filter src/lms1xx_filter.cc)
 target_link_libraries(lms1xx_filter ${catkin_LIBRARIES})
 
-add_library(single_scan_filter src/single_scan_filter.cc)
-target_link_libraries(single_scan_filter ${catkin_LIBRARIES})
+add_library(single_laser_filter src/single_laser_filter.cc)
+target_link_libraries(single_laser_filter ${catkin_LIBRARIES})

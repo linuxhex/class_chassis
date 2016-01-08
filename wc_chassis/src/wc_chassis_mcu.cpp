@@ -534,10 +534,13 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   float delta_speed_v = speed_v - last_speed_v_;
   float delta_speed_w = speed_w - last_speed_w_;  
   // speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;  
+  
   if(delta_speed_v > 0.0) { 
     speed_v = delta_speed_v > DELTA_SPEED_V_INC_TH ? (last_speed_v_ + DELTA_SPEED_V_INC_TH) : speed_v;  
-	} else {
-    speed_v = delta_speed_v < DELTA_SPEED_V_DEC_TH ? (last_speed_v_ + DELTA_SPEED_V_DEC_TH) : speed_v;  
+ } else {
+    float delta_speed_v_inc = DELTA_SPEED_V_DEC_TH;
+    if(fabs(speed_v) < 0.01) delta_speed_v_inc *= 2.0;
+    speed_v = delta_speed_v < delta_speed_v_inc ? (last_speed_v_ + delta_speed_v_inc) : speed_v;  
   }
 /*  if(delta_speed_w > 0.0) { 
     speed_w = delta_speed_w > DELTA_SPEED_W_INC_TH ? (last_speed_w_ + DELTA_SPEED_W_INC_TH) : speed_w;  

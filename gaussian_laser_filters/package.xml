@@ -11,7 +11,7 @@
     <filters plugin="${prefix}/front_safe_filter.xml" />
     <filters plugin="${prefix}/angle_limit_filter.xml" />
     <filters plugin="${prefix}/lms1xx_filter.xml" />
-    <filters plugin="${prefix}/single_scan_filter.xml" />
+    <filters plugin="${prefix}/single_laser_filter.xml" />
   </export>
 
   <buildtool_depend>catkin</buildtool_depend>
