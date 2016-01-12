@@ -39,7 +39,9 @@ class SingleLaserFilter : public filters::FilterBase<sensor_msgs::LaserScan> {
   bool update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out);  // NOLINT
 
  private:
-  double distance_min_;       /* min distance to determain as single */
+  double check_distance_min_;     /* min distance to filter */
+  double single_distance_min_;    /* min distance to determain as single */
+  double upper_bounds_;           /* upper bounds of ranges, will replace range if longer than this */
 };
 
 };  // namespace gaussian_laser_filters

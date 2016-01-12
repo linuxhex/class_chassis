@@ -18,13 +18,16 @@ PLUGINLIB_EXPORT_CLASS(gaussian_laser_filters::SingleLaserFilter, filters::Filte
 namespace gaussian_laser_filters {
 
 SingleLaserFilter::SingleLaserFilter() {
-  distance_min_ = 0.01;
+  check_distance_min_ = 2.0;
+  single_distance_min_ = 0.05;
 }
 
 SingleLaserFilter::~SingleLaserFilter() { }
 
 bool SingleLaserFilter::configure() {
-  getParam("distance_min", distance_min_);
+  getParam("check_distance_min", check_distance_min_);
+  getParam("single_distance_min", single_distance_min_);
+  getParam("upper_bounds", upper_bounds_);
   return true;
 }
 
@@ -32,9 +35,11 @@ bool SingleLaserFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
   scan_out = scan_in;
   for (unsigned int i = 1; i < scan_out.ranges.size() - 1; ++i) {
 //      scan_out.ranges[i] = scan_out.ranges[i - 1];
-    if (fabs(scan_out.ranges[i] - scan_out.ranges[i - 1]) > distance_min_ &&
-          fabs(scan_out.ranges[i] - scan_out.ranges[i + 1]) > distance_min_) {
-      scan_out.ranges[i] = scan_out.ranges[i - 1];
+    if (scan_in.ranges[i] < check_distance_min_
+				&& fabs(scan_in.ranges[i] - scan_in.ranges[i - 1]) > single_distance_min_ 
+        && fabs(scan_in.ranges[i] - scan_in.ranges[i + 1]) > single_distance_min_) {
+//      scan_out.ranges[i] = scan_out.ranges[i - 1];
+      scan_out.ranges[i] = scan_out.range_max + 0.1;
     }
   }
   return true;
