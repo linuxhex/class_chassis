@@ -158,16 +158,16 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 		case TIME:
 			break;
 		case SPEED2:
-	        protol->data.speed2_.system_time = data->angle_.system_time;
-	        protol->data.speed2_.speed_v = data->speed2_.speed_v;
-	        protol->data.speed2_.speed_w = data->speed2_.speed_w;
-	        protol->len = sizeof(AngleProtocol);
+	        	protol->data.speed2_.system_time = data->angle_.system_time;
+	        	protol->data.speed2_.speed_v = data->speed2_.speed_v;
+	        	protol->data.speed2_.speed_w = data->speed2_.speed_w;
+	        	protol->len = sizeof(AngleProtocol);
 	        break;
 		case SPEED3:
-	        protol->data.speed3_.speed_v = data->speed3_.speed_v;
-	        protol->data.speed3_.speed_w = data->speed3_.speed_w;
-	        protol->data.speed3_.plan_type = data->speed3_.plan_type;
-	        protol->len = sizeof(SpeedProtocol3);
+	        	protol->data.speed3_.speed_v = data->speed3_.speed_v;
+	        	protol->data.speed3_.speed_w = data->speed3_.speed_w;
+	        	protol->data.speed3_.plan_type = data->speed3_.plan_type;
+	        	protol->len = sizeof(SpeedProtocol3);
 	        break;
 		case SPEED_TWO_WHEEL:
 			protol->data.speed4_.system_time = data->speed4_.system_time;
@@ -177,20 +177,20 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 			protol->len = sizeof(SpeedTwoWheelProtocol);
 			break;
 		case RULTRASONIC:
-	        protol->len = sizeof(RUltraProtocol);
+	        	protol->len = sizeof(RUltraProtocol);
 	        break;
 		case RYAW_ANGLE:
 			protol->len = sizeof(RYawAngleProtocol);
 	        break;
 		case DO:
-	        protol->data.do_.usdo = data->do_.usdo ;
-	        protol->len = sizeof(DoProtocol);
+	        	protol->data.do_.usdo = data->do_.usdo ;
+	        	protol->len = sizeof(DoProtocol);
 	    	break;
 		case DA:
 			protol->data.da_.system_time = data->da_.system_time;
 			protol->data.da_.axis_id =  data->da_.axis_id;
-	        protol->data.da_.da_value = data->da_.da_value;
-	        protol->len = sizeof(DaProtocol);
+	        	protol->data.da_.da_value = data->da_.da_value;
+	        	protol->len = sizeof(DaProtocol);
 	    	break;
 		case RCURRENT:
 			break;
@@ -203,13 +203,13 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 			break;
 		case RDI:
 		   	protol->data.r_di_ .system_time = data->r_pos_.system_time;
-	        protol->data.r_di_.axis_id = data->r_pos_.axis_id;
-	        protol->len = sizeof(RDiProtocol);
+	        	protol->data.r_di_.axis_id = data->r_pos_.axis_id;
+	        	protol->len = sizeof(RDiProtocol);
 	    	break;
 		case RAD:
-	    	protol->data.r_ad_.system_time = data->r_ad_.system_time;
-	        protol->data.r_ad_.axis_id = data->r_ad_.axis_id;
-	        protol->len = sizeof(RAdProtocol);
+	    		protol->data.r_ad_.system_time = data->r_ad_.system_time;
+	        	protol->data.r_ad_.axis_id = data->r_ad_.axis_id;
+	        	protol->len = sizeof(RAdProtocol);
 	    	break;
 		case RTIME:
 			break;

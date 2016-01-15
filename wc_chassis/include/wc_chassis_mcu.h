@@ -21,7 +21,7 @@ class WC_chassis_mcu{
   WC_chassis_mcu();
   ~WC_chassis_mcu();
 
-  void Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts);
+  void Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio);
 
   void setThaZero(double zero);
   void setThaLeft(double left);
@@ -30,7 +30,7 @@ class WC_chassis_mcu{
   unsigned int getDI();
   void setSpeed(float speed_v, float speed_w, int plan_type);
   void setTwoWheelSpeed(float speed_v, float speed_w);
-  int getMotorSpeed(float);
+  short getMotorSpeed(float speed);
   bool getOdo(double &x, double &y, double &a);  // NOLINT
   bool getCSpeed(double &v, double &w);  // NOLINT
   void getUltra();
@@ -43,7 +43,7 @@ class WC_chassis_mcu{
   int V2RPM(float v);
   int GetCopleySpeed(float v);
   int GetCopleyAngle(float angle);
-
+  double acc_odom_theta_;
  private:
   bool is_auto_;
 
@@ -58,7 +58,7 @@ class WC_chassis_mcu{
   float Axle_;
   float TimeWidth_;
   int Counts_;
-  int reduction_ratio_;
+  int Reduction_ratio_;
 
   Socket* transfer_;
 
