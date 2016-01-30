@@ -32,7 +32,7 @@
 WC_chassis_mcu g_chassis_mcu;
 
 double ACC_LIM_TH = 3.0 / 2.0 * M_PI;
-
+double ultral_effective_range = 0.4;
 double g_odom_x   = 0;
 double g_odom_y   = 0;
 double g_odom_tha = 0;
@@ -172,7 +172,7 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
   float dis_meter = recv_int * 5.44 / 1000.0;
   if (dis_meter < range.min_range) {
     range.range = range.min_range;
-  } else if (dis_meter > 0.4) {  // effective range
+  } else if (dis_meter > ultral_effective_range) {  // effective range
     range.range = range.max_range;
   } else {
     range.range = dis_meter;
@@ -181,10 +181,6 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
 }
 
 void PublishUltrasonic() {
-/*
-  publish_ultrasonic(ultrasonic0_pub, "ultrasonic0", g_ultrasonic[0]);
-  publish_ultrasonic(ultrasonic1_pub, "ultrasonic1", g_ultrasonic[1]);
-*/ 
   publish_ultrasonic(ultrasonic0_pub, "ultrasonic0", g_ultrasonic[1]);
   publish_ultrasonic(ultrasonic1_pub, "ultrasonic1", g_ultrasonic[2]);
   publish_ultrasonic(ultrasonic2_pub, "ultrasonic2", g_ultrasonic[3]);
@@ -258,14 +254,14 @@ void PublishModel() {
 
 void PublishMarkGoal(unsigned char mark_goal_index) {
   ROS_INFO("[wc_chassis] publish mark goal index = %d", mark_goal_index);
-  std_msgs::UInt8 msg;
+  std_msgs::UInt32 msg;
   msg.data = mark_goal_index; 
   mark_goal_pub.publish(msg);
 }
 
 void PublishSetGoal(unsigned char set_goal_index) {
   ROS_INFO("[wc_chassis] publish set goal index = %d", set_goal_index);
-  std_msgs::UInt8 msg;
+  std_msgs::UInt32 msg;
   msg.data = set_goal_index; 
   set_goal_pub.publish(msg);
 }
@@ -393,6 +389,7 @@ int main(int argc, char **argv) {
   nh.param("B_DIA", b_dia, static_cast<double>(0.125));
   nh.param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
   nh.param("TimeWidth", timeWidth, static_cast<double>(0.1));
+  nh.param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
   nh.param("host_name", host_name, std::string("192.168.1.199"));
   nh.param("port", port, 5000);
   nh.param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
@@ -400,8 +397,8 @@ int main(int argc, char **argv) {
   std::cout << "v_scrub: " << v_scrub_threshold << " radius_scrub: " << radius_scrub_threshold << std::endl;
 
   model_pub = n.advertise<std_msgs::UInt32>(str_auto_topic, 10);
-  mark_goal_pub = n.advertise<std_msgs::UInt8>("mark_goal", 10); 
-  set_goal_pub = n.advertise<std_msgs::UInt8>("set_goal", 10); 
+  mark_goal_pub = n.advertise<std_msgs::UInt32>("mark_goal", 10); 
+  set_goal_pub = n.advertise<std_msgs::UInt32>("set_goal", 10); 
   pause_pub = n.advertise<std_msgs::UInt32>("/move_base_simple/gaussian_pause", 10); 
   terminate_pub = n.advertise<std_msgs::UInt32>("/move_base_simple/gaussian_cancel", 10); 
 
@@ -409,6 +406,10 @@ int main(int argc, char **argv) {
   odom_pub  = n.advertise<nav_msgs::Odometry>("odom", 50);
   ultrasonic0_pub = n.advertise<sensor_msgs::Range>("ultrasonic0", 50);
   ultrasonic1_pub = n.advertise<sensor_msgs::Range>("ultrasonic1", 50);
+  ultrasonic2_pub = n.advertise<sensor_msgs::Range>("ultrasonic2", 50);
+  ultrasonic3_pub = n.advertise<sensor_msgs::Range>("ultrasonic3", 50);
+  ultrasonic4_pub = n.advertise<sensor_msgs::Range>("ultrasonic4", 50);
+  ultrasonic5_pub = n.advertise<sensor_msgs::Range>("ultrasonic5", 50);
   launch_scrubber_srv = n.advertiseService("launch_scrubber", &LaunchScrubber);
   stop_scrubber_srv = n.advertiseService("stop_scrubber", &StopScrubber);
   start_rotate_srv = device_nh.advertiseService("start_rotate", &StartRotate);
@@ -421,7 +422,7 @@ int main(int argc, char **argv) {
 
   pthread_mutex_init(&speed_mutex, NULL);
 
-  g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth,  12, 38);
+  g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth,  12, 37);
   g_chassis_mcu.setThaZero(f_zero_);
 
   std::cout << "Start Main Loop!" << std::endl;

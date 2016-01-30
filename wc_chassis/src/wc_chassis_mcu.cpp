@@ -16,11 +16,11 @@
 
 #define REDUCTION_RATIO	        (25)
 #define SPEED_TH	        (1000)	
-#define SPEED_V_TH		(0.6)
-#define SPEED_W_TH		(0.7)
+#define SPEED_V_TH		(0.52)
+#define SPEED_W_TH		(0.6)
 #define DELTA_SPEED_V_INC_TH    (0.025)
 #define DELTA_SPEED_V_DEC_TH    (-0.12)
-#define DELTA_SPEED_W_TH	(0.08) 
+#define DELTA_SPEED_W_TH	(0.25) 
 #define DT                      (0.1)
 
 extern double ACC_LIM_TH;
@@ -205,7 +205,8 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
 //  odom_a_ += da;
 //  acc_odom_theta_ += da;
 
-  if (!(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta)) {
+//  if (!(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta)) {
+  if (true) {
     double temp_dtheta = yaw_angle_ - last_yaw_angle_;
     if(temp_dtheta > -3500.0 &&  temp_dtheta < 0.0 ) {
       temp_dtheta += 3600.0;
@@ -233,7 +234,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
   }
 
   double yaw = odom_a_ * 180.0 / M_PI;
-	ROS_INFO("yaw angle = %lf", yaw);
+  ROS_INFO("yaw angle = %lf", yaw);
   //ROS_INFO("odom_a=%lf, odom_a_gyro=%lf", odom_a_ * 57.3, odom_a_gyro_ * 57.3); 
   x = odom_x_;
   y = odom_y_;
@@ -265,8 +266,8 @@ void WC_chassis_mcu::getUltra() {
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send ultra: " << str << std::endl;
 
-  // std::string str = cComm::ByteToHexString(rec, rlen);
-  // std::cout << "recv ultra: " << str << std::endl;
+  std::string str = cComm::ByteToHexString(rec, rlen);
+  std::cout << "recv ultra: " << str << std::endl;
   //  std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
   if (rlen == 35) {
     for (int i = 0; i < rlen; ++i) {
@@ -555,12 +556,10 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   // speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;  
   
   if(delta_speed_v > 0.0) { 
-    float delta_speed_v_inc = DELTA_SPEED_V_INC_TH;
-    if(fabs(speed_v) < 0.01) delta_speed_v_inc = 0.25;
+    float delta_speed_v_inc = fabs(speed_v) < 0.01 ? 0.30 : DELTA_SPEED_V_INC_TH;
     speed_v = delta_speed_v > delta_speed_v_inc ? (last_speed_v_ + delta_speed_v_inc) : speed_v;  
  } else {
-    float delta_speed_v_dec = DELTA_SPEED_V_DEC_TH;
-    if(fabs(speed_v) < 0.01) delta_speed_v_dec = -0.25;
+    float delta_speed_v_dec = fabs(speed_v) < 0.01 ? -0.25 : DELTA_SPEED_V_DEC_TH;
     speed_v = delta_speed_v < delta_speed_v_dec ? (last_speed_v_ + delta_speed_v_dec) : speed_v;  
   }
 /*  if(delta_speed_w > 0.0) { 
