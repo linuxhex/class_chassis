@@ -372,6 +372,9 @@ int main(int argc, char **argv) {
   double f_dia = 0;
   double b_dia = 0;
   double axle  = 0;
+  int counts = 0;
+  int reduction_ratio = 0;
+  double speed_ratio = 1.0;
   double timeWidth = 0;
   std::string host_name;
   int port;
@@ -388,12 +391,15 @@ int main(int argc, char **argv) {
   nh.param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
   nh.param("B_DIA", b_dia, static_cast<double>(0.125));
   nh.param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
+  nh.param("COUNTS", counts, 12);
+  nh.param("REDUCTION_RATIO", reduction_ratio, 30);
+  nh.param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
   nh.param("TimeWidth", timeWidth, static_cast<double>(0.1));
   nh.param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
   nh.param("host_name", host_name, std::string("192.168.1.199"));
   nh.param("port", port, 5000);
   nh.param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
-  std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << std::endl;
+  std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << " reduction_ratio: " << reduction_ratio << " speed_ratio:" << speed_ratio << std::endl;
   std::cout << "v_scrub: " << v_scrub_threshold << " radius_scrub: " << radius_scrub_threshold << std::endl;
 
   model_pub = n.advertise<std_msgs::UInt32>(str_auto_topic, 10);
@@ -422,7 +428,7 @@ int main(int argc, char **argv) {
 
   pthread_mutex_init(&speed_mutex, NULL);
 
-  g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth,  12, 37);
+  g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth, counts, reduction_ratio, speed_ratio);
   g_chassis_mcu.setThaZero(f_zero_);
 
   std::cout << "Start Main Loop!" << std::endl;

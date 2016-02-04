@@ -36,9 +36,9 @@ float current_v = 0.0;
 float current_theta = 0.0;
 
 WC_chassis_mcu::WC_chassis_mcu()
-  : transfer_(0), H_(0.5), Dia_F_(0.2), Dia_B_(0.2), Axle_(0.6), Counts_(4000), Reduction_ratio_(25),
+  : transfer_(0), H_(0.5), Dia_F_(0.2), Dia_B_(0.2), Axle_(0.6), Counts_(4000), Reduction_ratio_(25), Speed_ratio_(1.0),
     odom_x_(0.0), odom_y_(0.0), odom_a_(0.0), odom_a_gyro_(0.0), acc_odom_theta_(0.0),
-    delta_counts_left_(0), delta_counts_right_(0),
+    delta_counts_left_(0), delta_counts_right_(0),  
     yaw_angle_(0),
     last_speed_v_(0.0), last_speed_w_(0.0),
     counts_left_(0), counts_right_(0), first_odo_(true),
@@ -49,7 +49,7 @@ WC_chassis_mcu::WC_chassis_mcu()
 
 WC_chassis_mcu::~WC_chassis_mcu() { }
 
-void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio) {
+void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio) {
   if (!transfer_) {
     transfer_ = new Socket();
     transfer_->Init(host_name, port);
@@ -84,10 +84,16 @@ void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,
     std::cout << "Counts err value:" <<Counts<< std::endl;
   }
 
-  if ((Reduction_ratio > 0) && (Reduction_ratio < 50)) {
+  if ((Reduction_ratio > 0) && (Reduction_ratio < 100)) {
     Reduction_ratio_ = Reduction_ratio;
   } else {
     std::cout << "Reduction_ratio err value:" << Reduction_ratio<< std::endl;
+  }
+
+  if ((Speed_ratio > 0) && (Speed_ratio < 2)) {
+    Speed_ratio_ = Speed_ratio;
+  } else {
+    std::cout << "Speed_ratio err value:" << Speed_ratio<< std::endl;
   }
 
   if ((TimeWidth > 0) && (TimeWidth < 0.2)) {
@@ -128,7 +134,7 @@ bool WC_chassis_mcu::getCSpeed(double &v, double &w) {
   double da = (r_wheel_pos - l_wheel_pos) / Axle_;
 
   if ((fabs(t) > 10e-3) && (fabs(t) < 10e3)) {
-    v = dx / t;
+    v = dx / t * Speed_ratio_;
     w = da / t;
   } else {
     v = 0;
