@@ -82,6 +82,8 @@ ros::Publisher model_pub;
 ros::Publisher yaw_pub;
 ros::Publisher mark_goal_pub;
 ros::Publisher set_goal_pub;
+ros::Publisher mark_init_pub;
+ros::Publisher set_init_pub;
 ros::Publisher pause_pub;
 ros::Publisher terminate_pub;
 ros::Publisher ultrasonic0_pub;
@@ -252,18 +254,32 @@ void PublishModel() {
   }
 }
 
-void PublishMarkGoal(unsigned char mark_goal_index) {
-  ROS_INFO("[wc_chassis] publish mark goal index = %d", mark_goal_index);
+void PublishMarkGoal(unsigned char mark_index) {
+  ROS_INFO("[wc_chassis] publish mark goal index = %d", mark_index);
   std_msgs::UInt32 msg;
-  msg.data = mark_goal_index; 
+  msg.data = mark_index; 
   mark_goal_pub.publish(msg);
 }
 
-void PublishSetGoal(unsigned char set_goal_index) {
-  ROS_INFO("[wc_chassis] publish set goal index = %d", set_goal_index);
+void PublishSetGoal(unsigned char set_index) {
+  ROS_INFO("[wc_chassis] publish set goal index = %d", set_index);
   std_msgs::UInt32 msg;
-  msg.data = set_goal_index; 
+  msg.data = set_index; 
   set_goal_pub.publish(msg);
+}
+
+void PublishMarkInit(unsigned char mark_index) {
+  ROS_INFO("[wc_chassis] publish mark init index = %d", mark_index);
+  std_msgs::UInt32 msg;
+  msg.data = mark_index; 
+  mark_init_pub.publish(msg);
+}
+
+void PublishSetInit(unsigned char set_index) {
+  ROS_INFO("[wc_chassis] publish set init index = %d", set_index);
+  std_msgs::UInt32 msg;
+  msg.data = set_index; 
+  set_init_pub.publish(msg);
 }
 
 void PublishPause() {
@@ -405,6 +421,8 @@ int main(int argc, char **argv) {
   model_pub = n.advertise<std_msgs::UInt32>(str_auto_topic, 10);
   mark_goal_pub = n.advertise<std_msgs::UInt32>("mark_goal", 10); 
   set_goal_pub = n.advertise<std_msgs::UInt32>("set_goal", 10); 
+  mark_init_pub = n.advertise<std_msgs::UInt32>("mark_init", 10); 
+  set_init_pub = n.advertise<std_msgs::UInt32>("set_init", 10); 
   pause_pub = n.advertise<std_msgs::UInt32>("/move_base_simple/gaussian_pause", 10); 
   terminate_pub = n.advertise<std_msgs::UInt32>("/move_base_simple/gaussian_cancel", 10); 
 

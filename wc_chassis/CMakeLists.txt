@@ -45,3 +45,4 @@ set(WC_CHASSIS_SRC
 )
 add_executable(wc_chassis ${WC_CHASSIS_SRC})
 target_link_libraries(wc_chassis ${catkin_LIBRARIES} )
+add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})

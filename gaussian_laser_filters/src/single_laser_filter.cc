@@ -33,10 +33,10 @@ bool SingleLaserFilter::configure() {
 
 bool SingleLaserFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out) {
   scan_out = scan_in;
-  for (unsigned int i = 1; i < scan_out.ranges.size() - 1; ++i) {
+  for (int i = 30; i < scan_out.ranges.size() - 30; ++i) {
 //      scan_out.ranges[i] = scan_out.ranges[i - 1];
     if (scan_in.ranges[i] < check_distance_min_
-				&& fabs(scan_in.ranges[i] - scan_in.ranges[i - 1]) > single_distance_min_ 
+        && fabs(scan_in.ranges[i] - scan_in.ranges[i - 1]) > single_distance_min_ 
         && fabs(scan_in.ranges[i] - scan_in.ranges[i + 1]) > single_distance_min_) {
 //      scan_out.ranges[i] = scan_out.ranges[i - 1];
       scan_out.ranges[i] = scan_out.range_max + 0.1;
