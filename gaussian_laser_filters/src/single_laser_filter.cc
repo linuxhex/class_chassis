@@ -20,6 +20,8 @@ namespace gaussian_laser_filters {
 SingleLaserFilter::SingleLaserFilter() {
   check_distance_min_ = 2.0;
   single_distance_min_ = 0.05;
+  begin_skip_beams_ = 0;
+  end_skip_beams_ = 0;
 }
 
 SingleLaserFilter::~SingleLaserFilter() { }
@@ -28,12 +30,14 @@ bool SingleLaserFilter::configure() {
   getParam("check_distance_min", check_distance_min_);
   getParam("single_distance_min", single_distance_min_);
   getParam("upper_bounds", upper_bounds_);
+  getParam("begin_skip_beams", begin_skip_beams_);
+  getParam("end_skip_beams", end_skip_beams_);
   return true;
 }
 
 bool SingleLaserFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs::LaserScan& scan_out) {
   scan_out = scan_in;
-  for (int i = 30; i < scan_out.ranges.size() - 30; ++i) {
+  for (int i = begin_skip_beams_; i < scan_out.ranges.size() - end_skip_beams_; ++i) {
 //      scan_out.ranges[i] = scan_out.ranges[i - 1];
     if (scan_in.ranges[i] < check_distance_min_
         && fabs(scan_in.ranges[i] - scan_in.ranges[i - 1]) > single_distance_min_ 
