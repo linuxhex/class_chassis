@@ -33,9 +33,11 @@ class WC_chassis_mcu{
   short getMotorSpeed(float speed);
   bool getOdo(double &x, double &y, double &a);  // NOLINT
   bool getCSpeed(double &v, double &w);  // NOLINT
-  void getUltra();
-  int getYawAngle();
-
+  unsigned short getRemoteCmd(void);
+//  bool setRemoteStatus(unsigned int cmd, unsigned int mark);  // NOLINT
+  void getUltra(void);
+//  int getYawAngle(void);
+  void  getYawAngle(short& yaw, short& pitch, short& roll);
   void comunication(void);
 
   bool setAuto(bool is_auto);
@@ -81,6 +83,8 @@ class WC_chassis_mcu{
   S32 last_counts_right_;
   short last_yaw_angle_;
   short yaw_angle_;
+  short pitch_angle_;
+  short rool_angle_;
   float last_speed_v_;
   float last_speed_w_;
 

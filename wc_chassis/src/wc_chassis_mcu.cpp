@@ -39,7 +39,7 @@ WC_chassis_mcu::WC_chassis_mcu()
   : transfer_(0), H_(0.5), Dia_F_(0.2), Dia_B_(0.2), Axle_(0.6), Counts_(4000), Reduction_ratio_(25), Speed_ratio_(1.0),
     odom_x_(0.0), odom_y_(0.0), odom_a_(0.0), odom_a_gyro_(0.0), acc_odom_theta_(0.0),
     delta_counts_left_(0), delta_counts_right_(0),  
-    yaw_angle_(0),
+    yaw_angle_(0), pitch_angle_(0), rool_angle_(0),
     last_speed_v_(0.0), last_speed_w_(0.0),
     counts_left_(0), counts_right_(0), first_odo_(true),
     direction(0), speed_v_(0), speed_w_(0) {
@@ -272,9 +272,9 @@ void WC_chassis_mcu::getUltra() {
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send ultra: " << str << std::endl;
 
-  std::string str = cComm::ByteToHexString(rec, rlen);
-  std::cout << "recv ultra: " << str << std::endl;
-  //  std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
+  // std::string str = cComm::ByteToHexString(rec, rlen);
+  // std::cout << "recv ultra: " << str << std::endl;
+  // std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
   if (rlen == 35) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
@@ -286,7 +286,37 @@ void WC_chassis_mcu::getUltra() {
   }
 }
 
-int WC_chassis_mcu::getYawAngle() {
+unsigned short WC_chassis_mcu::getRemoteCmd(void) {
+  unsigned char send[1024] = {0};
+  int len = 0;
+
+  unsigned char rec[1024] = {0};
+  int rlen = 0;
+
+  createRemoteCmd(send, &len);
+  if (transfer_) {
+    transfer_->Send_data(send, len);
+    transfer_->Read_data(rec, rlen, 15, 500);
+  }
+
+  // std::string str = cComm::ByteToHexString(send, len);
+  // std::cout << "send Remote cmd: " << str << std::endl;
+
+  std::string str = cComm::ByteToHexString(rec, rlen);
+  std::cout << "recv Remote cmd: " << str << std::endl;
+  if (rlen == 13) {
+    for (int i = 0; i < rlen; ++i) {
+      if (IRQ_CH(rec[i])) {
+	  	  return getRemote();
+      }
+    }
+  } else {
+    // sleep(1);
+  }
+  return 0;
+}
+
+void WC_chassis_mcu::getYawAngle(short& yaw, short& pitch, short& roll) {
   unsigned char send[1024] = {0};
   int len = 0;
 
@@ -296,23 +326,24 @@ int WC_chassis_mcu::getYawAngle() {
   createYawAngle(send, &len);
   if (transfer_) {
     transfer_->Send_data(send, len);
-    transfer_->Read_data(rec, rlen, 15, 500);
+    transfer_->Read_data(rec, rlen, 19, 500);
   }
 
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send ultra: " << str << std::endl;
 
-  std::string str = cComm::ByteToHexString(rec, rlen);
-  std::cout << "recv Yaw angle: " << str << std::endl;
-  if (rlen == 15) {
+  // std::string str = cComm::ByteToHexString(rec, rlen);
+  // std::cout << "recv Yaw angle: " << str << std::endl;
+  if (rlen == 19) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
-	  	return getYaw();
+        getYaw(yaw, pitch, roll);
       }
     }
   } else {
     // sleep(1);
   }
+//	return 0;
 }
 
 int WC_chassis_mcu::getLPos() {
@@ -683,7 +714,7 @@ void WC_chassis_mcu::comunication(void) {
   usleep(1000);
   getUltra();
   usleep(1000);
-  yaw_angle_ = getYawAngle();
+  getYawAngle(yaw_angle_, pitch_angle_, rool_angle_);
   yaw_angle_ = yaw_angle_ < 0 ? (3600 + yaw_angle_) : yaw_angle_;
   usleep(1000); 
 }

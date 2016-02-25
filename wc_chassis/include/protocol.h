@@ -56,12 +56,14 @@ typedef enum{
 	RPOS = 0x83,
 	RANGLE = 0x84,
 	RSPEED2 = 0x85,
-  	RULTRASONIC = 0x86,	
-  	RDI = 0x87,
-	ULTRASONIC = 0x88,
-	RAD = 0x89,
-	RYAW_ANGLE = 0x8a, 	//Request for Yaw
-  	YAW_ANGLE = 0x8b
+  RULTRASONIC = 0x86,	
+  RDI = 0x87,
+  ULTRASONIC = 0x88,
+  RAD = 0x89,
+  RYAW_ANGLE = 0x8a, 	//Request for Yaw
+  YAW_ANGLE = 0x8b,
+  RREMOTE_CMD = 0x8c, 	//Request for remote cmd 
+  REMOTE_CMD = 0x8d
 }CMDTypes;
 
 typedef struct _MsgState
@@ -212,12 +214,18 @@ typedef struct _RUltra {
 typedef struct _RYAWANGLE {
 }RYawAngleProtocol;
 
-
 typedef struct _YAWANGLE {
 	short yaw;
-	short none;
+	short pitch;
+	short roll;
 }YawAngleProtocol;
 
+typedef struct _RREMOTECMD {
+}RRemoteCmdProtocol;
+
+typedef struct _REMOTECMD {
+	short cmd;
+}RemoteCmdProtocol;
 
 typedef struct _Ultra {
   uint8_t length[24];
@@ -226,7 +234,7 @@ typedef struct _Ultra {
 typedef union _Data{
 	SpeedProtocol speed_;
 	SpeedProtocol2 speed2_;
-    SpeedProtocol3 speed3_;
+  SpeedProtocol3 speed3_;
 	SpeedTwoWheelProtocol speed4_;
 	PosProtocol pos_;
 	AngleProtocol angle_;
@@ -235,10 +243,12 @@ typedef union _Data{
 	RDiProtocol r_di_;
 	RPosProtocol r_pos_;
 	RAdProtocol r_ad_;
-    RUltraProtocol r_ultra_;
-    UltraProtocol ultra_;
+  RUltraProtocol r_ultra_;
+  UltraProtocol ultra_;
 	RYawAngleProtocol r_yaw_anle_;
 	YawAngleProtocol yaw_angle_;
+	RRemoteCmdProtocol r_remote_cmd_;
+	RemoteCmdProtocol remote_cmd_;
 }Data;
 
 typedef struct _AGVProtocol
@@ -275,7 +285,9 @@ extern int m_right_pos;
 float GetSpeed(void);
 int GetPos(int id);
 int GetDelta(int id);
-short getYaw(void);
+//short getYaw(void);
+void getYaw(short& yaw_angle, short& pitch_angle, short& roll_angle);
+short getRemote(void);
 unsigned int GetDI();
 float GetAD(int id);
 float GetAngle(void);
@@ -285,6 +297,7 @@ void CreateSpeed2(unsigned char* ch,int* len,int v,int w);
 void CreateSpeed3(unsigned char* ch,int* len,int v,int w, int plan_type);
 void CreateRUltra(unsigned char* ch, int* len);
 void createYawAngle(unsigned char* ch, int* len);
+void createRemoteCmd(unsigned char* ch, int* len);
 void CreatePos(unsigned char* ch,int* len,int id,int pos);
 void CreateAngle(unsigned char* ch,int* len,int id,float angle);
 void CreateDO(unsigned char* ch,int* len,int id,unsigned int usdo);

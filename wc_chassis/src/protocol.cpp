@@ -47,6 +47,9 @@ int m_right_pos = 0;
 int volatile m_left_delta = 0;
 int volatile m_right_delta = 0;
 short volatile m_yaw_angle = 0;
+short volatile m_pitch_angle = 0;
+short volatile m_roll_angle = 0;
+short volatile m_remote_cmd = 0;
 
 unsigned int m_di = 0;
 
@@ -158,17 +161,17 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 		case TIME:
 			break;
 		case SPEED2:
-	        	protol->data.speed2_.system_time = data->angle_.system_time;
-	        	protol->data.speed2_.speed_v = data->speed2_.speed_v;
-	        	protol->data.speed2_.speed_w = data->speed2_.speed_w;
-	        	protol->len = sizeof(AngleProtocol);
-	        break;
+     	protol->data.speed2_.system_time = data->angle_.system_time;
+     	protol->data.speed2_.speed_v = data->speed2_.speed_v;
+     	protol->data.speed2_.speed_w = data->speed2_.speed_w;
+     	protol->len = sizeof(AngleProtocol);
+      break;
 		case SPEED3:
-	        	protol->data.speed3_.speed_v = data->speed3_.speed_v;
-	        	protol->data.speed3_.speed_w = data->speed3_.speed_w;
-	        	protol->data.speed3_.plan_type = data->speed3_.plan_type;
-	        	protol->len = sizeof(SpeedProtocol3);
-	        break;
+    	protol->data.speed3_.speed_v = data->speed3_.speed_v;
+    	protol->data.speed3_.speed_w = data->speed3_.speed_w;
+    	protol->data.speed3_.plan_type = data->speed3_.plan_type;
+    	protol->len = sizeof(SpeedProtocol3);
+    break;
 		case SPEED_TWO_WHEEL:
 			protol->data.speed4_.system_time = data->speed4_.system_time;
 			protol->data.speed4_.speed_left = data->speed4_.speed_left;
@@ -177,21 +180,24 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 			protol->len = sizeof(SpeedTwoWheelProtocol);
 			break;
 		case RULTRASONIC:
-	        	protol->len = sizeof(RUltraProtocol);
-	        break;
+    	protol->len = sizeof(RUltraProtocol);
+      break;
 		case RYAW_ANGLE:
 			protol->len = sizeof(RYawAngleProtocol);
-	        break;
+      break;
+		case RREMOTE_CMD:
+			protol->len = sizeof(RRemoteCmdProtocol);
+      break;
 		case DO:
-	        	protol->data.do_.usdo = data->do_.usdo ;
-	        	protol->len = sizeof(DoProtocol);
-	    	break;
+     	protol->data.do_.usdo = data->do_.usdo ;
+     	protol->len = sizeof(DoProtocol);
+    	break;
 		case DA:
 			protol->data.da_.system_time = data->da_.system_time;
 			protol->data.da_.axis_id =  data->da_.axis_id;
-	        	protol->data.da_.da_value = data->da_.da_value;
-	        	protol->len = sizeof(DaProtocol);
-	    	break;
+     	protol->data.da_.da_value = data->da_.da_value;
+     	protol->len = sizeof(DaProtocol);
+    	break;
 		case RCURRENT:
 			break;
 		case RSPEED:
@@ -202,15 +208,15 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 			protol->len = sizeof(RPosProtocol);
 			break;
 		case RDI:
-		   	protol->data.r_di_ .system_time = data->r_pos_.system_time;
-	        	protol->data.r_di_.axis_id = data->r_pos_.axis_id;
-	        	protol->len = sizeof(RDiProtocol);
-	    	break;
+    	protol->data.r_di_ .system_time = data->r_pos_.system_time;
+    	protol->data.r_di_.axis_id = data->r_pos_.axis_id;
+    	protol->len = sizeof(RDiProtocol);
+   	break;
 		case RAD:
-	    		protol->data.r_ad_.system_time = data->r_ad_.system_time;
-	        	protol->data.r_ad_.axis_id = data->r_ad_.axis_id;
-	        	protol->len = sizeof(RAdProtocol);
-	    	break;
+  		protol->data.r_ad_.system_time = data->r_ad_.system_time;
+     	protol->data.r_ad_.axis_id = data->r_ad_.axis_id;
+     	protol->len = sizeof(RAdProtocol);
+    	break;
 		case RTIME:
 			break;
 		case RSPEED2:
@@ -261,8 +267,13 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
 			break;
 		case YAW_ANGLE:
 			m_yaw_angle = protol->data.yaw_angle_.yaw; 
+			m_pitch_angle = protol->data.yaw_angle_.pitch; 
+			m_roll_angle = protol->data.yaw_angle_.roll; 
 			break;
-	    case ULTRASONIC:
+		case REMOTE_CMD:
+			m_remote_cmd = protol->data.remote_cmd_.cmd; 
+			break;
+	  case ULTRASONIC:
 			g_ultrasonic.clear();
 			g_ultrasonic.resize(24);
 			for (int i = 0; i < 24; ++i) {
@@ -355,6 +366,14 @@ void createYawAngle(unsigned char* ch, int* len) {
   Data data;
 
   SInit_Proto(&sendProtocol,RYAW_ANGLE);
+
+  Coder(ch,len,&sendProtocol,&data);
+}
+
+void createRemoteCmd(unsigned char* ch, int* len) {
+  Data data;
+
+  SInit_Proto(&sendProtocol, RREMOTE_CMD);
 
   Coder(ch,len,&sendProtocol,&data);
 }
@@ -475,10 +494,18 @@ int GetDelta(int id) {
     return m_right_delta;
   }
 }
-short getYaw(void)
+void getYaw(short& yaw_angle, short& pitch_angle, short& roll_angle)
 {
-	return m_yaw_angle;
+  yaw_angle = m_yaw_angle;
+  pitch_angle = m_pitch_angle;
+  roll_angle = m_roll_angle;
 }
+
+short getRemote(void)
+{
+	return m_remote_cmd;
+}
+
 int GetPos(int id){
 	if(id == 0){
 	    //std::cout<<"left_pos:"<<m_left_pos<<std::endl;

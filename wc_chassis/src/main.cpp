@@ -68,12 +68,24 @@ pthread_mutex_t speed_mutex;
 float g_spe = 0.0;
 float g_angle = 0.0;
 int g_planner_type = 0;
-
+unsigned int loop_count = 0;
 unsigned int rotate_angle = 0;
+
 bool start_rotate_flag = false;
 bool stop_rotate_flag = true;
 bool is_rotate_finished = false;
 
+enum remote_cmd {
+  CMD_NULL = 0,
+  CMD_SETGOAL, 
+  CMD_INIT,
+  CMD_SLAM,
+  CMD_RECORDPATH,
+  CMD_MARKGOAL,
+  CMD_PAUSE,
+  CMD_RESUME,
+  CMD_TERMINATE
+};
 //unsigned char mark_goal_index;
 //unsigned char set_goal_index;
 
@@ -254,28 +266,28 @@ void PublishModel() {
   }
 }
 
-void PublishMarkGoal(unsigned char mark_index) {
+void PublishMarkGoal(unsigned int mark_index) {
   ROS_INFO("[wc_chassis] publish mark goal index = %d", mark_index);
   std_msgs::UInt32 msg;
   msg.data = mark_index; 
   mark_goal_pub.publish(msg);
 }
 
-void PublishSetGoal(unsigned char set_index) {
+void PublishSetGoal(unsigned int set_index) {
   ROS_INFO("[wc_chassis] publish set goal index = %d", set_index);
   std_msgs::UInt32 msg;
   msg.data = set_index; 
   set_goal_pub.publish(msg);
 }
 
-void PublishMarkInit(unsigned char mark_index) {
+void PublishMarkInit(unsigned int mark_index) {
   ROS_INFO("[wc_chassis] publish mark init index = %d", mark_index);
   std_msgs::UInt32 msg;
   msg.data = mark_index; 
   mark_init_pub.publish(msg);
 }
 
-void PublishSetInit(unsigned char set_index) {
+void PublishSetInit(unsigned int set_index) {
   ROS_INFO("[wc_chassis] publish set init index = %d", set_index);
   std_msgs::UInt32 msg;
   msg.data = set_index; 
@@ -302,7 +314,34 @@ void PublishTerminate() {
   cmd_terminate.data = 1;
   terminate_pub.publish(cmd_terminate);
 }
-
+void HandleRemoteCmd(unsigned short remote_cmd) {
+  unsigned int cmd = remote_cmd & 0xff;
+  unsigned int mark = (remote_cmd >> 8) & 0xff;
+//  std::cout << "cmd = " << cmd << "; mark = "  << mark << std::endl; 
+  switch(cmd) {
+    case CMD_SETGOAL: 
+      PublishSetGoal(mark);
+      break;
+    case CMD_INIT: 
+      PublishSetInit(mark);
+      break;
+    case CMD_MARKGOAL: 
+      PublishMarkGoal(mark);
+      break;
+    case CMD_PAUSE: 
+      PublishPause();
+      break;
+    case CMD_RESUME: 
+      PublishResume();
+      break;
+    case CMD_TERMINATE: 
+      PublishTerminate();
+      break;
+    case CMD_NULL:
+    default:
+      break;
+	}
+}
 bool DoRotate() {
   if(start_rotate_flag) {
     if (fabs(g_chassis_mcu.acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) ) {
@@ -474,6 +513,10 @@ int main(int argc, char **argv) {
     }
    // set do get di
     DoDIO();
+    if (++loop_count % 2) {
+      HandleRemoteCmd(g_chassis_mcu.getRemoteCmd());
+      loop_count = 0;
+    }
     //发布里程计
     PublishOdom();
     //发布模式状态
