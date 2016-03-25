@@ -10,8 +10,10 @@
 #include <std_msgs/UInt32.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/UInt8.h>
+#include <std_msgs/Int8.h>
 #include <std_msgs/Float32.h>
 #include <tf/message_filter.h>
+#include <tf/transform_broadcaster.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/Range.h>
 #include <autoscrubber_services/LaunchScrubber.h>
@@ -48,6 +50,7 @@ U32 g_plc_auto  = 1;   // 默认自动模式
 U32 g_plc_front = 0;   // 默认中间模式
 
 unsigned int g_dio_count  = 0;
+unsigned int g_ret_count  = 0;
 unsigned int g_pc_control = 0;
 
 double last_cmd_vel_time = 0.0;
@@ -75,21 +78,76 @@ bool start_rotate_flag = false;
 bool stop_rotate_flag = true;
 bool is_rotate_finished = false;
 
-enum remote_cmd {
+unsigned int remote_ret_ = 0x0a00;
+unsigned int remote_ret_cnt_ = 0;
+unsigned char remote_cmd_;
+unsigned short remote_index_;
+
+enum RemoteCmdType {
+  TYPE_CANCEL = -1,
+  TYPE_STOP = 0,
+  TYPE_START = 1
+};
+
+enum RemoteCmd {
   CMD_NULL = 0,
-  CMD_SETGOAL, 
+  CMD_SET_GOAL, 
   CMD_INIT,
-  CMD_SLAM,
-  CMD_RECORDPATH,
-  CMD_MARKGOAL,
+  CMD_SCAN_MAP,
+  CMD_RECORD_PATH,
+  CMD_MARK_GOAL,
+  CMD_GUIDE,
+  CMD_USHER,
   CMD_PAUSE,
   CMD_RESUME,
-  CMD_TERMINATE
+  CMD_TERMINATE,
+  CMD_MOVE,
+  CMD_RETURN,
+  CMD_MAX 
 };
-//unsigned char mark_goal_index;
-//unsigned char set_goal_index;
+
+enum RemoteRet {
+  RET_NULL = 0,
+  RET_INFO, 
+  RET_CONFORM,
+  RET_ERROR,
+  RET_WARN
+};
+
+enum ErrorIndex {
+  E_NULL = 0,
+  E_INIT_FAILED,
+  E_PATH_NOT_SAFE,
+  E_LOCATION_INVALID,
+  E_PLANNING_INVALID,
+  E_FRONT_NOT_SAFE,
+  E_FOOTPRINT_NOT_SAFE,
+  E_GOAL_UNREACHED 
+};
+
+enum WarnIndex {
+  W_NULL = 0,
+  W_MAP_NOT_EXSIT,
+  W_MAP_EXSIT,
+  W_PATH_NOT_EXSIT,
+  W_PATH_EXSIT,
+  W_GOAL_EXSIT
+
+};
+
+enum InfoIndex {
+  I_NULL = 0,
+  I_SLAM_FINISHED,
+  I_RECORDPATH_FINISHED,
+  I_MARKGOAL_FINISHED,
+  I_INIT_FINISHED,
+  I_GOAL_REACHED
+
+};
 
 ros::Publisher odom_pub;
+ros::Publisher gyro_pub;
+ros::Publisher remote_cmd_pub;
 ros::Publisher model_pub;
 ros::Publisher yaw_pub;
 ros::Publisher mark_goal_pub;
@@ -98,6 +156,8 @@ ros::Publisher mark_init_pub;
 ros::Publisher set_init_pub;
 ros::Publisher pause_pub;
 ros::Publisher terminate_pub;
+ros::Publisher scan_map_pub;
+ros::Publisher record_path_pub;
 ros::Publisher ultrasonic0_pub;
 ros::Publisher ultrasonic1_pub;
 ros::Publisher ultrasonic2_pub;
@@ -147,7 +207,7 @@ void DoNavigation(const geometry_msgs::Twist& Navigation_msg) {
   m_speed_v = Navigation_msg.linear.x;
   m_speed_w = Navigation_msg.angular.z;
 
-  ROS_INFO("Navigation.linear.x = %f, angular.z = %f", m_speed_v, m_speed_w);
+//  ROS_INFO("Navigation.linear.x = %f, angular.z = %f", m_speed_v, m_speed_w);
   
   pthread_mutex_lock(&speed_mutex);
   double temp_v = Navigation_msg.linear.x;
@@ -168,8 +228,25 @@ void DoNavigation(const geometry_msgs::Twist& Navigation_msg) {
   }
 }
 
-void WC_UD_CallBack(const std_msgs::UInt32 &up_down) {
+void WC_UD_CallBack(const std_msgs::UInt32& up_down) {
   g_pc_control = up_down.data;
+}
+
+void RemoteRetCallback(const std_msgs::UInt32& ret) {
+  remote_ret_ = ret.data;
+  if (remote_ret_ & 0xff != 0) {
+    remote_ret_cnt_ = 0;
+  } 
+  ROS_INFO("[wc_chassis] get remote ret cmd = %d, state = %d", (remote_ret_ & 0xff), (remote_ret_ >> 8) & 0xff);
+}
+
+void GyroUpdateCallback(const std_msgs::UInt32& state) {
+  if (state.data == 0) {
+    g_chassis_mcu.gyro_state_ = 0; 
+  } else {
+    g_chassis_mcu.gyro_state_ = 1; 
+  }
+  ROS_INFO("[wc_chassis] set gyro state = %d", g_chassis_mcu.gyro_state_);
 }
 
 void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int) {  // NOLINT
@@ -203,7 +280,28 @@ void PublishUltrasonic() {
   publish_ultrasonic(ultrasonic5_pub, "ultrasonic5", g_ultrasonic[6]);
 }
 
-void PublishOdom() {
+void PublishGyro() {
+  sensor_msgs::Imu imu_msg;
+  imu_msg.header.stamp = ros::Time::now();
+  imu_msg.header.frame_id = "world";
+
+  tf::Quaternion temp;
+  double roll, pitch, yaw;
+  roll = g_chassis_mcu.roll_angle_ / 10.0 / 180.0 * M_PI;
+  pitch = g_chassis_mcu.pitch_angle_ / 10.0 / 180.0 * M_PI;
+  yaw = g_chassis_mcu.yaw_angle_ / 10.0 / 180.0 * M_PI;
+  temp.setRPY(roll, pitch, yaw);
+//#ifdef DEBUG_PRINT 
+//  std::cout << "roll = " << roll * 57.6 << "; pitch = " << pitch << ";yaw = " << std::endl;
+//#endif
+  imu_msg.orientation.x = temp.getX();
+  imu_msg.orientation.y = temp.getY();
+  imu_msg.orientation.z = temp.getZ();
+  imu_msg.orientation.w = temp.getW();
+  gyro_pub.publish(imu_msg);
+}
+
+void PublishOdom(tf::TransformBroadcaster* odom_broadcaster) {
   nav_msgs::Odometry odom;
   odom.header.stamp = ros::Time::now();;
 
@@ -248,6 +346,12 @@ void PublishOdom() {
   odom.twist.twist.angular.z = g_odom_w;
   // publish the message
   odom_pub.publish(odom);
+
+  tf::Quaternion q;
+  tf::quaternionMsgToTF(odom.pose.pose.orientation, q);
+  tf::Transform odom_meas(q, tf::Vector3(odom.pose.pose.position.x, odom.pose.pose.position.y, 0));
+  tf::StampedTransform odom_transform(odom_meas, ros::Time::now(), "base_odom", "base_link");
+  odom_broadcaster->sendTransform(odom_transform);
 }
 void PublishYaw(){
   std_msgs::Float32 msg;
@@ -265,7 +369,7 @@ void PublishModel() {
     model_pub.publish(msg);
   }
 }
-
+/*
 void PublishMarkGoal(unsigned int mark_index) {
   ROS_INFO("[wc_chassis] publish mark goal index = %d", mark_index);
   std_msgs::UInt32 msg;
@@ -278,6 +382,10 @@ void PublishSetGoal(unsigned int set_index) {
   std_msgs::UInt32 msg;
   msg.data = set_index; 
   set_goal_pub.publish(msg);
+}
+
+void PublishGoingBack() {
+  PublishSetGoal(0);
 }
 
 void PublishMarkInit(unsigned int mark_index) {
@@ -314,53 +422,48 @@ void PublishTerminate() {
   cmd_terminate.data = 1;
   terminate_pub.publish(cmd_terminate);
 }
-void HandleRemoteCmd(unsigned short remote_cmd) {
-  unsigned int cmd = remote_cmd & 0xff;
-  unsigned int mark = (remote_cmd >> 8) & 0xff;
-//  std::cout << "cmd = " << cmd << "; mark = "  << mark << std::endl; 
-  switch(cmd) {
-    case CMD_SETGOAL: 
-      PublishSetGoal(mark);
-      break;
-    case CMD_INIT: 
-      PublishSetInit(mark);
-      break;
-    case CMD_MARKGOAL: 
-      PublishMarkGoal(mark);
-      break;
-    case CMD_PAUSE: 
-      PublishPause();
-      break;
-    case CMD_RESUME: 
-      PublishResume();
-      break;
-    case CMD_TERMINATE: 
-      PublishTerminate();
-      break;
-    case CMD_NULL:
-    default:
-      break;
-	}
+
+void PublishScanMap(int cmd_type) {
+  std_msgs::Int8 cmd_scan_map;
+  cmd_scan_map.data = cmd_type;
+  scan_map_pub.publish(cmd_scan_map);
 }
+
+void PublishRecordPath(int cmd_type) {
+  std_msgs::Int8 cmd_record_path;
+  cmd_record_path.data = cmd_type;
+  record_path_pub.publish(cmd_record_path);
+}
+*/
+
+void PublisheRemoteCmd(unsigned char cmd, unsigned short index) {
+  std_msgs::UInt32 remote_cmd; 
+  if (cmd > 0 && cmd < 12) {
+    ROS_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
+  }
+  remote_cmd.data = (index << 8) | cmd; 
+  remote_cmd_pub.publish(remote_cmd);
+}
+
 bool DoRotate() {
   if(start_rotate_flag) {
     if (fabs(g_chassis_mcu.acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) ) {
       start_rotate_flag = false;
       is_rotate_finished = true;
       g_chassis_mcu.setTwoWheelSpeed(0.0, 0.0);
-      ROS_INFO("[wc_chassis] rotate finished!");
+//      ROS_INFO("[wc_chassis] rotate finished!");
       timeval tv;
       gettimeofday(&tv, NULL);
       last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
     } else {
       is_rotate_finished = false;
-      ROS_INFO("[wc_chassis] inplace rotation: cur_yaw = %lf, targer_yaw = %d ", g_chassis_mcu.acc_odom_theta_ * 57.3, rotate_angle);
+//      ROS_INFO("[wc_chassis] inplace rotation: cur_yaw = %lf, targer_yaw = %d ", g_chassis_mcu.acc_odom_theta_ * 57.3, rotate_angle);
       if (rotate_angle > 0) {
         g_chassis_mcu.setTwoWheelSpeed(0.0, 0.2);
-        ROS_INFO("[wc_chassis] rotate to left");
+//        ROS_INFO("[wc_chassis] rotate to left");
       } else if (rotate_angle < 0) {
         g_chassis_mcu.setTwoWheelSpeed(0.0, -0.2);
-        ROS_INFO("[wc_chassis] rotate to right");
+//        ROS_INFO("[wc_chassis] rotate to right");
       } else {
         is_rotate_finished = true;
         start_rotate_flag = false;
@@ -375,17 +478,16 @@ bool DoRotate() {
 }
 
 void DoDIO() {
-  if ((g_dio_count++ % 10) == 0) {
-    if (launch_scrubber) {
-      if (scrub_need_stop) {
-        g_chassis_mcu.setDO(g_scrub_without_water_mode);
-      } else {
-        g_chassis_mcu.setDO(g_scrub_mode);
-      }
-    } else {
-      g_chassis_mcu.setDO(g_silent_mode);
-    }
+  if ((g_dio_count++ % 2) == 0) {
+    g_chassis_mcu.setDO(remote_ret_);
   }
+}
+
+void DoRemoteRet() {
+  if (++remote_ret_cnt_ > 15) {
+    remote_ret_ &= 0xff00;
+  }
+  g_chassis_mcu.setRemoteRet(remote_ret_);
 }
 
 bool LaunchScrubber(autoscrubber_services::LaunchScrubber::Request& req, autoscrubber_services::LaunchScrubber::Response& res) {
@@ -424,6 +526,8 @@ int main(int argc, char **argv) {
   ros::NodeHandle nh("~");
   ros::NodeHandle device_nh("device");
 
+  tf::TransformBroadcaster odom_broadcaster;
+
   double f_dia = 0;
   double b_dia = 0;
   double axle  = 0;
@@ -458,30 +562,39 @@ int main(int argc, char **argv) {
   std::cout << "v_scrub: " << v_scrub_threshold << " radius_scrub: " << radius_scrub_threshold << std::endl;
 
   model_pub = n.advertise<std_msgs::UInt32>(str_auto_topic, 10);
+/*
   mark_goal_pub = n.advertise<std_msgs::UInt32>("mark_goal", 10); 
   set_goal_pub = n.advertise<std_msgs::UInt32>("set_goal", 10); 
   mark_init_pub = n.advertise<std_msgs::UInt32>("mark_init", 10); 
   set_init_pub = n.advertise<std_msgs::UInt32>("set_init", 10); 
   pause_pub = n.advertise<std_msgs::UInt32>("/move_base_simple/gaussian_pause", 10); 
   terminate_pub = n.advertise<std_msgs::UInt32>("/move_base_simple/gaussian_cancel", 10); 
+  scan_map_pub = n.advertise<std_msgs::Int8>("/remote_scan_map", 10); 
+  record_path_pub = n.advertise<std_msgs::Int8>("/remote_record_path", 10); 
+*/
 
   yaw_pub = n.advertise<std_msgs::Float32>("yaw", 10);
   odom_pub  = n.advertise<nav_msgs::Odometry>("odom", 50);
+  gyro_pub  = n.advertise<sensor_msgs::Imu>("gyro", 50);
+  remote_cmd_pub  = n.advertise<std_msgs::UInt32>("/device/remote_cmd", 50);
   ultrasonic0_pub = n.advertise<sensor_msgs::Range>("ultrasonic0", 50);
   ultrasonic1_pub = n.advertise<sensor_msgs::Range>("ultrasonic1", 50);
   ultrasonic2_pub = n.advertise<sensor_msgs::Range>("ultrasonic2", 50);
   ultrasonic3_pub = n.advertise<sensor_msgs::Range>("ultrasonic3", 50);
   ultrasonic4_pub = n.advertise<sensor_msgs::Range>("ultrasonic4", 50);
   ultrasonic5_pub = n.advertise<sensor_msgs::Range>("ultrasonic5", 50);
+
   launch_scrubber_srv = n.advertiseService("launch_scrubber", &LaunchScrubber);
   stop_scrubber_srv = n.advertiseService("stop_scrubber", &StopScrubber);
   start_rotate_srv = device_nh.advertiseService("start_rotate", &StartRotate);
   stop_rotate_srv = device_nh.advertiseService("stop_rotate", &StopRotate);
   check_rotate_srv = device_nh.advertiseService("check_rotate", &CheckRotate);
 
-  ros::Subscriber Navi_sub   = n.subscribe("cmd_vel", 100, DoNavigation);
-  ros::Subscriber sb_Up_Down = n.subscribe("WC_UP_DOWN", 100, WC_UD_CallBack);
-  ros::Subscriber planner_type_sub = n.subscribe("planner_type", 100, PlanTypeCallBack);
+  ros::Subscriber Navi_sub   = n.subscribe("cmd_vel", 10, DoNavigation);
+  ros::Subscriber sb_Up_Down = n.subscribe("WC_UP_DOWN", 10, WC_UD_CallBack);
+  ros::Subscriber planner_type_sub = n.subscribe("planner_type", 10, PlanTypeCallBack);
+  ros::Subscriber remote_ret_sub = n.subscribe("/device/remote_ret", 10, RemoteRetCallback);
+  ros::Subscriber gyro_update_state_sub = n.subscribe("/gyro_update_state", 10, GyroUpdateCallback);
 
   pthread_mutex_init(&speed_mutex, NULL);
 
@@ -512,16 +625,19 @@ int main(int argc, char **argv) {
       }
     }
    // set do get di
-    DoDIO();
+//    DoDIO();
+    DoRemoteRet();
     if (++loop_count % 2) {
-      HandleRemoteCmd(g_chassis_mcu.getRemoteCmd());
+      g_chassis_mcu.getRemoteCmd(remote_cmd_, remote_index_);
+      PublisheRemoteCmd(remote_cmd_, remote_index_); 
       loop_count = 0;
     }
     //发布里程计
-    PublishOdom();
+    PublishOdom(&odom_broadcaster);
     //发布模式状态
     PublishModel();
     PublishYaw();
+    PublishGyro();
     // publish ultrasonic data
     PublishUltrasonic();
     ros::spinOnce();

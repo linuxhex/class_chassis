@@ -49,7 +49,8 @@ int volatile m_right_delta = 0;
 short volatile m_yaw_angle = 0;
 short volatile m_pitch_angle = 0;
 short volatile m_roll_angle = 0;
-short volatile m_remote_cmd = 0;
+unsigned char volatile m_remote_cmd = 0;
+unsigned short volatile m_remote_index = 0;
 
 unsigned int m_di = 0;
 
@@ -188,6 +189,10 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 		case RREMOTE_CMD:
 			protol->len = sizeof(RRemoteCmdProtocol);
       break;
+		case REMOTE_RET:
+     	protol->data.remote_ret_.ret = data->remote_ret_.ret;
+     	protol->len = sizeof(RemoteRetProtocol);
+    	break;
 		case DO:
      	protol->data.do_.usdo = data->do_.usdo ;
      	protol->len = sizeof(DoProtocol);
@@ -267,13 +272,14 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
 			break;
 		case YAW_ANGLE:
 			m_yaw_angle = protol->data.yaw_angle_.yaw; 
-			m_pitch_angle = protol->data.yaw_angle_.pitch; 
 			m_roll_angle = protol->data.yaw_angle_.roll; 
+			m_pitch_angle = protol->data.yaw_angle_.pitch; 
 			break;
 		case REMOTE_CMD:
 			m_remote_cmd = protol->data.remote_cmd_.cmd; 
+			m_remote_index = (protol->data.remote_cmd_.index_H << 8) | protol->data.remote_cmd_.index_L; 
 			break;
-	  case ULTRASONIC:
+	    case ULTRASONIC:
 			g_ultrasonic.clear();
 			g_ultrasonic.resize(24);
 			for (int i = 0; i < 24; ++i) {
@@ -387,6 +393,17 @@ void CreateDO(unsigned char* ch,int* len,int id,unsigned int usdo){
 
   Coder(ch,len,&sendProtocol,&data);
 }
+
+void CreateRemoteRet(unsigned char* ch,int* len,int id, unsigned short ret) {
+  Data data;
+
+  data.remote_ret_.ret = ret;
+
+  SInit_Proto(&sendProtocol, REMOTE_RET);
+
+  Coder(ch, len, &sendProtocol, &data);
+}
+
 void CreateRDI(unsigned char* ch,int* len,int id){
   Data data;
 
@@ -501,9 +518,10 @@ void getYaw(short& yaw_angle, short& pitch_angle, short& roll_angle)
   roll_angle = m_roll_angle;
 }
 
-short getRemote(void)
+void getRemote(unsigned char& cmd, unsigned short& index)
 {
-	return m_remote_cmd;
+  cmd = m_remote_cmd;
+  index = m_remote_index;
 }
 
 int GetPos(int id){

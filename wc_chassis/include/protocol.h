@@ -39,7 +39,7 @@ typedef enum{
 }MSGStates;
 
 typedef enum{
-	NONE = 0x00,
+  NONE = 0x00,
 	CURRENT = 0x01,
 	SPEED = 0x02,
 	POS = 0x03,
@@ -63,7 +63,9 @@ typedef enum{
   RYAW_ANGLE = 0x8a, 	//Request for Yaw
   YAW_ANGLE = 0x8b,
   RREMOTE_CMD = 0x8c, 	//Request for remote cmd 
-  REMOTE_CMD = 0x8d
+  REMOTE_CMD = 0x8d,
+  REMOTE_RET = 0x8e   //send remote ret
+//  REMOTE_RET = 0x8f
 }CMDTypes;
 
 typedef struct _MsgState
@@ -122,9 +124,9 @@ typedef struct _Speed3
 
 typedef struct _Pos
 {
-	int system_time; //ʱ���
-	int axis_id;     //Ŀ����id
-	int position;    //λ������ֵ
+  int system_time; //ʱ���
+  int axis_id;     //Ŀ����id
+  int position;    //λ������ֵ
 
 }PosProtocol;
 
@@ -157,7 +159,6 @@ typedef struct _DA
     unsigned int da_value;       //�Ƕ�����ֵ
 
 }DaProtocol;
-
 
 typedef struct _Time
 {
@@ -215,40 +216,47 @@ typedef struct _RYAWANGLE {
 }RYawAngleProtocol;
 
 typedef struct _YAWANGLE {
-	short yaw;
-	short pitch;
-	short roll;
+  short yaw;
+  short roll;
+  short pitch;
 }YawAngleProtocol;
 
 typedef struct _RREMOTECMD {
 }RRemoteCmdProtocol;
 
 typedef struct _REMOTECMD {
-	short cmd;
+  unsigned char cmd; 
+  unsigned char index_H; 
+  unsigned char index_L;
 }RemoteCmdProtocol;
+
+typedef struct _REMOTERET {
+  unsigned short ret;
+}RemoteRetProtocol;
 
 typedef struct _Ultra {
   uint8_t length[24];
 }UltraProtocol;
 
 typedef union _Data{
-	SpeedProtocol speed_;
-	SpeedProtocol2 speed2_;
+  SpeedProtocol speed_;
+  SpeedProtocol2 speed2_;
   SpeedProtocol3 speed3_;
-	SpeedTwoWheelProtocol speed4_;
-	PosProtocol pos_;
-	AngleProtocol angle_;
-	DaProtocol da_;
-	DoProtocol do_;
-	RDiProtocol r_di_;
-	RPosProtocol r_pos_;
-	RAdProtocol r_ad_;
+  SpeedTwoWheelProtocol speed4_;
+  PosProtocol pos_;
+  AngleProtocol angle_;
+  DaProtocol da_;
+  DoProtocol do_;
+  RDiProtocol r_di_;
+  RPosProtocol r_pos_;
+  RAdProtocol r_ad_;
   RUltraProtocol r_ultra_;
   UltraProtocol ultra_;
-	RYawAngleProtocol r_yaw_anle_;
-	YawAngleProtocol yaw_angle_;
-	RRemoteCmdProtocol r_remote_cmd_;
-	RemoteCmdProtocol remote_cmd_;
+  RYawAngleProtocol r_yaw_anle_;
+  YawAngleProtocol yaw_angle_;
+  RRemoteCmdProtocol r_remote_cmd_;
+  RemoteCmdProtocol remote_cmd_;
+  RemoteRetProtocol remote_ret_;
 }Data;
 
 typedef struct _AGVProtocol
@@ -287,11 +295,12 @@ int GetPos(int id);
 int GetDelta(int id);
 //short getYaw(void);
 void getYaw(short& yaw_angle, short& pitch_angle, short& roll_angle);
-short getRemote(void);
+void getRemote(unsigned char& cmd, unsigned short& index);
 unsigned int GetDI();
 float GetAD(int id);
 float GetAngle(void);
 void CreateSpeed(unsigned char* ch,int* len,int id,float v);
+void CreateRemoteRet(unsigned char* ch,int* len,int id, unsigned short ret);
 void CreateTwoWheelSpeed(unsigned char* ch,int* len,short speedLeft, short speedRight);
 void CreateSpeed2(unsigned char* ch,int* len,int v,int w);
 void CreateSpeed3(unsigned char* ch,int* len,int v,int w, int plan_type);

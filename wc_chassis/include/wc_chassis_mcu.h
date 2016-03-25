@@ -27,17 +27,18 @@ class WC_chassis_mcu{
   void setThaLeft(double left);
 
   void setDO(U32 usdo);
+  void setRemoteRet(unsigned short ret);
   unsigned int getDI();
   void setSpeed(float speed_v, float speed_w, int plan_type);
   void setTwoWheelSpeed(float speed_v, float speed_w);
   short getMotorSpeed(float speed);
   bool getOdo(double &x, double &y, double &a);  // NOLINT
   bool getCSpeed(double &v, double &w);  // NOLINT
-  unsigned short getRemoteCmd(void);
+  void getRemoteCmd(unsigned char& cmd, unsigned short& index);
 //  bool setRemoteStatus(unsigned int cmd, unsigned int mark);  // NOLINT
   void getUltra(void);
 //  int getYawAngle(void);
-  void  getYawAngle(short& yaw, short& pitch, short& roll);
+  void getYawAngle(short& yaw, short& pitch, short& roll);
   void comunication(void);
 
   bool setAuto(bool is_auto);
@@ -45,7 +46,12 @@ class WC_chassis_mcu{
   int V2RPM(float v);
   int GetCopleySpeed(float v);
   int GetCopleyAngle(float angle);
+  short yaw_angle_;
+  short pitch_angle_;
+  short roll_angle_;
   double acc_odom_theta_;
+  unsigned int gyro_state_;
+
  private:
   bool is_auto_;
 
@@ -82,9 +88,6 @@ class WC_chassis_mcu{
   S32 last_counts_left_;
   S32 last_counts_right_;
   short last_yaw_angle_;
-  short yaw_angle_;
-  short pitch_angle_;
-  short rool_angle_;
   float last_speed_v_;
   float last_speed_w_;
 
