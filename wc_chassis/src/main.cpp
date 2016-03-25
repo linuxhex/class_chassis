@@ -240,7 +240,7 @@ void RemoteRetCallback(const std_msgs::UInt32& ret) {
   if (remote_ret_ & 0xff != 0) {
     remote_ret_cnt_ = 0;
   } 
-  //ROS_INFO("[wc_chassis] get remote ret cmd = %d, state = %d", (remote_ret_ & 0xff), (remote_ret_ >> 8) & 0xff);
+  ROS_INFO("[wc_chassis] get remote ret cmd = %d, state = %d", (remote_ret_ & 0xff), (remote_ret_ >> 8) & 0xff);
 }
 
 void GyroUpdateCallback(const std_msgs::UInt32& state) {
@@ -249,7 +249,7 @@ void GyroUpdateCallback(const std_msgs::UInt32& state) {
   } else {
     g_chassis_mcu.gyro_state_ = 1; 
   }
-  //ROS_INFO("[wc_chassis] set gyro state = %d", g_chassis_mcu.gyro_state_);
+  ROS_INFO("[wc_chassis] set gyro state = %d", g_chassis_mcu.gyro_state_);
 }
 
 void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int) {  // NOLINT

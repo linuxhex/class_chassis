@@ -549,8 +549,8 @@ void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
 #endif
   }
 
-  std::string str = cComm::ByteToHexString(send, len);
-  std::cout << "send remote ret: " << str << std::endl;
+  // std::string str = cComm::ByteToHexString(send, len);
+  // std::cout << "send remote ret: " << str << std::endl;
 
   usleep(1000);
 }
@@ -757,7 +757,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   m_speed_left = getMotorSpeed(speed_left);
   m_speed_right= getMotorSpeed(speed_right);
   
-  ROS_INFO("[CHASSIS] set motor cmd Left: %d, Right: %d", m_speed_left, m_speed_right);
+//  ROS_INFO("[CHASSIS] set motor cmd Left: %d, Right: %d", m_speed_left, m_speed_right);
 
   unsigned char send[1024] = {0};
   int len = 0;
