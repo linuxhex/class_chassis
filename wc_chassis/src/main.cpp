@@ -192,6 +192,8 @@ ros::ServiceServer check_rotate_srv;
 #define DI_MODE 0X0400
 #define DI_ENMERGENCY_STOP 0X2000
 
+//#define SETTING_PRIORITY
+
 const int g_scrub_mode = DO_SUCK_ENABLE | DO_BRUSH_ENABLE | DO_SUCK_DOWN | DO_BRUSH_DOWN | (255 << 16);
 const int g_silent_mode = DO_SUCK_UP | DO_BRUSH_UP;
 const int g_scrub_without_water_mode = DO_SUCK_ENABLE | DO_BRUSH_ENABLE | DO_SUCK_DOWN | DO_BRUSH_DOWN;
@@ -522,7 +524,7 @@ bool CheckRotate(autoscrubber_services::CheckRotate::Request& req, autoscrubber_
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "wc_chassis");
-
+#ifdef SETTING_PRIORITY
   struct sched_param param;
   param.sched_priority = 99;
   if (0 != sched_setscheduler(getpid(), SCHED_RR, &param)) {
@@ -530,7 +532,7 @@ int main(int argc, char **argv) {
   } else {
     std::cout << "set priority succeed" << std::endl;
   }
-
+#endif
   ros::NodeHandle n;
   ros::NodeHandle nh("~");
   ros::NodeHandle device_nh("device");
@@ -567,10 +569,8 @@ int main(int argc, char **argv) {
   nh.param("host_name", host_name, std::string("192.168.1.199"));
   nh.param("port", port, 5000);
   nh.param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
-#ifdef DEBUG_PRINT 
   std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << " reduction_ratio: " << reduction_ratio << " speed_ratio:" << speed_ratio << std::endl;
   std::cout << "v_scrub: " << v_scrub_threshold << " radius_scrub: " << radius_scrub_threshold << std::endl;
-#endif
 
   model_pub = n.advertise<std_msgs::UInt32>(str_auto_topic, 10);
 /*

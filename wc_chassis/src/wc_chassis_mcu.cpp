@@ -230,7 +230,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
 
     double gyro_dtheta =  (temp_dtheta / 10.0) / 180.0 * M_PI;
     odom_a_ += gyro_dtheta;
-    acc_odom_theta_ += gyro_dtheta;
+    acc_odom_theta_ += fabs(gyro_dtheta);
     std::cout << "temp_theta: " << temp_dtheta << " ;odom_dtheta: " << gyro_dtheta << " acc_odom_theta_: " << acc_odom_theta_ << std::endl;
     odom_a_gyro_ = odom_a_; 
   }
