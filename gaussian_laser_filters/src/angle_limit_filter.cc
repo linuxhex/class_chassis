@@ -9,6 +9,7 @@
  * @date 2015-07-08
  */
 
+#include <iostream>
 #include "gaussian_laser_filters/angle_limit_filter.h"
 
 #include <pluginlib/class_list_macros.h>
@@ -37,7 +38,7 @@ bool AngleLimitFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs
     double angle = scan_out.angle_min;
     for (unsigned int i = 0; i < scan_out.ranges.size(); ++i) {
       if (angle <= angle_min_ || angle >= angle_max_) {
-        scan_out.ranges[i] = scan_out.range_max + 1.0;
+        scan_out.ranges[i] = 0.0;
       }
       angle += scan_out.angle_increment;
     }
@@ -79,6 +80,7 @@ bool AngleLimitFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs
     scan_out.scan_time = scan_in.scan_time;
     scan_out.range_min = scan_in.range_min;
     scan_out.range_max = scan_in.range_max;
+    std::cout << "angle_min = " << scan_out.angle_min << "; angle_max = " << scan_out.angle_max << std::endl;
   }
   return true;
 }

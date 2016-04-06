@@ -46,6 +46,7 @@ typedef enum{
 	ANGLE = 0x04,
 	SPEED2 = 0x05,
 	DO = 0x06,
+	DI = 0x07,
 	DA = 0x08,
 	SPEED3 = 0x09,
 	SPEED_TWO_WHEEL = 0x0a,
@@ -140,24 +141,26 @@ typedef struct _Angle
 
 typedef struct _DO
 {
-    unsigned int usdo;       //�Ƕ�����ֵ
-
+  unsigned int usdo;       //�Ƕ�����ֵ
 }DoProtocol;
+
+typedef struct _DI
+{
+  unsigned int usdi;       //�Ƕ�����ֵ
+}DiProtocol;
 
 typedef struct _RAD
 {
-    int system_time; //ʱ���
-    int axis_id;     //Ŀ����id
-    unsigned int ad_value;       //�Ƕ�����ֵ
-
+  int system_time; //ʱ���
+  int axis_id;     //Ŀ����id
+  unsigned int ad_value;       //�Ƕ�����ֵ
 }RAdProtocol;
 
 typedef struct _DA
 {
-    int system_time; //ʱ���
-    int axis_id;     //Ŀ����id
-    unsigned int da_value;       //�Ƕ�����ֵ
-
+  int system_time; //ʱ���
+  int axis_id;     //Ŀ����id
+  unsigned int da_value;       //�Ƕ�����ֵ
 }DaProtocol;
 
 typedef struct _Time
@@ -247,6 +250,7 @@ typedef union _Data{
   AngleProtocol angle_;
   DaProtocol da_;
   DoProtocol do_;
+  DiProtocol di_;
   RDiProtocol r_di_;
   RPosProtocol r_pos_;
   RAdProtocol r_ad_;

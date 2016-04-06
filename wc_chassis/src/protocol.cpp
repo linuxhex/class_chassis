@@ -212,16 +212,6 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 			protol->data.r_pos_.axis_id = data->r_pos_.axis_id;
 			protol->len = sizeof(RPosProtocol);
 			break;
-		case RDI:
-    	protol->data.r_di_ .system_time = data->r_pos_.system_time;
-    	protol->data.r_di_.axis_id = data->r_pos_.axis_id;
-    	protol->len = sizeof(RDiProtocol);
-   	break;
-		case RAD:
-  		protol->data.r_ad_.system_time = data->r_ad_.system_time;
-     	protol->data.r_ad_.axis_id = data->r_ad_.axis_id;
-     	protol->len = sizeof(RAdProtocol);
-    	break;
 		case RTIME:
 			break;
 		case RSPEED2:
@@ -246,7 +236,7 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 	return *len;
 }
 int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
-		memcpy(&(protol->data),ch+4,sizeof(Data));
+		memcpy(&(protol->data), ch + 4, sizeof(Data));
 
 	switch(protol->type){
 		case CURRENT:
@@ -256,19 +246,17 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
 			m_speed = m_speed / (1<<16);
 			break;
 		case POS:
-
 		   // std::cout<<"decode:"<<protol->data.pos_.axis_id<<std::endl;
 			if (protol->data.pos_.axis_id == 0){
 			    //std::cout<<"left pos:"<<protol->data.pos_.position<<std::endl;
 				m_left_delta = protol->data.pos_.position;
-	    		m_left_pos = protol->data.pos_.system_time;
+	    	m_left_pos = protol->data.pos_.system_time;
 				//std::cout<<"left_pos:"<<m_left_pos<<std::endl;
 			}else if (protol->data.pos_.axis_id == 1){
 				m_right_delta = protol->data.pos_.position;
-	    		m_right_pos = protol->data.pos_.system_time;
+	    	m_right_pos = protol->data.pos_.system_time;
 				//std::cout<<"right_pos:"<<m_right_pos<<std::endl;
 			}
-
 			break;
 		case YAW_ANGLE:
 			m_yaw_angle = protol->data.yaw_angle_.yaw; 
@@ -290,14 +278,9 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
 			m_angle = protol->data.angle_.angle;
 			m_angle = m_angle / (1<<16);
 			break;
-		case RDI:
-		    m_di = protol->data.r_di_.usdi;
+		case DI:
+		    m_di = protol->data.di_.usdi;
 		    break;
-		case RAD:
-			if(protol->data.r_ad_.axis_id < 4){
-				m_ad [protol->data.r_ad_.axis_id] = protol->data.r_ad_.ad_value;
-			}
-			break;
 		case TIME:
 			break;
 		case RCURRENT:
@@ -404,18 +387,6 @@ void CreateRemoteRet(unsigned char* ch,int* len,int id, unsigned short ret) {
   Coder(ch, len, &sendProtocol, &data);
 }
 
-void CreateRDI(unsigned char* ch,int* len,int id){
-  Data data;
-
-  data.r_di_.system_time = 0xffffffff;
-  data.r_di_.axis_id = id;
-
-  SInit_Proto(&sendProtocol,RDI);
-
-  Coder(ch,len,&sendProtocol,&data);
-
-  rs_init = 0; //清空状态机
-}
 void CreateSpeed(unsigned char* ch,int* len,int id,float v){
 	Data data;
 
@@ -452,18 +423,7 @@ void CreateDA(unsigned char* ch,int* len,int id,float v){
 
   Coder(ch,len,&sendProtocol,&data);
 }
-void CreateRAD(unsigned char* ch,int* len,int id){
-  Data data;
 
-  data.r_ad_.system_time = 0xffffffff;
-  data.r_ad_.axis_id = id;
-
-  SInit_Proto(&sendProtocol,RAD);
-
-  Coder(ch,len,&sendProtocol,&data);
-
-  rs_init = 0;
-}
 void CreateRPos(unsigned char* ch,int* len,int id){
 	Data data;
 

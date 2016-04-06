@@ -43,7 +43,7 @@ double GetTimeInSeconds() {
 WC_chassis_mcu::WC_chassis_mcu()
   : transfer_(0), H_(0.5), Dia_F_(0.2), Dia_B_(0.2), Axle_(0.6), Counts_(4000), Reduction_ratio_(25), Speed_ratio_(1.0),
     odom_x_(0.0), odom_y_(0.0), odom_a_(0.0), odom_a_gyro_(0.0), acc_odom_theta_(0.0),
-    delta_counts_left_(0), delta_counts_right_(0),  
+    delta_counts_left_(0), delta_counts_right_(0), mileage_left_(0.0), mileage_right_(0.0),
     yaw_angle_(0), pitch_angle_(0), roll_angle_(0),
     last_speed_v_(0.0), last_speed_w_(0.0),
     counts_left_(0), counts_right_(0), first_odo_(true),
@@ -108,10 +108,6 @@ void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,
   }
 }
 
-bool WC_chassis_mcu::is_Auto() {
-  return true;
-}
-
 int WC_chassis_mcu::V2RPM(float v) {
   int rpm = v * 60 / (M_PI*Dia_F_);
   return rpm;
@@ -134,6 +130,8 @@ bool WC_chassis_mcu::getCSpeed(double &v, double &w) {
   const double t = 0.05; //stm32 update delta_counts_ in 20Hz
   double l_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_left_ * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
   double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right_ * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
+  mileage_left_ += fabs(l_wheel_pos);
+  mileage_right_ += fabs(r_wheel_pos);
 
   double dx = (r_wheel_pos + l_wheel_pos) * 0.5;
   double da = (r_wheel_pos - l_wheel_pos) / Axle_;
@@ -219,9 +217,6 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
 //  if (!(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta)) {
   if (!gyro_state_ || (gyro_state_ && !(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta))) {
     double temp_dtheta = yaw_angle_ - last_yaw_angle_;
-//    if(temp_dtheta > -3500.0 && temp_dtheta < 0.0) {
-//      temp_dtheta += 3600.0;
-//    } else 
     if(temp_dtheta > 3000.0) {
       temp_dtheta = -1.0 * (3600.0 - temp_dtheta);
     } else if(temp_dtheta <= -3000.0) {
@@ -231,7 +226,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     double gyro_dtheta =  (temp_dtheta / 10.0) / 180.0 * M_PI;
     odom_a_ += gyro_dtheta;
     acc_odom_theta_ += fabs(gyro_dtheta);
-    std::cout << "temp_theta: " << temp_dtheta << " ;odom_dtheta: " << gyro_dtheta << " acc_odom_theta_: " << acc_odom_theta_ << std::endl;
+//    std::cout << "temp_theta: " << temp_dtheta << " ;odom_dtheta: " << gyro_dtheta << " acc_odom_theta_: " << acc_odom_theta_ << std::endl;
     odom_a_gyro_ = odom_a_; 
   }
 
@@ -259,10 +254,6 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
   last_counts_right_ = counts_right_;
   last_yaw_angle_ = yaw_angle_;
   return true;
-}
-
-void WC_chassis_mcu::setThaZero(double zero) {
-  tha_zero_ = zero;
 }
 
 void WC_chassis_mcu::getUltra() {
@@ -484,7 +475,8 @@ int WC_chassis_mcu::getRPos() {
   }
   return delta_counts_right_;
 }
-void WC_chassis_mcu::setDO(U32 usdo) {
+
+unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
   unsigned char send[1024] = {0};
   int len = 0;
 
@@ -499,25 +491,32 @@ void WC_chassis_mcu::setDO(U32 usdo) {
 #ifdef DEBUG_ETHERNET
     double send_time = GetTimeInSeconds(); 
     if (send_time - start_time> 0.002)
-      ROS_INFO("[CHASSIS] set_DIO: send time = %lf", send_time - start_time);
+      ROS_INFO("[CHASSIS] set_DO: cost time = %lf", send_time - start_time);
 #endif
 
-    transfer_->Read_data(rec, rlen, 23, 500);
+    transfer_->Read_data(rec, rlen, 15, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time> 0.002)
-      ROS_INFO("[CHASSIS] set_DIO: recv time = %lf", recv_time - send_time);
+      ROS_INFO("[CHASSIS] get_DI: cost time = %lf", recv_time - send_time);
 #endif
   }
-
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send do: " << str << std::endl;
+  std::string str = cComm::ByteToHexString(rec, len);
+  std::cout << "get di: " << str << std::endl;
 
-  usleep(1000);
-}
+  if (rlen == 15) {
+    for (int i = 0 ; i < rlen ; ++i) {
+      if (IRQ_CH(rec[i])) {
+        return GetDI();
+      }
+    }
+  } else {
+    // sleep(1);
+  }
 
-bool WC_chassis_mcu::setAuto(bool is_auto) {
-  is_auto_ = is_auto;
+  return 0xffffffff;
 }
 
 void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
@@ -553,34 +552,6 @@ void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
   // std::cout << "send remote ret: " << str << std::endl;
 
   usleep(1000);
-}
-
-unsigned int WC_chassis_mcu::getDI() {
-  unsigned char send[1024] = {0};
-  int len = 0;
-
-  unsigned char rec[1024] = {0};
-  int rlen = 0;
-
-  CreateRDI(send, &len, 0);
-
-  if (transfer_) {
-    transfer_->Send_data(send, len);
-    transfer_->Read_data(rec, rlen, 23, 500);
-  }
-  // std::string str = cComm::ByteToHexString(rec, rlen);
-  // std::cout << "getdi pos: " << str << std::endl;
-
-  if (rlen == 23) {
-    for (int i = 0 ; i < rlen ; ++i) {
-      if (IRQ_CH(rec[i])) {
-        return GetDI();
-      }
-    }
-  } else {
-    // sleep(1);
-  }
-  return 0xffffffff;
 }
 
 bool IsInPlaceRotation(float v, float w) {

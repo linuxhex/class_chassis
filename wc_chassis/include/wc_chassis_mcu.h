@@ -26,7 +26,7 @@ class WC_chassis_mcu{
   void setThaZero(double zero);
   void setThaLeft(double left);
 
-  void setDO(U32 usdo);
+  unsigned int doDIO(unsigned int usdo);
   void setRemoteRet(unsigned short ret);
   unsigned int getDI();
   void setSpeed(float speed_v, float speed_w, int plan_type);
@@ -41,8 +41,6 @@ class WC_chassis_mcu{
   void getYawAngle(short& yaw, short& pitch, short& roll);
   void comunication(void);
 
-  bool setAuto(bool is_auto);
-  bool is_Auto();
   int V2RPM(float v);
   int GetCopleySpeed(float v);
   int GetCopleyAngle(float angle);
@@ -51,14 +49,12 @@ class WC_chassis_mcu{
   short roll_angle_;
   double acc_odom_theta_;
   unsigned int gyro_state_;
+  double mileage_left_;
+  double mileage_right_;
 
  private:
-  bool is_auto_;
-
   int getLPos();
   int getRPos();
-
-  float tha_zero_;
 
   float H_;
   float Dia_F_;
