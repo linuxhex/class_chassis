@@ -130,9 +130,7 @@ void DoNavigation(const geometry_msgs::Twist& Navigation_msg) {
 
 void RemoteRetCallback(const std_msgs::UInt32& ret) {
   remote_ret_ = ret.data;
-  if (remote_ret_ & 0xff != 0) {
-    remote_ret_cnt_ = 0;
-  } 
+  remote_ret_cnt_ = 0;
   ROS_INFO("[wc_chassis] get remote ret cmd = %d, state = %d", (remote_ret_ & 0xff), (remote_ret_ >> 8) & 0xff);
 }
 
@@ -434,10 +432,13 @@ int main(int argc, char **argv) {
   check_rotate_srv = device_nh.advertiseService("check_rotate", &CheckRotate);
 
   ros::Subscriber Navi_sub   = n.subscribe("cmd_vel", 10, DoNavigation);
-  ros::Subscriber remote_ret_sub = device_nh.subscribe("/remote_ret", 10, RemoteRetCallback);
+  ros::Subscriber remote_ret_sub = n.subscribe("/device/remote_ret", 10, RemoteRetCallback);
   ros::Subscriber gyro_update_state_sub = n.subscribe("/gyro_update_state", 10, GyroUpdateCallback);
 
   pthread_mutex_init(&speed_mutex, NULL);
+
+  ROS_INFO("waiting network w5500 start....");
+//  sleep(10);
 
   g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth, counts, reduction_ratio, speed_ratio);
 

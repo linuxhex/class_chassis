@@ -43,7 +43,7 @@ bool SingleLaserFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
         && fabs(scan_in.ranges[i] - scan_in.ranges[i - 1]) > single_distance_min_ 
         && fabs(scan_in.ranges[i] - scan_in.ranges[i + 1]) > single_distance_min_) {
 //      scan_out.ranges[i] = scan_out.ranges[i - 1];
-      scan_out.ranges[i] = scan_out.range_max + 0.1;
+      scan_out.ranges[i] = 0.0;
     }
   }
   return true;

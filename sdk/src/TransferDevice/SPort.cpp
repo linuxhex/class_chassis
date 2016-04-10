@@ -9,7 +9,7 @@
 
 #include "SPort.h"
 #include "Comm.h"
-
+#include <boost/exception/all.hpp>
 Socket::Socket() {
   socket_ = NULL;
   thread_ = NULL;
@@ -45,6 +45,10 @@ bool Socket::open() {
     return true;
   } catch (std::exception &e) {
     ROS_ERROR("[SOCKET] open socket failed");
+       if (socket_ != NULL) {
+        delete socket_;
+        socket_ = NULL;
+      }
     return false;
   }
 }
@@ -81,7 +85,7 @@ void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
     if (timeout--) {
       SLEEP(1);
     } else {
-      ROS_INFO("[SOCKET] time out");
+      ROS_ERROR("[SOCKET] time out");
       break;
     }
   }
@@ -134,9 +138,14 @@ void Socket::read() {
 }
 
 void Socket::write() {
-  if (socket_) {
-    size_t len = socket_->write_some(boost::asio::buffer(m_szWriteBuffer, m_nWriteBufferSize));
-  }
+
+  try{
+     if (socket_) {
+        size_t len = socket_->write_some(boost::asio::buffer(m_szWriteBuffer, m_nWriteBufferSize));
+     }
+  }catch(boost::exception &e){
+    cout << diagnostic_information(e)<<endl; 
+  }  
 }
 
 void Socket::Init(const std::string& host_name, const std::string& port) {

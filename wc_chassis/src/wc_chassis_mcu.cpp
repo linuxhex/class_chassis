@@ -528,6 +528,8 @@ void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
 
   unsigned char rec[1024] = {0};
   int rlen = 0;
+  
+  ROS_INFO("chassis remote ret cmd = %d, state = %d", (ret & 0xff), (ret >> 8) & 0xff);
 
   CreateRemoteRet(send, &len, 0, ret);
 

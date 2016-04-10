@@ -31,6 +31,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <string>
+#include <iostream>
 
 #include "LMS1xx/LMS1xx.h"
 #include "console_bridge/console.h"
@@ -114,6 +115,28 @@ status_t LMS1xx::queryStatus() {
 	sscanf((buf + 10), "%d", &ret);
 
 	return (status_t) ret;
+}
+
+
+std::string LMS1xx::getSerialNumber() {
+	
+	char buf[100];
+	sprintf(buf, "%c%s%c", 0x02, "sRN SerialNumber", 0x03);
+	write(sockDesc, buf, strlen(buf));
+	int len = read(sockDesc, buf, 100);
+	if (buf[0] != 0x02)
+		logWarn("invalid packet recieved");
+	buf[len - 1] = 0;
+	char* tok = strtok(buf, " ");
+	tok = strtok(NULL, " ");
+	tok = strtok(NULL, " ");
+	tok = strtok(NULL, " ");
+	len = strlen(tok);
+	std::string serialStr;
+	for (int i = 0; i < len; ++i) {
+		serialStr.push_back(tok[i]);
+	}
+	return serialStr;
 }
 
 void LMS1xx::login() {
@@ -231,7 +254,6 @@ void LMS1xx::getData(scanData& data) {
     leftovers.clear();
   }
   unsigned long start;
-
   while (true) {
     fd_set rfds;
     FD_ZERO(&rfds);
@@ -260,6 +282,12 @@ void LMS1xx::getData(scanData& data) {
       }
     }
     if(done) break;
+    if (curLen == 0) {
+      data.dist_len1 = 0;
+      data.rssi_len1 = 0;
+      logDebug("scan data can not recieved");
+      return;
+    }
   }
 
 	logDebug("scan data recieved");

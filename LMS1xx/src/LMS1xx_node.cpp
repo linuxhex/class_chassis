@@ -29,6 +29,10 @@ int main(int argc, char **argv)
   n.param<std::string>("host", host, "192.168.1.2");
   n.param<std::string>("frame_id", frame_id, "laser");
 
+  #if defined(LASER_VERIFY_KEY)
+  ros::ServiceServer service = nh.advertiseService("verify_laser_model", &LMS1xx::verifySerialNumber, &laser);
+  #endif
+
   while(ros::ok())
   {
     ROS_INFO("Connecting to laser at : %s", host.c_str());
@@ -125,6 +129,12 @@ int main(int argc, char **argv)
 
         laser.getData(data);
 
+        if (data.dist_len1 == 0) {
+          ROS_ERROR("getData failed, retrying in 1 second.");
+          ros::Duration(1.0).sleep();
+          break;
+        }
+        
         for (int i = 0; i < data.dist_len1; i++)
         {
           scan_msg.ranges[i] = data.dist1[i] * 0.001;

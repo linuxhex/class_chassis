@@ -23,8 +23,8 @@ AngleLimitFilter::AngleLimitFilter() { }
 AngleLimitFilter::~AngleLimitFilter() { }
 
 bool AngleLimitFilter::configure() {
-  angle_min_ = -M_PI;
-  angle_max_ = M_PI;
+  angle_min_ = -M_PI / 2.0;
+  angle_max_ = M_PI / 2.0;
   range_outside_ = 0.01;
   getParam("angle_min", angle_min_);
   getParam("angle_max", angle_max_);

@@ -27,6 +27,13 @@
 #include <string>
 #include <stdint.h>
 
+#if defined(LASER_VERIFY_KEY)
+#include <common_services/VerifyLaserModel.h>
+#define STRINGIFY(x) #x
+#define STRING_MACRO_VALUE(x) STRINGIFY(x)
+#endif
+
+
 /*!
 * @class scanCfg
 * @brief Structure containing scan configuration.
@@ -221,6 +228,20 @@ class LMS1xx {
 public:
 	LMS1xx();
 	virtual ~LMS1xx();
+
+	std::string getSerialNumber();
+
+	#if defined(LASER_VERIFY_KEY)
+	bool verifySerialNumber(common_services::VerifyLaserModel::Request &req,
+		common_services::VerifyLaserModel::Response &res) {
+		if (req.key == STRING_MACRO_VALUE(LASER_VERIFY_KEY)) {
+			res.model = getSerialNumber();
+			return true;
+		} 
+		res.model = "16389879";
+		return true;
+	}
+    #endif
 
 	/*!
 	* @brief Connect to LMS1xx.

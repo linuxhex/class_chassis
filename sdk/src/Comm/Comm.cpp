@@ -227,7 +227,7 @@ bool Config::loadConfig() {
   m_RunPath+="/config.txt";
 
   m_configs.clear();
-  fstream stream(m_RunPath.c_str(),ios::in|ios::out);
+  std::fstream stream(m_RunPath.c_str(),ios::in|ios::out);
 
   string key;
   int value;
@@ -255,7 +255,7 @@ void Config::setConfig(char *name , int value) {
 
 
 bool Config::SaveConfig() {
-  fstream stream("config.txt",ios::in|ios::out);
+  std::fstream stream("config.txt",ios::in|ios::out);
 
   string key;
   int value;
