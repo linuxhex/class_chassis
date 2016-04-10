@@ -817,4 +817,6 @@ void WC_chassis_mcu::comunication(void) {
   getYawAngle(yaw_angle_, pitch_angle_, roll_angle_);
   yaw_angle_ = yaw_angle_ < 0 ? (3600 + yaw_angle_) : yaw_angle_;
   usleep(1000); 
+  ROS_INFO("[CHASSIS] yaw_angle %d", yaw_angle_);
+
 }

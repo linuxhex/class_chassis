@@ -415,7 +415,7 @@ int main(int argc, char **argv) {
   battery_empty_level *= 100.0;
   std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << " reduction_ratio: " << reduction_ratio << " speed_ratio:" << speed_ratio << std::endl;
 
-//  yaw_pub = n.advertise<std_msgs::Float32>("yaw", 10);
+  yaw_pub = n.advertise<std_msgs::Float32>("yaw", 10);
   odom_pub  = n.advertise<nav_msgs::Odometry>("odom", 50);
   gyro_pub  = device_nh.advertise<sensor_msgs::Imu>("gyro", 50);
   remote_cmd_pub  = device_nh.advertise<std_msgs::UInt32>("remote_cmd", 50);
@@ -476,7 +476,7 @@ int main(int argc, char **argv) {
     }
     //发布里程计
     PublishOdom(&odom_broadcaster);
-//    PublishYaw();
+   PublishYaw();
     PublishGyro();
     // publish ultrasonic data
     PublishUltrasonic();

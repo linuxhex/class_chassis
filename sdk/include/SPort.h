@@ -39,7 +39,7 @@ class Socket {
 
   boost::asio::ip::tcp::socket* socket_;
   boost::asio::io_service ios_;
-
+//  boost::asio::io_service::work work(ios_);
   boost::thread* thread_;
   bool BeginThread();
   void EndThread();
