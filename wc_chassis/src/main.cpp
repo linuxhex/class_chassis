@@ -91,6 +91,7 @@ enum Device_ID{
 ros::Publisher odom_pub;
 ros::Publisher gyro_pub;
 ros::Publisher remote_cmd_pub;
+ros::Publisher going_back_pub;
 ros::Publisher device_pub;
 ros::Publisher yaw_pub;
 ros::Publisher ultrasonic0_pub;
@@ -335,9 +336,16 @@ bool DoRotate() {
 }
 
 void DoDIO() {
-  if ((g_dio_count++ % 2) == 0) {
-    g_di_data_ = g_chassis_mcu.doDIO(g_do_data_);
-    cur_emergency_status = (g_di_data_ >> (8 + Emergency_stop)) & 0x01;
+  if ((++g_dio_count % 2) == 0) {
+    unsigned int temp_di_data = g_chassis_mcu.doDIO(g_do_data_);
+    cur_emergency_status = (temp_di_data >> (8 + Emergency_stop)) & 0x01;
+    if (g_dio_count > 2 && ((g_di_data_ & 0x03) != 0x03) && ((temp_di_data & 0x03) == 0x03)) {
+      ROS_INFO("[wc_chassis] get_di data: 0x%x, and then publish going back!!!", temp_di_data);
+      std_msgs::UInt32 msg;
+      msg.data = 1;
+      going_back_pub.publish(msg); 
+    }
+    g_di_data_ = temp_di_data;
   }
 }
 
@@ -419,6 +427,7 @@ int main(int argc, char **argv) {
   odom_pub  = n.advertise<nav_msgs::Odometry>("odom", 50);
   gyro_pub  = device_nh.advertise<sensor_msgs::Imu>("gyro", 50);
   remote_cmd_pub  = device_nh.advertise<std_msgs::UInt32>("remote_cmd", 50);
+  going_back_pub  = device_nh.advertise<std_msgs::UInt32>("cmd_going_back", 50);
   device_pub = device_nh.advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
   ultrasonic0_pub = n.advertise<sensor_msgs::Range>("ultrasonic0", 50);
   ultrasonic1_pub = n.advertise<sensor_msgs::Range>("ultrasonic1", 50);
