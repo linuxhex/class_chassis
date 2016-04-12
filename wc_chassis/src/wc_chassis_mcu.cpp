@@ -153,7 +153,7 @@ int getsign(int t) {
 
 bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
   comunication();
-  std::cout << "left: " << counts_left_ << " right: " << counts_right_ << " dleft: " << delta_counts_left_ << " dright: " << delta_counts_right_ << " angle: " << yaw_angle_  << std::endl;
+//  std::cout << "left: " << counts_left_ << " right: " << counts_right_ << " dleft: " << delta_counts_left_ << " dright: " << delta_counts_right_ << " angle: " << yaw_angle_  << std::endl;
 
   if (first_odo_) {
     odom_x_ = 0;
@@ -181,8 +181,8 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
  
   int delta_counts_left = (counts_left_ - last_counts_left_) * getsign(delta_counts_left_);
   int delta_counts_right = (counts_right_ - last_counts_right_) * getsign(delta_counts_left_);
-  std::cout << "delta_counts_left" << delta_counts_left << endl;
-  std::cout << "delta_counts_right" << delta_counts_right << endl;
+  //std::cout << "delta_counts_left" << delta_counts_left << endl;
+ // std::cout << "delta_counts_right" << delta_counts_right << endl;
 
   if (delta_counts_left > 800) {
     delta_counts_left -= 65536;
@@ -197,12 +197,12 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
 
   // std::cout << "dleft: " << delta_counts_left << " dright: " << delta_counts_right << std::endl;
 
-  if (abs(delta_counts_right) > 800) {
-    std::cout << "err delta_counts_right: " << delta_counts_right << std::endl;
-  }
-  if (abs(delta_counts_left) > 800) {
-    std::cout << "err delta_counts_left: " << delta_counts_left << std::endl;
-  }
+  //if (abs(delta_counts_right) > 800) {
+   // std::cout << "err delta_counts_right: " << delta_counts_right << std::endl;
+ // }
+ // if (abs(delta_counts_left) > 800) {
+   // std::cout << "err delta_counts_left: " << delta_counts_left << std::endl;
+ // }
 
   double l_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_left * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
   double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
@@ -227,7 +227,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     double gyro_dtheta =  (temp_dtheta / 10.0) / 180.0 * M_PI;
     odom_a_ += gyro_dtheta;
     acc_odom_theta_ += fabs(gyro_dtheta);
-  std::cout << "temp_theta: " << temp_dtheta << " ;odom_dtheta: " << gyro_dtheta << " acc_odom_theta_: " << acc_odom_theta_ << std::endl;
+ // std::cout << "temp_theta: " << temp_dtheta << " ;odom_dtheta: " << gyro_dtheta << " acc_odom_theta_: " << acc_odom_theta_ << std::endl;
     odom_a_gyro_ = odom_a_; 
   }
 
@@ -504,8 +504,10 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
   }
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send do: " << str << std::endl;
-  std::string str = cComm::ByteToHexString(rec, len);
-  std::cout << "get di: " << str << std::endl;
+  // std::string str = cComm::ByteToHexString(rec, len);
+  // std::cout << "get di: " << str << std::endl;
+
+  
 
   if (rlen == 15) {
     for (int i = 0 ; i < rlen ; ++i) {
@@ -513,9 +515,10 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
         return GetDI();
       }
     }
-  } else {
-    // sleep(1);
-  }
+  } 
+  
+  transfer_->Send_data(rec,rlen); // Gavin request
+  transfer_->Read_data(rec,rlen,rlen,500); // Gavin request 
 
   return 0xffffffff;
 }

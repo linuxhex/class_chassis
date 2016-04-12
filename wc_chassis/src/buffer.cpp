@@ -6,26 +6,20 @@
 
 void Init(BufList* list,int iLen){
 
-	if (list->m_pBuffer != 0)
+	if (list->m_pBuffer != NULL)
 	{
-
-		//assert(false);
-		list->m_pBuffer = 0;
+		delete list->m_pBuffer;
+		list->m_pBuffer = NULL;
 	}
-
-	if (iLen>0 && iLen<1025)
-	{
-	
 		list->m_pBuffer = (unsigned char*)malloc(iLen*sizeof(unsigned char));
 		memset(list->m_pBuffer,0,iLen);
 		list->m_iMax = iLen;
-	}
 }
 void Des(BufList* list){
-	if (list->m_pBuffer != 0)
+	if (list->m_pBuffer != NULL)
 	{
 		free(list->m_pBuffer);
-		list->m_pBuffer = 0;
+		list->m_pBuffer = NULL;
 	}
 }
 int Size(BufList* list){
@@ -39,12 +33,12 @@ int Write(BufList* list,unsigned char* pWrite,int len){
 		len = list->m_iMax - list->m_iOffset;
 	}
 
-	if (list->m_pBuffer == 0)
+	if (list->m_pBuffer == NULL)
 	{
 		//LOGS_ERROR("TransferDevice")<<"write bufferP is null :"<<len;
 		return 0;
 	}
-	assert(list->m_pBuffer!=0);
+	assert(list->m_pBuffer!=NULL);
 	memset(list->m_pBuffer + list->m_iOffset,0,len);
 	memcpy(list->m_pBuffer + list->m_iOffset,pWrite,len);
 

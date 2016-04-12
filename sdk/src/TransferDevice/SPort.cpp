@@ -54,8 +54,7 @@ bool Socket::open() {
 }
 
 void Socket::Send_data(U8* s_data, U16 len) {
-  if (len > 1024)
-    return;
+  
   m_lReadBuffer.Clear();
   memset(m_szWriteBuffer, 0, 1024);
   m_nWriteBufferSize = len;
@@ -68,9 +67,7 @@ void Socket::read_callback(const boost::system::error_code& error, std::size_t b
     ROS_ERROR("[SOCKET] read data error");
     return;
   }
-
   m_lReadBuffer.Write(m_szReadTemp, bytes_transferred);
-
   read();
 }
 
@@ -97,11 +94,8 @@ int Socket::ThreadRun() {
     while (1) {
       if (open()) {
         read();
-
         ios_.run();
         ios_.reset();
-
-        boost::this_thread::interruption_point();
       }
 
       boost::this_thread::interruption_point();
@@ -109,8 +103,9 @@ int Socket::ThreadRun() {
     }
     return 0;
   } catch(boost::thread_interrupted) {
+   
     return -1;
-  }
+  } 
 }
 
 bool Socket::BeginThread() {
