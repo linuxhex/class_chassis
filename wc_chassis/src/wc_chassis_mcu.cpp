@@ -143,7 +143,7 @@ bool WC_chassis_mcu::getCSpeed(double &v, double &w) {
     v = 0;
     w = 0;
   }
-//  ROS_INFO("get v = %lf, w = %lf; set v = %lf, w = %lf",v, w, speed_v_, speed_w_);
+  ROS_INFO("get v = %lf, w = %lf; set v = %lf, w = %lf",v, w, speed_v_, speed_w_);
   return true;
 }
 
@@ -153,8 +153,7 @@ int getsign(int t) {
 
 bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
   comunication();
-
-//  std::cout << "left: " << counts_left_ << " right: " << counts_right_ << " dleft: " << delta_counts_left_ << " dright: " << delta_counts_right_ << " angle: " << yaw_angle_  << std::endl;
+  std::cout << "left: " << counts_left_ << " right: " << counts_right_ << " dleft: " << delta_counts_left_ << " dright: " << delta_counts_right_ << " angle: " << yaw_angle_  << std::endl;
 
   if (first_odo_) {
     odom_x_ = 0;
@@ -182,6 +181,8 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
  
   int delta_counts_left = (counts_left_ - last_counts_left_) * getsign(delta_counts_left_);
   int delta_counts_right = (counts_right_ - last_counts_right_) * getsign(delta_counts_left_);
+  std::cout << "delta_counts_left" << delta_counts_left << endl;
+  std::cout << "delta_counts_right" << delta_counts_right << endl;
 
   if (delta_counts_left > 800) {
     delta_counts_left -= 65536;
@@ -226,7 +227,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     double gyro_dtheta =  (temp_dtheta / 10.0) / 180.0 * M_PI;
     odom_a_ += gyro_dtheta;
     acc_odom_theta_ += fabs(gyro_dtheta);
-//    std::cout << "temp_theta: " << temp_dtheta << " ;odom_dtheta: " << gyro_dtheta << " acc_odom_theta_: " << acc_odom_theta_ << std::endl;
+  std::cout << "temp_theta: " << temp_dtheta << " ;odom_dtheta: " << gyro_dtheta << " acc_odom_theta_: " << acc_odom_theta_ << std::endl;
     odom_a_gyro_ = odom_a_; 
   }
 
