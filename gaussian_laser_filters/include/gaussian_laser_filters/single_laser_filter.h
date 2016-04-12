@@ -40,7 +40,9 @@ class SingleLaserFilter : public filters::FilterBase<sensor_msgs::LaserScan> {
 
  private:
   double check_distance_min_;     /* min distance to filter */
-  double single_distance_min_;    /* min distance to determain as single */
+  double single_isolated_distance_min_;   /* min distance to determain if it is isolated */
+  double double_isolated_distance_min_;
+  double triple_isolated_distance_min_;
   double upper_bounds_;           /* upper bounds of ranges, will replace range if longer than this */
   double begin_skip_beams_;
   double end_skip_beams_;

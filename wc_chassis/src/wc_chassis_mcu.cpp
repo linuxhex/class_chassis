@@ -181,7 +181,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
   // std::cout << "right turn round: " << showpoint << round_right << std::endl;
  
   int delta_counts_left = (counts_left_ - last_counts_left_) * getsign(delta_counts_left_);
-  int delta_counts_right = (counts_right_ - last_counts_right_) * getsign(delta_counts_left_);
+  int delta_counts_right = (counts_right_ - last_counts_right_) * getsign(delta_counts_right_);
 
   if (delta_counts_left > 800) {
     delta_counts_left -= 65536;
