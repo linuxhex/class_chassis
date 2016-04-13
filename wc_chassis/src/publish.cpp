@@ -107,3 +107,63 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
 
   device_pub.publish(device_status);
 }
+
+
+void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub ) {
+  nav_msgs::Odometry odom;
+  odom.header.stamp = ros::Time::now();;
+
+  odom.header.frame_id = "base_odom";
+  // set the position
+  odom.pose.pose.position.x = g_odom_x;
+  odom.pose.pose.position.y = g_odom_y;
+  odom.pose.pose.position.z = 0.0;
+  int i;
+  for (i = 0; i < 36; i++) odom.pose.covariance.elems[i] = 0.0;
+  odom.pose.covariance.elems[0]  = 1.0;
+  odom.pose.covariance.elems[7]  = 1.0;
+  odom.pose.covariance.elems[14] = 1.0;
+  odom.pose.covariance.elems[21] = 1.0;
+  odom.pose.covariance.elems[28] = 1.0;
+  odom.pose.covariance.elems[35] = 1.0;
+
+  for (i = 0; i < 36; i++) odom.twist.covariance.elems[i] = 0.0;
+  odom.twist.covariance.elems[0]  = 1.0;
+  odom.twist.covariance.elems[7]  = 1.0;
+  odom.twist.covariance.elems[14] = 1.0;
+  odom.twist.covariance.elems[21] = 1.0;
+  odom.twist.covariance.elems[28] = 1.0;
+  odom.twist.covariance.elems[35] = 1.0;
+
+  geometry_msgs::Quaternion odom_quat;
+//  ROS_INFO("Odo Yaw = %lf", g_odom_tha * 57.3);
+  odom_quat = tf::createQuaternionMsgFromYaw(g_odom_tha);
+#ifdef DEBUG_PRINT
+  std::cout << "odo based" << std::endl;
+  std::cout << "x : " << Odomsg.x \
+      << " y : " << Odomsg.y \
+      << " angle : " << Odomsg.theta*180.0/3.1415926\
+      << "Current Time-> " << now_s->tm_hour << ":" << now_s->tm_min << ":" << now_s->tm_sec << std::endl;
+#endif
+
+  odom.pose.pose.orientation = odom_quat;
+  odom.child_frame_id = "base_link";
+  odom.twist.twist.linear.x = g_odom_v;
+  odom.twist.twist.linear.y = 0;
+  odom.twist.twist.angular.z = g_odom_w;
+  // publish the message
+  odom_pub.publish(odom);
+
+  tf::Quaternion q;
+  tf::quaternionMsgToTF(odom.pose.pose.orientation, q);
+  tf::Transform odom_meas(q, tf::Vector3(odom.pose.pose.position.x, odom.pose.pose.position.y, 0));
+  tf::StampedTransform odom_transform(odom_meas, ros::Time::now(), "base_odom", "base_link");
+  odom_broadcaster->sendTransform(odom_transform);
+}
+
+void PublishYaw(ros::Publisher &yaw_pub){
+  std_msgs::Float32 msg;
+  msg.data = g_odom_tha * 180.0 / M_PI;
+  yaw_pub.publish(msg);
+}
+

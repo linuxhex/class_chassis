@@ -27,6 +27,8 @@
 #include <vector>
 #define __PUBLISH__
 
+extern void PublishYaw(ros::Publisher &yaw_pub);
+extern void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub );
 extern void publishDeviceStatus(ros::Publisher &device_pub);
 extern void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index);
 extern void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int);
