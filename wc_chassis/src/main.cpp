@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
     DoRemoteRet();
     if (++loop_count % 2) {
       g_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);
-      PublisheRemoteCmd(remote_cmd_pub,remote_cmd_, remote_index_);
+      PublishRemoteCmd(remote_cmd_pub,remote_cmd_, remote_index_);
       publish_device_status(device_pub);
       loop_count = 0;
     }

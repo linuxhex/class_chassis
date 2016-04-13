@@ -54,3 +54,12 @@ void PublishGyro(ros::Publisher &gyro_pub) {
   imu_msg.orientation.w = temp.getW();
   gyro_pub.publish(imu_msg);
 }
+
+void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index) {
+  std_msgs::UInt32 remote_cmd;
+  if (cmd > 0 && cmd < 12) {
+    ROS_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
+  }
+  remote_cmd.data = (index << 8) | cmd;
+  remote_cmd_pub.publish(remote_cmd);
+}

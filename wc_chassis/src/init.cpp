@@ -156,6 +156,7 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
 }
 
 
+
 void publish_device_status(ros::Publisher &device_pub) {
   diagnostic_msgs::DiagnosticStatus device_status;
   diagnostic_msgs::KeyValue device_value;
