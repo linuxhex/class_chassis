@@ -54,7 +54,6 @@ int main(int argc, char **argv) {
         g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
       }
     }
-   // set do get di
     DoDIO();
     DoRemoteRet();
     if (++loop_count % 2) {
@@ -66,7 +65,6 @@ int main(int argc, char **argv) {
     PublishOdom(odom_broadcaster);
     PublishYaw();
     PublishGyro();
-    // publish ultrasonic data
     PublishUltrasonic();
     ros::spinOnce();
     loop_rate->sleep();

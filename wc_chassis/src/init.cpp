@@ -49,18 +49,20 @@ ros::Rate *loop_rate;
 std::vector<int> g_ultrasonic;
 
 
-ros::Publisher odom_pub;
-ros::Publisher gyro_pub;
-ros::Publisher remote_cmd_pub;
-ros::Publisher device_pub;
-ros::Publisher yaw_pub;
-ros::Publisher ultrasonic0_pub;
-ros::Publisher ultrasonic1_pub;
-ros::Publisher ultrasonic2_pub;
-ros::Publisher ultrasonic3_pub;
-ros::Publisher ultrasonic4_pub;
-ros::Publisher ultrasonic5_pub;
-
+ros::Publisher *p_odom_pub;
+ros::Publisher *p_gyro_pub;
+ros::Publisher *p_remote_cmd_pub;
+ros::Publisher *p_device_pub;
+ros::Publisher *p_yaw_pub;
+ros::Publisher *p_ultrasonic0_pub;
+ros::Publisher *p_ultrasonic1_pub;
+ros::Publisher *p_ultrasonic2_pub;
+ros::Publisher *p_ultrasonic3_pub;
+ros::Publisher *p_ultrasonic4_pub;
+ros::Publisher *p_ultrasonic5_pub;
+ros::NodeHandle *p_n;
+ros::NodeHandle *p_nh;
+ros::NodeHandle *p_device_nh;
 
 void DoNavigation(const geometry_msgs::Twist& Navigation_msg) {
   timeval tv;
@@ -125,18 +127,18 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
 }
 
 void PublishUltrasonic() {
-  publish_ultrasonic(ultrasonic0_pub, "ultrasonic0", g_ultrasonic[1]);
-  publish_ultrasonic(ultrasonic1_pub, "ultrasonic1", g_ultrasonic[2]);
-  publish_ultrasonic(ultrasonic2_pub, "ultrasonic2", g_ultrasonic[3]);
-  publish_ultrasonic(ultrasonic3_pub, "ultrasonic3", g_ultrasonic[4]);
-  publish_ultrasonic(ultrasonic4_pub, "ultrasonic4", g_ultrasonic[5]);
-  publish_ultrasonic(ultrasonic5_pub, "ultrasonic5", g_ultrasonic[6]);
+  publish_ultrasonic(p_ultrasonic0_pub, "ultrasonic0", g_ultrasonic[1]);
+  publish_ultrasonic(p_ultrasonic1_pub, "ultrasonic1", g_ultrasonic[2]);
+  publish_ultrasonic(p_ultrasonic2_pub, "ultrasonic2", g_ultrasonic[3]);
+  publish_ultrasonic(p_ultrasonic3_pub, "ultrasonic3", g_ultrasonic[4]);
+  publish_ultrasonic(p_ultrasonic4_pub, "ultrasonic4", g_ultrasonic[5]);
+  publish_ultrasonic(p_ultrasonic5_pub, "ultrasonic5", g_ultrasonic[6]);
 }
 
 void PublishYaw(){
   std_msgs::Float32 msg;
   msg.data = g_odom_tha * 180.0 / M_PI;
-  yaw_pub.publish(msg);
+  p_yaw_pub.publish(msg);
 }
 
 void PublishGyro() {
@@ -157,7 +159,7 @@ void PublishGyro() {
   imu_msg.orientation.y = temp.getY();
   imu_msg.orientation.z = temp.getZ();
   imu_msg.orientation.w = temp.getW();
-  gyro_pub.publish(imu_msg);
+  p_gyro_pub->publish(imu_msg);
 }
 
 void PublishOdom(tf::TransformBroadcaster* odom_broadcaster) {
@@ -204,7 +206,7 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster) {
   odom.twist.twist.linear.y = 0;
   odom.twist.twist.angular.z = g_odom_w;
   // publish the message
-  odom_pub.publish(odom);
+  odom_pub->publish(odom);
 
   tf::Quaternion q;
   tf::quaternionMsgToTF(odom.pose.pose.orientation, q);
@@ -219,7 +221,7 @@ void PublisheRemoteCmd(unsigned char cmd, unsigned short index) {
     ROS_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
   }
   remote_cmd.data = (index << 8) | cmd;
-  remote_cmd_pub.publish(remote_cmd);
+  p_remote_cmd_pub.publish(remote_cmd);
 }
 
 void publish_device_status() {
@@ -263,7 +265,7 @@ void publish_device_status() {
   device_value.value = std::to_string(mileage);
   device_status.values.push_back(device_value);
 
-  device_pub.publish(device_status);
+  p_device_pub.publish(device_status);
 }
 
 bool DoRotate() {
@@ -328,42 +330,38 @@ bool CheckRotate(autoscrubber_services::CheckRotate::Request& req, autoscrubber_
 /***
  * 初始化所有的Service和订阅服务
  */
-void InitService(ros::NodeHandle n,
-                 ros::NodeHandle nh,
-                 ros::NodeHandle device_nh){
-    device_nh.advertiseService("start_rotate", &StartRotate);
-    device_nh.advertiseService("stop_rotate", &StopRotate);
-    device_nh.advertiseService("check_rotate", &CheckRotate);
-    n.subscribe("cmd_vel", 10, DoNavigation);
-    device_nh.subscribe("/remote_ret", 10, RemoteRetCallback);
-    n.subscribe("/gyro_update_state", 10, GyroUpdateCallback);
+void InitService(void){
+    p_device_nh->advertiseService("start_rotate", &StartRotate);
+    p_device_nh->advertiseService("stop_rotate", &StopRotate);
+    p_device_nh->advertiseService("check_rotate", &CheckRotate);
+    p_n->subscribe("cmd_vel", 10, DoNavigation);
+    p_device_nh->subscribe("/remote_ret", 10, RemoteRetCallback);
+    p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
 }
 
 /***
  * 初始化所有的Publish服务
  */
-void InitPublisher(ros::NodeHandle n,
-                   ros::NodeHandle nh,
-                   ros::NodeHandle device_nh){
-    // yaw_pub = n.advertise<std_msgs::Float32>("yaw", 10);
-    odom_pub  = n.advertise<nav_msgs::Odometry>("odom", 50);
-    gyro_pub  = device_nh.advertise<sensor_msgs::Imu>("gyro", 50);
-    remote_cmd_pub  = device_nh.advertise<std_msgs::UInt32>("remote_cmd", 50);
-    device_pub = device_nh.advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
-    ultrasonic0_pub = n.advertise<sensor_msgs::Range>("ultrasonic0", 50);
-    ultrasonic1_pub = n.advertise<sensor_msgs::Range>("ultrasonic1", 50);
-    ultrasonic2_pub = n.advertise<sensor_msgs::Range>("ultrasonic2", 50);
-    ultrasonic3_pub = n.advertise<sensor_msgs::Range>("ultrasonic3", 50);
-    ultrasonic4_pub = n.advertise<sensor_msgs::Range>("ultrasonic4", 50);
-    ultrasonic5_pub = n.advertise<sensor_msgs::Range>("ultrasonic5", 50);
+void InitPublisher(){
+    p_yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
+    p_odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
+    p_gyro_pub        = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
+    p_remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
+    p_device_pub = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
+    p_ultrasonic0_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic0", 50);
+    p_ultrasonic1_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic1", 50);
+    p_ultrasonic2_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic2", 50);
+    p_ultrasonic3_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic3", 50);
+    p_ultrasonic4_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic4", 50);
+    p_ultrasonic5_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic5", 50);
 }
 
 /***
  *  用到的所有的参数的初始化
  */
-void InitParameter(ros::NodeHandle n,
-                   ros::NodeHandle nh,
-                   ros::NodeHandle device_nh){
+void InitParameter(ros::NodeHandle &n,
+                   ros::NodeHandle &nh,
+                   ros::NodeHandle &device_nh){
 
     g_chassis_mcu = new WC_chassis_mcu();
     odom_broadcaster = new tf::TransformBroadcaster();
@@ -407,13 +405,14 @@ void InitParameter(ros::NodeHandle n,
  */
 bool InitChassis(int argc, char **argv){
      ros::init(argc, argv, "wc_chassis");
-     ros::NodeHandle n;
-     ros::NodeHandle nh("~");
-     ros::NodeHandle device_nh("device");
 
-     InitService(n,nh,device_nh);
-     InitPublisher(n,nh,device_nh);
-     InitParameter(n,nh,device_nh);
-     loop_rate =  new ros::Rate(10);
+     p_n = new ros::NodeHandle();
+     p_nh =new ros::NodeHandle("~");
+     p_device_nh = new ros::NodeHandle("device");
+     p_loop_rate =  new ros::Rate(10);
+
+     InitService();
+     InitPublisher();
+     InitParameter();
      return true;
 }
