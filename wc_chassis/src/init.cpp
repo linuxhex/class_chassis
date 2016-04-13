@@ -1,5 +1,6 @@
 #include "init.h"
 #include "advertise_service.h"
+#include "subscribe.h"
 double ACC_LIM_TH = 3.0 / 2.0 * M_PI;
 double ultral_effective_range = 0.4;
 double g_odom_x   = 0;
