@@ -29,6 +29,7 @@
 #include "wc_chassis_mcu.h"  // NOLINT
 #include "init.h"
 #include "publish.h"
+#include "action.h"
 
 int main(int argc, char **argv) {
 

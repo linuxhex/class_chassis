@@ -82,9 +82,7 @@ extern ros::NodeHandle *p_device_nh;
 
 
 extern bool InitChassis(int argc, char **argv);
-extern bool DoRotate();
-extern void DoDIO();
-extern void DoRemoteRet();
+
 
 #endif
 
