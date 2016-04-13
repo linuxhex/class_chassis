@@ -2,6 +2,7 @@
 */
 #include "tools.h"
 #include "wc_chassis_mcu.h"  // NOLINT
+<<<<<<< HEAD
 
 WC_chassis_mcu g_chassis_mcu;
 
@@ -326,89 +327,17 @@ bool CheckRotate(autoscrubber_services::CheckRotate::Request& req, autoscrubber_
   res.isFinished.data = is_rotate_finished;
   return true;
 }
+=======
+#include "init.h"
+>>>>>>> 8e0cd9742c3d0b6b9dfba2ddf925a0b7b33bc109
 
 
 int main(int argc, char **argv) {
-  ros::init(argc, argv, "wc_chassis");
-#ifdef SETTING_PRIORITY
-  struct sched_param param;
-  param.sched_priority = 99;
-  if (0 != sched_setscheduler(getpid(), SCHED_RR, &param)) {
-    std::cout << "set priority failed" << std::endl;
-  } else {
-    std::cout << "set priority succeed" << std::endl;
-  }
-#endif
-  ros::NodeHandle n;
-  ros::NodeHandle nh("~");
-  ros::NodeHandle device_nh("device");
 
-  tf::TransformBroadcaster odom_broadcaster;
-
-  double f_dia = 0;
-  double b_dia = 0;
-  double axle  = 0;
-  int counts = 0;
-  int reduction_ratio = 0;
-  double speed_ratio = 1.0;
-  double timeWidth = 0;
-  std::string host_name;
-  int port;
-  std::string str_auto_topic;
-  std::string str_odom = "odom";
-
-  nh.param("odom", str_odom, str_odom);
-  nh.param("WC_Auto_topic", str_auto_topic, std::string("WC_AUTO"));
-  nh.param("max_cmd_interval", max_cmd_interval, 1.0);
-  nh.param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
-  nh.param("B_DIA", b_dia, static_cast<double>(0.125));
-  nh.param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
-  nh.param("COUNTS", counts, 12);
-  nh.param("REDUCTION_RATIO", reduction_ratio, 30);
-  nh.param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
-  nh.param("TimeWidth", timeWidth, static_cast<double>(0.1));
-  nh.param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
-  nh.param("host_name", host_name, std::string("192.168.1.199"));
-  nh.param("port", port, 5000);
-  nh.param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
-  nh.param("battery_full_level", battery_full_level, static_cast<double>(27.5));
-  nh.param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
-  battery_full_level *= 100.0;
-  battery_empty_level *= 100.0;
-  std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << " reduction_ratio: " << reduction_ratio << " speed_ratio:" << speed_ratio << std::endl;
-
-  yaw_pub = n.advertise<std_msgs::Float32>("yaw", 10);
-  odom_pub  = n.advertise<nav_msgs::Odometry>("odom", 50);
-  gyro_pub  = device_nh.advertise<sensor_msgs::Imu>("gyro", 50);
-  remote_cmd_pub  = device_nh.advertise<std_msgs::UInt32>("remote_cmd", 50);
-  device_pub = device_nh.advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
-  ultrasonic0_pub = n.advertise<sensor_msgs::Range>("ultrasonic0", 50);
-  ultrasonic1_pub = n.advertise<sensor_msgs::Range>("ultrasonic1", 50);
-  ultrasonic2_pub = n.advertise<sensor_msgs::Range>("ultrasonic2", 50);
-  ultrasonic3_pub = n.advertise<sensor_msgs::Range>("ultrasonic3", 50);
-  ultrasonic4_pub = n.advertise<sensor_msgs::Range>("ultrasonic4", 50);
-  ultrasonic5_pub = n.advertise<sensor_msgs::Range>("ultrasonic5", 50);
-
-  start_rotate_srv = device_nh.advertiseService("start_rotate", &StartRotate);
-  stop_rotate_srv = device_nh.advertiseService("stop_rotate", &StopRotate);
-  check_rotate_srv = device_nh.advertiseService("check_rotate", &CheckRotate);
-
-  ros::Subscriber Navi_sub   = n.subscribe("cmd_vel", 10, DoNavigation);
-  ros::Subscriber remote_ret_sub = n.subscribe("/device/remote_ret", 10, RemoteRetCallback);
-  ros::Subscriber gyro_update_state_sub = n.subscribe("/gyro_update_state", 10, GyroUpdateCallback);
-
-  pthread_mutex_init(&speed_mutex, NULL);
-
-  ROS_INFO("waiting network w5500 start....");
-//  sleep(10);
-
-  g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth, counts, reduction_ratio, speed_ratio);
-
-//  std::cout << "Start Main Loop!" << std::endl;
-  ros::Rate loop_rate(10);
+  InitChassis(argc, argv);
   while (ros::ok()) {
-    g_chassis_mcu.getOdo(g_odom_x, g_odom_y, g_odom_tha);
-    g_chassis_mcu.getCSpeed(g_odom_v, g_odom_w);
+    g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
+    g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
     usleep(1000);
     timeval tv;
     gettimeofday(&tv, NULL);
@@ -418,32 +347,38 @@ int main(int argc, char **argv) {
       DoRotate();
     } else {
       if (time_now - last_cmd_vel_time >= max_cmd_interval) {
-        g_chassis_mcu.setTwoWheelSpeed(0.0,0.0);
+        g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
       } else {
 //        pthread_mutex_lock(&speed_mutex);
 //        float speed_v = g_speed_v[current_v_index];
 //        float speed_w = g_speed_w[current_w_index];
 //        pthread_mutex_unlock(&speed_mutex);
+<<<<<<< HEAD
         g_chassis_mcu.setTwoWheelSpeed(m_speed_v, m_speed_w);
+=======
+        g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
+>>>>>>> 8e0cd9742c3d0b6b9dfba2ddf925a0b7b33bc109
       }
     }
-   // set do get di
     DoDIO();
     DoRemoteRet();
     if (++loop_count % 2) {
-      g_chassis_mcu.getRemoteCmd(remote_cmd_, remote_index_);
-      PublisheRemoteCmd(remote_cmd_, remote_index_); 
+      g_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);
+      PublisheRemoteCmd(remote_cmd_, remote_index_);
       publish_device_status();
       loop_count = 0;
     }
+<<<<<<< HEAD
     //发布里程计
     PublishOdom(&odom_broadcaster);
+=======
+    PublishOdom(odom_broadcaster);
+>>>>>>> 8e0cd9742c3d0b6b9dfba2ddf925a0b7b33bc109
     PublishYaw();
     PublishGyro();
-    // publish ultrasonic data
     PublishUltrasonic();
     ros::spinOnce();
-    loop_rate.sleep();
+    p_loop_rate->sleep();
   }
   return 0;
 }

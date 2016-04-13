@@ -208,14 +208,14 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
   double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
 
   double dx = (r_wheel_pos + l_wheel_pos) * 0.5;
-  double da = (r_wheel_pos - l_wheel_pos) / Axle_ * odom_a_ratio;
-//  double da = asin((r_wheel_pos - l_wheel_pos) / Axle_);
+  //double da = (r_wheel_pos - l_wheel_pos) / Axle_ * odom_a_ratio; //有了陀螺仪就不会挂
+  //double da = asin((r_wheel_pos - l_wheel_pos) / Axle_);
   odom_x_ += dx * cos(odom_a_);
   odom_y_ += dx * sin(odom_a_);
-//  odom_a_ += da;
-//  acc_odom_theta_ += da;
+  // odom_a_ += da;
+  // acc_odom_theta_ += da;
 
-//  if (!(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta)) {
+  // if (!(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta)) {
   if (!gyro_state_ || (gyro_state_ && !(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta))) {
     double temp_dtheta = yaw_angle_ - last_yaw_angle_;
     if(temp_dtheta > 3000.0) {
