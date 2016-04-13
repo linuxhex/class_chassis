@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
     PublishGyro();
     PublishUltrasonic();
     ros::spinOnce();
-    loop_rate->sleep();
+    p_loop_rate->sleep();
   }
   return 0;
 }

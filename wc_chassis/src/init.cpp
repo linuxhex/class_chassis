@@ -123,7 +123,7 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
   } else {
     range.range = dis_meter;
   }
-  publisher.publish(range);
+  publisher->publish(range);
 }
 
 void PublishUltrasonic() {
