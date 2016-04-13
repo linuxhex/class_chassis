@@ -10,17 +10,16 @@
 #include <fstream>
 #include <algorithm>
 #include "SPort.h"
-#include "protocol.h"  // NOLINT
-
-#include "wc_chassis_mcu.h"  // NOLINT
+#include "protocol.h"
+#include "wc_chassis_mcu.h"
 
 #define REDUCTION_RATIO	        (25)
-#define SPEED_TH	        (1000)	
-#define SPEED_V_TH		(0.52)
-#define SPEED_W_TH		(0.6)
+#define SPEED_TH	            (1000)
+#define SPEED_V_TH		        (0.52)
+#define SPEED_W_TH		        (0.6)
 #define DELTA_SPEED_V_INC_TH    (0.025)
 #define DELTA_SPEED_V_DEC_TH    (-0.12)
-#define DELTA_SPEED_W_TH	(0.25) 
+#define DELTA_SPEED_W_TH	    (0.25)
 #define DT                      (0.1)
 
 extern double ACC_LIM_TH;
@@ -34,6 +33,7 @@ extern pthread_mutex_t speed_mutex;
 const float  H = 0.92;
 float current_v = 0.0;
 float current_theta = 0.0;
+
 double GetTimeInSeconds() {
   timeval t;
   gettimeofday(&t, NULL);
@@ -52,7 +52,22 @@ WC_chassis_mcu::WC_chassis_mcu()
   memset(rec_, 0, 20);
 }
 
-WC_chassis_mcu::~WC_chassis_mcu() { }
+WC_chassis_mcu::~WC_chassis_mcu() {
+
+    if(transfer_ !=NULL){
+        delete transfer_;
+        transfer_ = NULL;
+    }
+    if(pos_pub_left_ != NULL){
+        delete pos_pub_left_;
+        pos_pub_left_ = NULL;
+    }
+    if(pos_pub_right_ != NULL){
+        delete pos_pub_right_;
+        pos_pub_right_ = NULL;
+    }
+
+}
 
 void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio) {
   if (!transfer_) {
@@ -471,8 +486,6 @@ int WC_chassis_mcu::getRPos() {
         return GetDelta(1);
       }
     }
-  } else {
-    // sleep(1);
   }
   return delta_counts_right_;
 }

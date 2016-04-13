@@ -6,10 +6,10 @@
 #include <boost/bind.hpp>
 #include <ros/ros.h>
 #include <string>
-
+#include <boost/exception/all.hpp>
 #include "SPort.h"
 #include "Comm.h"
-#include <boost/exception/all.hpp>
+
 Socket::Socket() {
   socket_ = NULL;
   thread_ = NULL;
@@ -26,6 +26,14 @@ Socket::~Socket() {
   if (socket_ != NULL) {
     delete socket_;
     socket_ = NULL;
+  }
+  if(thread_ != NULL){
+      delete thread_;
+      thread_ = NULL;
+  }
+  if(ios_ != NULL){
+      delete ios_;
+      ios_ = NULL;
   }
 }
 
