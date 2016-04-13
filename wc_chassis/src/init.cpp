@@ -157,49 +157,7 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
 
 
 
-void publish_device_status(ros::Publisher &device_pub) {
-  diagnostic_msgs::DiagnosticStatus device_status;
-  diagnostic_msgs::KeyValue device_value;
-  device_status.level = diagnostic_msgs::DiagnosticStatus::OK;
-  device_status.name = std::string("device_status");
-  device_status.message = std::string("status_msgs");
-  device_status.hardware_id = std::string("status_msgs");
 
-  device_value.key = std::string("emergency_stop");
-  device_value.value = cur_emergency_status == 0 ? std::string("true") : std::string("false");
-  device_status.values.push_back(device_value);
-
-  unsigned int battery_ADC = (g_ultrasonic[20] << 2) | (g_ultrasonic[21] & 0x03);
-  double battery_value = (0.2393 * battery_ADC - 125.04) * 100;
-  int battery_capacity;
-  if(battery_value <= battery_empty_level) {
-    battery_capacity = 0;
-  } else if(battery_value >= battery_full_level) {
-    battery_capacity = 100;
-  } else {
-    battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
-  }
-/*
-  } else if(battery_value >= 2350) {
-    battery_capacity = (battery_value - 2350) * 40 / (2750 - 2350) + 60;
-  } else {
-    battery_capacity = (battery_value - 2000) * 60 / (3500 - 3100);
-  }
-  battery_capacity = battery_capacity > 100 ? 100 : battery_capacity;
-  battery_capacity = battery_capacity < 0 ? 0 : battery_capacity;
-*/
-  std::cout << "battery_ADC " << battery_ADC << "; battery_balue " << battery_value << "; battery_capacity " << battery_capacity << std::endl;
-  device_value.key = std::string("battery");
-  device_value.value = std::to_string(battery_capacity);
-  device_status.values.push_back(device_value);
-
-  device_value.key = std::string("mileage");
-  unsigned int mileage = (unsigned int)((g_chassis_mcu->mileage_left_ + g_chassis_mcu->mileage_left_) / 2);
-  device_value.value = std::to_string(mileage);
-  device_status.values.push_back(device_value);
-
-  device_pub.publish(device_status);
-}
 
 bool DoRotate() {
   if (fabs(g_chassis_mcu->acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) ) {

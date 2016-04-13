@@ -1,6 +1,5 @@
 /* Copyright(C) Gaussian Robot. All rights reserved.
 */
-
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Twist.h>
@@ -77,7 +76,7 @@ int main(int argc, char **argv) {
     if (++loop_count % 2) {
       g_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);
       PublishRemoteCmd(remote_cmd_pub,remote_cmd_, remote_index_);
-      publish_device_status(device_pub);
+      publishDeviceStatus(device_pub);
       loop_count = 0;
     }
     //发布里程计

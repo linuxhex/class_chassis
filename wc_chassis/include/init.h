@@ -89,7 +89,6 @@ extern void RemoteRetCallback(const std_msgs::UInt32& ret);
 extern void GyroUpdateCallback(const std_msgs::UInt32& state);
 extern void PublishYaw(ros::Publisher &yaw_pub);
 extern void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub );
-extern void publish_device_status(ros::Publisher &device_pub);
 extern bool DoRotate();
 extern void DoDIO();
 extern void DoRemoteRet();

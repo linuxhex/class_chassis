@@ -27,7 +27,7 @@
 #include <vector>
 #define __PUBLISH__
 
-
+extern void publishDeviceStatus(ros::Publisher &device_pub);
 extern void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index);
 extern void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int);
 extern void PublishUltrasonic(ros::Publisher *ultrasonic_pubs);
