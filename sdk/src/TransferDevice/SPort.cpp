@@ -63,10 +63,10 @@ void Socket::Send_data(U8* s_data, U16 len) {
 }
 
 void Socket::read_callback(const boost::system::error_code& error, std::size_t bytes_transferred) {
-//  if (error) {  // No data was read!
-//    ROS_ERROR("[SOCKET] read data error");
-//    return;
-//  }
+  if (error) {  // No data was read!
+    ROS_ERROR("[SOCKET] read data error");
+    return;
+  }
   m_lReadBuffer.Write(m_szReadTemp, bytes_transferred);
   read();
 }
@@ -77,8 +77,10 @@ void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
 
   while (1) {
     len_tmp = m_lReadBuffer.Size();
-    if (len_tmp >= need)
+    if (len_tmp >= need){
+      m_lReadBuffer.Read(r_data, len);
       break;
+    }
     if (timeout--) {
       SLEEP(1);
     } else {
@@ -86,7 +88,7 @@ void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
       break;
     }
   }
-  m_lReadBuffer.Read(r_data, len);
+
 }
 
 int Socket::ThreadRun() {
@@ -103,7 +105,6 @@ int Socket::ThreadRun() {
     }
     return 0;
   } catch(boost::thread_interrupted) {
-   
     return -1;
   } 
 }
