@@ -90,9 +90,6 @@ extern void GyroUpdateCallback(const std_msgs::UInt32& state);
 extern bool DoRotate();
 extern void DoDIO();
 extern void DoRemoteRet();
-extern bool StartRotate(autoscrubber_services::StartRotate::Request& req, autoscrubber_services::StartRotate::Response& res);
-extern bool StopRotate(autoscrubber_services::StopRotate::Request& req, autoscrubber_services::StopRotate::Response& res);
-extern bool CheckRotate(autoscrubber_services::CheckRotate::Request& req, autoscrubber_services::CheckRotate::Response& res);
 
 #endif
 
