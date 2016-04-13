@@ -104,7 +104,7 @@ void GyroUpdateCallback(const std_msgs::UInt32& state) {
   ROS_INFO("[wc_chassis] set gyro state = %d", g_chassis_mcu->gyro_state_);
 }
 
-void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int) {  // NOLINT
+void publish_ultrasonic(ros::Publisher* publisher, const char* frame_id, int recv_int) {  // NOLINT
   sensor_msgs::Range range;
   range.header.seq = 0;
   range.header.stamp = ros::Time::now();
@@ -206,7 +206,7 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster) {
   odom.twist.twist.linear.y = 0;
   odom.twist.twist.angular.z = g_odom_w;
   // publish the message
-  odom_pub->publish(odom);
+  p_odom_pub->publish(odom);
 
   tf::Quaternion q;
   tf::quaternionMsgToTF(odom.pose.pose.orientation, q);
@@ -221,7 +221,7 @@ void PublisheRemoteCmd(unsigned char cmd, unsigned short index) {
     ROS_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
   }
   remote_cmd.data = (index << 8) | cmd;
-  p_remote_cmd_pub.publish(remote_cmd);
+  p_remote_cmd_pub->publish(remote_cmd);
 }
 
 void publish_device_status() {
@@ -265,7 +265,7 @@ void publish_device_status() {
   device_value.value = std::to_string(mileage);
   device_status.values.push_back(device_value);
 
-  p_device_pub.publish(device_status);
+  p_device_pub->publish(device_status);
 }
 
 bool DoRotate() {
@@ -343,17 +343,17 @@ void InitService(void){
  * 初始化所有的Publish服务
  */
 void InitPublisher(){
-    p_yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
-    p_odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
-    p_gyro_pub        = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
-    p_remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
-    p_device_pub = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
-    p_ultrasonic0_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic0", 50);
-    p_ultrasonic1_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic1", 50);
-    p_ultrasonic2_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic2", 50);
-    p_ultrasonic3_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic3", 50);
-    p_ultrasonic4_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic4", 50);
-    p_ultrasonic5_pub = p_n->advertise<sensor_msgs::Range>("ultrasonic5", 50);
+    p_yaw_pub         = &(p_n->advertise<std_msgs::Float32>("yaw", 10));
+    p_odom_pub        = &(p_n->advertise<nav_msgs::Odometry>("odom", 50));
+    p_gyro_pub        = &(p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50));
+    p_remote_cmd_pub  = &(p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50));
+    p_device_pub = &(p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50));
+    p_ultrasonic0_pub = &(p_n->advertise<sensor_msgs::Range>("ultrasonic0", 50));
+    p_ultrasonic1_pub = &(p_n->advertise<sensor_msgs::Range>("ultrasonic1", 50));
+    p_ultrasonic2_pub = &(p_n->advertise<sensor_msgs::Range>("ultrasonic2", 50));
+    p_ultrasonic3_pub = &(p_n->advertise<sensor_msgs::Range>("ultrasonic3", 50));
+    p_ultrasonic4_pub = &(p_n->advertise<sensor_msgs::Range>("ultrasonic4", 50));
+    p_ultrasonic5_pub = &(p_n->advertise<sensor_msgs::Range>("ultrasonic5", 50));
 }
 
 /***
