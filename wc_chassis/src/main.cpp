@@ -33,6 +33,22 @@
 int main(int argc, char **argv) {
 
   InitChassis(argc, argv);
+  ros::Publisher ultrasonic_pubs[6];
+  /***
+   * 初始化所有的Publish服务
+   */
+ ros::Publisher yaw_pub = p_n->advertise<std_msgs::Float32>("yaw", 10);
+ ros::Publisher odom_pub  = p_n->advertise<nav_msgs::Odometry>("odom", 50);
+ ros::Publisher gyro_pub  = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
+ ros::Publisher remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
+ ros::Publisher device_pub = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
+ ros::Publisher ultrasonic_pubs[0] = p_n->advertise<sensor_msgs::Range>("ultrasonic0", 50);
+ ros::Publisher ultrasonic_pubs[1] = p_n->advertise<sensor_msgs::Range>("ultrasonic1", 50);
+ ros::Publisher ultrasonic_pubs[2] = p_n->advertise<sensor_msgs::Range>("ultrasonic2", 50);
+ ros::Publisher ultrasonic_pubs[3] = p_n->advertise<sensor_msgs::Range>("ultrasonic3", 50);
+ ros::Publisher ultrasonic_pubs[4] = p_n->advertise<sensor_msgs::Range>("ultrasonic4", 50);
+ ros::Publisher ultrasonic_pubs[5] = p_n->advertise<sensor_msgs::Range>("ultrasonic5", 50);
+
   while (ros::ok()) {
     g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
     g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
@@ -59,18 +75,17 @@ int main(int argc, char **argv) {
     DoRemoteRet();
     if (++loop_count % 2) {
       g_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);
-      PublisheRemoteCmd(remote_cmd_, remote_index_);
-      publish_device_status();
+      PublisheRemoteCmd(remote_cmd_pub,remote_cmd_, remote_index_);
+      publish_device_status(device_pub);
       loop_count = 0;
     }
     //发布里程计
-    PublishOdom(odom_broadcaster);
-    PublishYaw();
-    PublishGyro();
-    // publish ultrasonic data
-    PublishUltrasonic();
+    PublishOdom(odom_broadcaster,odom_pub);
+    PublishYaw(yaw_pub);
+    PublishGyro(gyro_pub);
+    PublishUltrasonic(ultrasonic_pubs);
     ros::spinOnce();
-    loop_rate->sleep();
+    p_loop_rate->sleep();
   }
   return 0;
 }

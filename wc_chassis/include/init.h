@@ -74,7 +74,11 @@ extern unsigned short remote_index_;
 
 extern WC_chassis_mcu *g_chassis_mcu;
 extern tf::TransformBroadcaster *odom_broadcaster;
-extern ros::Rate *loop_rate;
+extern ros::Rate *p_loop_rate;
+
+extern ros::NodeHandle *p_n;
+extern ros::NodeHandle *p_nh;
+extern ros::NodeHandle *p_device_nh;
 
 /***
  *函数声明
@@ -84,10 +88,10 @@ extern void DoNavigation(const geometry_msgs::Twist& Navigation_msg);
 extern void RemoteRetCallback(const std_msgs::UInt32& ret);
 extern void GyroUpdateCallback(const std_msgs::UInt32& state);
 extern void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int);
-extern void PublishUltrasonic();
-extern void PublishYaw();
-extern void PublishGyro();
-extern void PublishOdom(tf::TransformBroadcaster* odom_broadcaster);
+extern void PublishUltrasonic(ros::Publisher *ultrasonic_pubs);
+extern void PublishYaw(ros::Publisher &yaw_pub);
+extern void PublishGyro(ros::Publisher &gyro_pub);
+extern void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub );
 extern void PublisheRemoteCmd(unsigned char cmd, unsigned short index);
 extern void publish_device_status();
 extern bool DoRotate();
