@@ -138,13 +138,6 @@ void DoRemoteRet() {
 }
 
 
-
-
-bool CheckRotate(autoscrubber_services::CheckRotate::Request& req, autoscrubber_services::CheckRotate::Response& res) {
-  res.isFinished.data = is_rotate_finished;
-  return true;
-}
-
 /***
  * 初始化所有的Service和订阅服务
  */
