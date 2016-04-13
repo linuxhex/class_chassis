@@ -63,10 +63,10 @@ void Socket::Send_data(U8* s_data, U16 len) {
 }
 
 void Socket::read_callback(const boost::system::error_code& error, std::size_t bytes_transferred) {
-  if (error) {  // No data was read!
-    ROS_ERROR("[SOCKET] read data error");
-    return;
-  }
+//  if (error) {  // No data was read!
+//    ROS_ERROR("[SOCKET] read data error");
+//    return;
+//  }
   m_lReadBuffer.Write(m_szReadTemp, bytes_transferred);
   read();
 }
