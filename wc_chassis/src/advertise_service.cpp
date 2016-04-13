@@ -10,13 +10,11 @@ bool StartRotate(autoscrubber_services::StartRotate::Request& req,
   return true;
 }
 
-
 bool StopRotate(autoscrubber_services::StopRotate::Request& req,
                 autoscrubber_services::StopRotate::Response& res) {
   start_rotate_flag = false;
   return true;
 }
-
 
 bool CheckRotate(autoscrubber_services::CheckRotate::Request& req,
                  autoscrubber_services::CheckRotate::Response& res) {

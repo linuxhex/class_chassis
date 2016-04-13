@@ -108,7 +108,6 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
   device_pub.publish(device_status);
 }
 
-
 void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub ) {
   nav_msgs::Odometry odom;
   odom.header.stamp = ros::Time::now();;

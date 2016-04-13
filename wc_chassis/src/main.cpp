@@ -32,11 +32,9 @@
 
 int main(int argc, char **argv) {
 
-  InitChassis(argc, argv);
-  ros::Publisher ultrasonic_pubs[6];
-  /***
-   * 初始化所有的Publish服务
-   */
+    InitChassis(argc, argv);
+    ros::Publisher ultrasonic_pubs[6];
+    /* 初始化所有的Publish服务*/
     ros::Publisher yaw_pub = p_n->advertise<std_msgs::Float32>("yaw", 10);
     ros::Publisher odom_pub  = p_n->advertise<nav_msgs::Odometry>("odom", 50);
     ros::Publisher gyro_pub  = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
