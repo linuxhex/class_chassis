@@ -359,9 +359,7 @@ void InitPublisher(){
 /***
  *  用到的所有的参数的初始化
  */
-void InitParameter(ros::NodeHandle &n,
-                   ros::NodeHandle &nh,
-                   ros::NodeHandle &device_nh){
+void InitParameter(){
 
     g_chassis_mcu = new WC_chassis_mcu();
     odom_broadcaster = new tf::TransformBroadcaster();
@@ -377,22 +375,22 @@ void InitParameter(ros::NodeHandle &n,
     int port;
     std::string str_auto_topic;
     std::string str_odom = "odom";
-    nh.param("odom", str_odom, str_odom);
-    nh.param("WC_Auto_topic", str_auto_topic, std::string("WC_AUTO"));
-    nh.param("max_cmd_interval", max_cmd_interval, 1.0);
-    nh.param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
-    nh.param("B_DIA", b_dia, static_cast<double>(0.125));
-    nh.param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
-    nh.param("COUNTS", counts, 12);
-    nh.param("REDUCTION_RATIO", reduction_ratio, 30);
-    nh.param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
-    nh.param("TimeWidth", timeWidth, static_cast<double>(0.1));
-    nh.param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
-    nh.param("host_name", host_name, std::string("192.168.1.199"));
-    nh.param("port", port, 5000);
-    nh.param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
-    nh.param("battery_full_level", battery_full_level, static_cast<double>(27.5));
-    nh.param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
+    p_nh->param("odom", str_odom, str_odom);
+    p_nh->param("WC_Auto_topic", str_auto_topic, std::string("WC_AUTO"));
+    p_nh->param("max_cmd_interval", max_cmd_interval, 1.0);
+    p_nh->param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
+    p_nh->param("B_DIA", b_dia, static_cast<double>(0.125));
+    p_nh->param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
+    p_nh->param("COUNTS", counts, 12);
+    p_nh->param("REDUCTION_RATIO", reduction_ratio, 30);
+    p_nh->param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
+    p_nh->param("TimeWidth", timeWidth, static_cast<double>(0.1));
+    p_nh->param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
+    p_nh->param("host_name", host_name, std::string("192.168.1.199"));
+    p_nh->param("port", port, 5000);
+    p_nh->param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
+    p_nh->param("battery_full_level", battery_full_level, static_cast<double>(27.5));
+    p_nh->param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
     battery_full_level *= 100.0;
     battery_empty_level *= 100.0;
 
