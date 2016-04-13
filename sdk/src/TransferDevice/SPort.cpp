@@ -88,7 +88,6 @@ void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
       break;
     }
   }
-
 }
 
 int Socket::ThreadRun() {
@@ -134,14 +133,13 @@ void Socket::read() {
 }
 
 void Socket::write() {
-
-  try{
      if (socket_) {
+    try{
         size_t len = socket_->write_some(boost::asio::buffer(m_szWriteBuffer, m_nWriteBufferSize));
+     }catch(boost::exception &e){
+        cout << diagnostic_information(e)<<endl;
      }
-  }catch(boost::exception &e){
-    cout << diagnostic_information(e)<<endl; 
-  }  
+    }
 }
 
 void Socket::Init(const std::string& host_name, const std::string& port) {

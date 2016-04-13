@@ -36,3 +36,5 @@ wc_chassis/src/main.cpp
 wc_chassis/src/protocol.cpp
 wc_chassis/src/tools.cpp
 wc_chassis/src/wc_chassis_mcu.cpp
+wc_chassis/src/publish.cpp
+wc_chassis/include/publish.h
