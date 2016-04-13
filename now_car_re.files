@@ -32,10 +32,7 @@ wc_chassis/src/buffer.cpp
 wc_chassis/src/main.cpp
 wc_chassis/src/protocol.cpp
 wc_chassis/src/wc_chassis_mcu.cpp
-<<<<<<< HEAD
 wc_chassis/src/tools.cpp
 wc_chassis/include/tools.h
-=======
 wc_chassis/src/init.cpp
 wc_chassis/include/init.h
->>>>>>> 8e0cd9742c3d0b6b9dfba2ddf925a0b7b33bc109
