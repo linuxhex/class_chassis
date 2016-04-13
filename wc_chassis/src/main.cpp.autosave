@@ -1,7 +1,7 @@
 /* Copyright(C) Gaussian Robot. All rights reserved.
 */
 #include "tools.h"
-#include "wc_chassis_mcu.h"  // NOLINT
+
 
 WC_chassis_mcu g_chassis_mcu;
 
