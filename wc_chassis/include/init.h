@@ -84,17 +84,10 @@ extern ros::NodeHandle *p_device_nh;
  *函数声明
 */
 extern bool InitChassis(int argc, char **argv);
-extern void DoNavigationCallback(const geometry_msgs::Twist& Navigation_msg);
-extern void RemoteRetCallback(const std_msgs::UInt32& ret);
-extern void GyroUpdateCallback(const std_msgs::UInt32& state);
-extern void PublishYaw(ros::Publisher &yaw_pub);
-extern void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub );
+
 extern bool DoRotate();
 extern void DoDIO();
 extern void DoRemoteRet();
-extern bool StartRotate(autoscrubber_services::StartRotate::Request& req, autoscrubber_services::StartRotate::Response& res);
-extern bool StopRotate(autoscrubber_services::StopRotate::Request& req, autoscrubber_services::StopRotate::Response& res);
-extern bool CheckRotate(autoscrubber_services::CheckRotate::Request& req, autoscrubber_services::CheckRotate::Response& res);
 
 #endif
 

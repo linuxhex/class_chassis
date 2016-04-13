@@ -40,3 +40,5 @@ wc_chassis/src/publish.cpp
 wc_chassis/include/publish.h
 wc_chassis/src/advertise_service.cpp
 wc_chassis/include/advertise_service.h
+wc_chassis/src/subscribe.cpp
+wc_chassis/include/subscribe.h
