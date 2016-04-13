@@ -1,4 +1,6 @@
 #include"subscribe.h"
+#include"init.h"
+
 void DoNavigationCallback(const geometry_msgs::Twist& Navigation_msg) {
   timeval tv;
   gettimeofday(&tv, NULL);
