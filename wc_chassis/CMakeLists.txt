@@ -1,5 +1,7 @@
+
+
 cmake_minimum_required(VERSION 2.8.3)
-project(wc_chassis)
+project(wc_chassis) 
 
 SET(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3")
@@ -44,6 +46,7 @@ set(WC_CHASSIS_SRC
     src/protocol.cpp
     src/wc_chassis_mcu.cpp
     src/main.cpp
+    src/init.cpp
 )
 add_executable(wc_chassis ${WC_CHASSIS_SRC})
 target_link_libraries(wc_chassis ${catkin_LIBRARIES} )

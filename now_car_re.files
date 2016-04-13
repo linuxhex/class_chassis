@@ -32,3 +32,4 @@ wc_chassis/src/buffer.cpp
 wc_chassis/src/main.cpp
 wc_chassis/src/protocol.cpp
 wc_chassis/src/wc_chassis_mcu.cpp
+wc_chassis/src/init.cpp
