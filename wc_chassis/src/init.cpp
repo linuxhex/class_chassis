@@ -35,7 +35,7 @@ unsigned int remote_ret_ = 0x0a00;
 unsigned int remote_ret_cnt_ = 0;
 unsigned char remote_cmd_ = 0;
 unsigned short remote_index_ = 0;
-tf::TransformBroadcaster *odom_broadcaster;
+tf::TransformBroadcaster *p_odom_broadcaster;
 WC_chassis_mcu *g_chassis_mcu;
 ros::Rate *p_loop_rate;
 std::vector<int> g_ultrasonic;
@@ -63,7 +63,7 @@ void InitService(){
 void InitParameter(){
 
     g_chassis_mcu = new WC_chassis_mcu();
-    odom_broadcaster = new tf::TransformBroadcaster();
+    p_odom_broadcaster = new tf::TransformBroadcaster();
     double f_dia = 0;
     double b_dia = 0;
     double axle  = 0;
