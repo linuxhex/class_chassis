@@ -24,6 +24,7 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
   publisher.publish(range);
 }
 
+
 void PublishUltrasonic(ros::Publisher *ultrasonic_pubs) {
   publish_ultrasonic(ultrasonic_pubs[0], "ultrasonic0", g_ultrasonic[1]);
   publish_ultrasonic(ultrasonic_pubs[1], "ultrasonic1", g_ultrasonic[2]);

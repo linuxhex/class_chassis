@@ -155,6 +155,14 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
   odom_broadcaster->sendTransform(odom_transform);
 }
 
+void PublisheRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index) {
+  std_msgs::UInt32 remote_cmd;
+  if (cmd > 0 && cmd < 12) {
+    ROS_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
+  }
+  remote_cmd.data = (index << 8) | cmd;
+  remote_cmd_pub.publish(remote_cmd);
+}
 
 void publish_device_status(ros::Publisher &device_pub) {
   diagnostic_msgs::DiagnosticStatus device_status;
