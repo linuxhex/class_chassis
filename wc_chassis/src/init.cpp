@@ -44,7 +44,7 @@ unsigned char remote_cmd_ = 0;
 unsigned short remote_index_ = 0;
 tf::TransformBroadcaster *odom_broadcaster;
 WC_chassis_mcu *g_chassis_mcu;
-ros::Rate *loop_rate;
+ros::Rate *p_loop_rate;
 
 std::vector<int> g_ultrasonic;
 

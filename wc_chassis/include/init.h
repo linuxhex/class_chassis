@@ -74,7 +74,7 @@ extern unsigned short remote_index_;
 
 extern WC_chassis_mcu *g_chassis_mcu;
 extern tf::TransformBroadcaster *odom_broadcaster;
-extern ros::Rate *loop_rate;
+extern ros::Rate *p_loop_rate;
 
 /***
  *函数声明
