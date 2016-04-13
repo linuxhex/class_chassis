@@ -31,10 +31,6 @@ Socket::~Socket() {
       delete thread_;
       thread_ = NULL;
   }
-  if(ios_ != NULL){
-      delete ios_;
-      ios_ = NULL;
-  }
 }
 
 bool Socket::open() {
