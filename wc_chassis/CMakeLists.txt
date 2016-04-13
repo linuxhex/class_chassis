@@ -52,6 +52,7 @@ set(WC_CHASSIS_SRC
     src/advertise_service.cpp  
     src/subscribe.cpp
     src/action.cpp
+    src/parameter.cpp
 )
 add_executable(wc_chassis ${WC_CHASSIS_SRC})
 target_link_libraries(wc_chassis ${catkin_LIBRARIES} )
