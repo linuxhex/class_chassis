@@ -1,5 +1,5 @@
 #include "init.h"
-
+#include "advertise_service.h"
 double ACC_LIM_TH = 3.0 / 2.0 * M_PI;
 double ultral_effective_range = 0.4;
 double g_odom_x   = 0;
@@ -137,18 +137,8 @@ void DoRemoteRet() {
   g_chassis_mcu->setRemoteRet(remote_ret_);
 }
 
-bool StartRotate(autoscrubber_services::StartRotate::Request& req, autoscrubber_services::StartRotate::Response& res) {
-  rotate_angle = req.rotateAngle.data;
-  start_rotate_flag = true;
-  is_rotate_finished = false;
-  g_chassis_mcu->acc_odom_theta_ = 0.0;
-  return true;
-}
 
-bool StopRotate(autoscrubber_services::StopRotate::Request& req, autoscrubber_services::StopRotate::Response& res) {
-  start_rotate_flag = false;
-  return true;
-}
+
 
 bool CheckRotate(autoscrubber_services::CheckRotate::Request& req, autoscrubber_services::CheckRotate::Response& res) {
   res.isFinished.data = is_rotate_finished;
