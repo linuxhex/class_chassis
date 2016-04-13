@@ -352,9 +352,7 @@ bool CheckRotate(autoscrubber_services::CheckRotate::Request& req, autoscrubber_
   res.isFinished.data = is_rotate_finished;
   return true;
 }
-=======
-#include "init.h"
->>>>>>> 8e0cd9742c3d0b6b9dfba2ddf925a0b7b33bc109
+
 
 
 int main(int argc, char **argv) {
