@@ -71,7 +71,7 @@ extern unsigned int remote_ret_;
 extern unsigned int remote_ret_cnt_;
 extern unsigned char remote_cmd_;
 extern unsigned short remote_index_;
-
+extern pthread_mutex_t speed_mutex;
 extern WC_chassis_mcu *g_chassis_mcu;
 extern tf::TransformBroadcaster *odom_broadcaster;
 extern ros::Rate *p_loop_rate;
