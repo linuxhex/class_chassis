@@ -30,6 +30,7 @@
 #include "init.h"
 #include "publish.h"
 #include "action.h"
+#include "parameter.h"
 
 int main(int argc, char **argv) {
 

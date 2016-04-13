@@ -34,11 +34,4 @@ unsigned int remote_ret_ = 0x0a00;
 unsigned int remote_ret_cnt_ = 0;
 unsigned char remote_cmd_ = 0;
 unsigned short remote_index_ = 0;
-tf::TransformBroadcaster *p_odom_broadcaster;
-WC_chassis_mcu *g_chassis_mcu;
-ros::Rate *p_loop_rate;
-std::vector<int> g_ultrasonic;
-ros::NodeHandle *p_n;
-ros::NodeHandle *p_nh;
-ros::NodeHandle *p_device_nh;
-pthread_mutex_t speed_mutex;
+
