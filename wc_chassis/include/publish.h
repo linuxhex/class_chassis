@@ -27,8 +27,8 @@
 #include <vector>
 #define __PUBLISH__
 
-
 extern void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int);
 extern void PublishUltrasonic(ros::Publisher *ultrasonic_pubs);
+extern void PublishGyro(ros::Publisher &gyro_pub);
 
 #endif

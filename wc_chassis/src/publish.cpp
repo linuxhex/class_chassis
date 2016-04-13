@@ -32,3 +32,24 @@ void PublishUltrasonic(ros::Publisher *ultrasonic_pubs) {
   publish_ultrasonic(ultrasonic_pubs[4], "ultrasonic4", g_ultrasonic[5]);
   publish_ultrasonic(ultrasonic_pubs[5], "ultrasonic5", g_ultrasonic[6]);
 }
+
+void PublishGyro(ros::Publisher &gyro_pub) {
+  sensor_msgs::Imu imu_msg;
+  imu_msg.header.stamp = ros::Time::now();
+  imu_msg.header.frame_id = "world";
+
+  tf::Quaternion temp;
+  double roll, pitch, yaw;
+  roll = g_chassis_mcu->roll_angle_ / 10.0 / 180.0 * M_PI;
+  pitch = g_chassis_mcu->pitch_angle_ / 10.0 / 180.0 * M_PI;
+  yaw = g_chassis_mcu->yaw_angle_ / 10.0 / 180.0 * M_PI;
+  temp.setRPY(roll, pitch, yaw);
+//#ifdef DEBUG_PRINT
+//  std::cout << "roll = " << roll * 57.6 << "; pitch = " << pitch << ";yaw = " << std::endl;
+//#endif
+  imu_msg.orientation.x = temp.getX();
+  imu_msg.orientation.y = temp.getY();
+  imu_msg.orientation.z = temp.getZ();
+  imu_msg.orientation.w = temp.getW();
+  gyro_pub.publish(imu_msg);
+}
