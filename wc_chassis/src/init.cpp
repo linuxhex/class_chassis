@@ -8,14 +8,11 @@ double g_odom_y   = 0;
 double g_odom_tha = 0;
 double g_odom_v = 0;
 double g_odom_w = 0;
-
 unsigned int g_dio_count  = 0;
 unsigned int g_ret_count  = 0;
 unsigned int g_pc_control = 0;
-
 double last_cmd_vel_time = 0.0;
 double max_cmd_interval  = 1.0;
-
 int current_v_index = 0;
 int current_w_index = 0;
 float m_speed_v = 0.0;
@@ -24,21 +21,16 @@ float g_speed_v[3] = {0.0, 0.0, 0.0};
 float g_speed_w[3] = {0.0, 0.0, 0.0};
 float g_spe = 0.0;
 float g_angle = 0.0;
-pthread_mutex_t speed_mutex;
-
 unsigned int loop_count = 0;
 unsigned int rotate_angle = 0;
-
 bool start_rotate_flag = false;
 bool stop_rotate_flag = true;
 bool is_rotate_finished = false;
-
 unsigned int g_di_data_ = 0;
 unsigned int g_do_data_ = 0;
 unsigned int cur_emergency_status = 1;
 double battery_full_level;
 double battery_empty_level;
-
 unsigned int remote_ret_ = 0x0a00;
 unsigned int remote_ret_cnt_ = 0;
 unsigned char remote_cmd_ = 0;
@@ -46,13 +38,11 @@ unsigned short remote_index_ = 0;
 tf::TransformBroadcaster *odom_broadcaster;
 WC_chassis_mcu *g_chassis_mcu;
 ros::Rate *p_loop_rate;
-
 std::vector<int> g_ultrasonic;
-
-
 ros::NodeHandle *p_n;
 ros::NodeHandle *p_nh;
 ros::NodeHandle *p_device_nh;
+pthread_mutex_t speed_mutex;
 
 
 bool DoRotate() {
@@ -96,7 +86,6 @@ void DoRemoteRet() {
   g_chassis_mcu->setRemoteRet(remote_ret_);
 }
 
-
 /***
  * 初始化所有的Service和订阅服务
  */
@@ -109,14 +98,11 @@ void InitService(){
     p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
 }
 
-/***
- *  用到的所有的参数的初始化
- */
+/*  ros参数服务器参数的初始化*/
 void InitParameter(){
 
     g_chassis_mcu = new WC_chassis_mcu();
     odom_broadcaster = new tf::TransformBroadcaster();
-
     double f_dia = 0;
     double b_dia = 0;
     double axle  = 0;
@@ -151,9 +137,7 @@ void InitParameter(){
     g_chassis_mcu->Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth, counts, reduction_ratio, speed_ratio);
 
 }
-/***
- * chassis的初始化
- */
+/* chassis的初始化*/
 bool InitChassis(int argc, char **argv){
      ros::init(argc, argv, "wc_chassis");
      p_n = new ros::NodeHandle();

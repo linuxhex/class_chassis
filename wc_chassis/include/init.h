@@ -80,11 +80,8 @@ extern ros::NodeHandle *p_n;
 extern ros::NodeHandle *p_nh;
 extern ros::NodeHandle *p_device_nh;
 
-/***
- *函数声明
-*/
-extern bool InitChassis(int argc, char **argv);
 
+extern bool InitChassis(int argc, char **argv);
 extern bool DoRotate();
 extern void DoDIO();
 extern void DoRemoteRet();
