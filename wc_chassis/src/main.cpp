@@ -467,7 +467,7 @@ int main(int argc, char **argv) {
     }
    // set do get di
     DoDIO();
-    DoRemoteRet();
+    DoRemoteRet(g_chassis_mcu);
     if (++loop_count % 2) {
       g_chassis_mcu.getRemoteCmd(remote_cmd_, remote_index_);
       PublisheRemoteCmd(remote_cmd_, remote_index_);
