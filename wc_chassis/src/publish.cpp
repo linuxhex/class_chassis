@@ -1,4 +1,5 @@
 #include "publish.h"
+#include "init.h"
 
 extern std::vector<int> g_ultrasonic;
 void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int) {  // NOLINT
