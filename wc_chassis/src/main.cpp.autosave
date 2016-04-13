@@ -43,7 +43,9 @@ std::vector<int> g_ultrasonic;
 /********************
   byte     0        1-13          14-17            18               19           20           21          22        23      24
        protector ultrasonic   reserve_ultra  hardware_status   device_status  battery_H    battery_L   charge_H   charge_L
- *******************/
+ **************
+http://gitlab.wisagv.com/zimuxingjun/autoscrubber_device.git
+*****/
 
 unsigned int g_dio_count  = 0;
 unsigned int g_ret_count  = 0;
