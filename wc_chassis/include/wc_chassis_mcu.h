@@ -18,7 +18,7 @@ class Socket;
 
 class WC_chassis_mcu{
  public:
-  WC_chassis_mcu();
+   WC_chassis_mcu();
   ~WC_chassis_mcu();
 
   void Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio);
@@ -29,12 +29,12 @@ class WC_chassis_mcu{
   unsigned int doDIO(unsigned int usdo);
   void setRemoteRet(unsigned short ret);
   unsigned int getDI();
-  void setSpeed(float speed_v, float speed_w, int plan_type);
-  void setTwoWheelSpeed(float speed_v, float speed_w);
+  void  setSpeed(float speed_v, float speed_w, int plan_type);
+  void  setTwoWheelSpeed(float speed_v, float speed_w);
   short getMotorSpeed(float speed);
-  bool getOdo(double &x, double &y, double &a);  // NOLINT
-  bool getCSpeed(double &v, double &w);  // NOLINT
-  void getRemoteCmd(unsigned char& cmd, unsigned short& index);
+  bool  getOdo(double &x, double &y, double &a);  // NOLINT
+  bool  getCSpeed(double &v, double &w);  // NOLINT
+  void  getRemoteCmd(unsigned char& cmd, unsigned short& index);
 //  bool setRemoteStatus(unsigned int cmd, unsigned int mark);  // NOLINT
   void getUltra(void);
 //  int getYawAngle(void);
@@ -56,18 +56,18 @@ class WC_chassis_mcu{
   int getLPos();
   int getRPos();
 
-  float H_;
-  float Dia_F_;
-  float Dia_B_;
-  float Axle_;
-  float TimeWidth_;
-  int Counts_;
-  int Reduction_ratio_;
+  float  H_;
+  float  Dia_F_;
+  float  Dia_B_;
+  float  Axle_;
+  float  TimeWidth_;
+  int    Counts_;
+  int    Reduction_ratio_;
   double Speed_ratio_; 
 
   Socket* transfer_;
 
-  bool first_odo_;
+  bool   first_odo_;
   double odom_x_;
   double odom_y_;
   double odom_a_;

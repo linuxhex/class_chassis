@@ -162,17 +162,17 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 		case TIME:
 			break;
 		case SPEED2:
-     	protol->data.speed2_.system_time = data->angle_.system_time;
-     	protol->data.speed2_.speed_v = data->speed2_.speed_v;
-     	protol->data.speed2_.speed_w = data->speed2_.speed_w;
-     	protol->len = sizeof(AngleProtocol);
-      break;
+            protol->data.speed2_.system_time = data->angle_.system_time;
+            protol->data.speed2_.speed_v = data->speed2_.speed_v;
+            protol->data.speed2_.speed_w = data->speed2_.speed_w;
+            protol->len = sizeof(AngleProtocol);
+            break;
 		case SPEED3:
-    	protol->data.speed3_.speed_v = data->speed3_.speed_v;
-    	protol->data.speed3_.speed_w = data->speed3_.speed_w;
-    	protol->data.speed3_.plan_type = data->speed3_.plan_type;
-    	protol->len = sizeof(SpeedProtocol3);
-    break;
+            protol->data.speed3_.speed_v = data->speed3_.speed_v;
+            protol->data.speed3_.speed_w = data->speed3_.speed_w;
+            protol->data.speed3_.plan_type = data->speed3_.plan_type;
+            protol->len = sizeof(SpeedProtocol3);
+            break;
 		case SPEED_TWO_WHEEL:
 			protol->data.speed4_.system_time = data->speed4_.system_time;
 			protol->data.speed4_.speed_left = data->speed4_.speed_left;
@@ -181,28 +181,28 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 			protol->len = sizeof(SpeedTwoWheelProtocol);
 			break;
 		case RULTRASONIC:
-    	protol->len = sizeof(RUltraProtocol);
-      break;
+            protol->len = sizeof(RUltraProtocol);
+            break;
 		case RYAW_ANGLE:
 			protol->len = sizeof(RYawAngleProtocol);
-      break;
+            break;
 		case RREMOTE_CMD:
 			protol->len = sizeof(RRemoteCmdProtocol);
-      break;
+            break;
 		case REMOTE_RET:
-     	protol->data.remote_ret_.ret = data->remote_ret_.ret;
-     	protol->len = sizeof(RemoteRetProtocol);
-    	break;
+            protol->data.remote_ret_.ret = data->remote_ret_.ret;
+            protol->len = sizeof(RemoteRetProtocol);
+            break;
 		case DO:
-     	protol->data.do_.usdo = data->do_.usdo ;
-     	protol->len = sizeof(DoProtocol);
-    	break;
+            protol->data.do_.usdo = data->do_.usdo ;
+            protol->len = sizeof(DoProtocol);
+            break;
 		case DA:
 			protol->data.da_.system_time = data->da_.system_time;
 			protol->data.da_.axis_id =  data->da_.axis_id;
-     	protol->data.da_.da_value = data->da_.da_value;
-     	protol->len = sizeof(DaProtocol);
-    	break;
+            protol->data.da_.da_value = data->da_.da_value;
+            protol->len = sizeof(DaProtocol);
+            break;
 		case RCURRENT:
 			break;
 		case RSPEED:
@@ -221,13 +221,11 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 			break;
 	}
 	Write(&(protol->buflist),protol->header,6);
-
 	Write(&(protol->buflist),&(protol->srcaddr),1);
 	Write(&(protol->buflist),&(protol->dstaddr),1);
 	Write(&(protol->buflist),(unsigned char*)&(protol->type),1);
 	Write(&(protol->buflist),(unsigned char*)&(protol->len),1);
 	Write(&(protol->buflist),(unsigned char*)&(protol->data),protol->len);
-
 
 	Read(&(protol->buflist),ch,len);
 	protol->chksum = checksum(ch+6,*len-6);
@@ -250,21 +248,21 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
 			if (protol->data.pos_.axis_id == 0){
 			    //std::cout<<"left pos:"<<protol->data.pos_.position<<std::endl;
 				m_left_delta = protol->data.pos_.position;
-	    	m_left_pos = protol->data.pos_.system_time;
+                m_left_pos = protol->data.pos_.system_time;
 				//std::cout<<"left_pos:"<<m_left_pos<<std::endl;
 			}else if (protol->data.pos_.axis_id == 1){
 				m_right_delta = protol->data.pos_.position;
-	    	m_right_pos = protol->data.pos_.system_time;
+                m_right_pos = protol->data.pos_.system_time;
 				//std::cout<<"right_pos:"<<m_right_pos<<std::endl;
 			}
 			break;
 		case YAW_ANGLE:
-			m_yaw_angle = protol->data.yaw_angle_.yaw; 
-			m_roll_angle = protol->data.yaw_angle_.roll; 
+            m_yaw_angle   = protol->data.yaw_angle_.yaw;
+            m_roll_angle  = protol->data.yaw_angle_.roll;
 			m_pitch_angle = protol->data.yaw_angle_.pitch; 
 			break;
 		case REMOTE_CMD:
-			m_remote_cmd = protol->data.remote_cmd_.cmd; 
+            m_remote_cmd   = protol->data.remote_cmd_.cmd;
 			m_remote_index = (protol->data.remote_cmd_.index_H << 8) | protol->data.remote_cmd_.index_L; 
 			break;
 	    case ULTRASONIC:

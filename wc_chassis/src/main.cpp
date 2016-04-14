@@ -37,11 +37,11 @@ int main(int argc, char **argv) {
     InitChassis(argc, argv);
     ros::Publisher ultrasonic_pubs[6];
     /* 获得Publish服务句柄*/
-    ros::Publisher yaw_pub = p_n->advertise<std_msgs::Float32>("yaw", 10);
-    ros::Publisher odom_pub  = p_n->advertise<nav_msgs::Odometry>("odom", 50);
-    ros::Publisher gyro_pub  = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
+    ros::Publisher yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
+    ros::Publisher odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
+    ros::Publisher gyro_pub        = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
     ros::Publisher remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
-    ros::Publisher device_pub = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
+    ros::Publisher device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
     ultrasonic_pubs[0] = p_n->advertise<sensor_msgs::Range>("ultrasonic0", 50);
     ultrasonic_pubs[1] = p_n->advertise<sensor_msgs::Range>("ultrasonic1", 50);
     ultrasonic_pubs[2] = p_n->advertise<sensor_msgs::Range>("ultrasonic2", 50);

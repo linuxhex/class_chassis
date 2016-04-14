@@ -34,17 +34,15 @@ Socket::~Socket() {
 }
 
 bool Socket::open() {
-  try {
-    if (socket_ != NULL) {
-      delete socket_;
-      socket_ = NULL;
-    }
 
+//    if (socket_ != NULL) {
+//      delete socket_;
+//      socket_ = NULL;
+//    }
+   try {
     socket_ = new boost::asio::ip::tcp::socket(ios_);
     boost::asio::ip::tcp::resolver resolver(ios_);
-
     boost::asio::connect(*socket_, resolver.resolve({host_name_.c_str(), port_.c_str()}));
-
     ROS_INFO("[SOCKET] open socket successfully");
     return true;
   } catch (std::exception &e) {
@@ -58,7 +56,6 @@ bool Socket::open() {
 }
 
 void Socket::Send_data(U8* s_data, U16 len) {
-  
   m_lReadBuffer.Clear();
   memset(m_szWriteBuffer, 0, 1024);
   m_nWriteBufferSize = len;
@@ -78,7 +75,6 @@ void Socket::read_callback(const boost::system::error_code& error, std::size_t b
 void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
   len = 0;
   int len_tmp = 0;
-
   while (1) {
     len_tmp = m_lReadBuffer.Size();
     if (len_tmp >= need){
@@ -97,7 +93,7 @@ void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
 int Socket::ThreadRun() {
   try {
     while (1) {
-      if (open()) {
+      if (socket_== NULL && open()) {
         read();
         ios_.run();
         ios_.reset();
@@ -134,15 +130,19 @@ void Socket::read() {
   socket_->async_read_some(boost::asio::buffer(m_szReadTemp, 1024),
                             boost::bind(&Socket::read_callback, this,
                                         boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+  if(socket_ != NULL){
+      delete socket_;
+      socket_ = NULL;
+  }
 }
 
 void Socket::write() {
-     if (socket_) {
-    try{
-        size_t len = socket_->write_some(boost::asio::buffer(m_szWriteBuffer, m_nWriteBufferSize));
-     }catch(boost::exception &e){
-        cout << diagnostic_information(e)<<endl;
-     }
+    if (socket_) {
+        try{
+            size_t len = socket_->write_some(boost::asio::buffer(m_szWriteBuffer, m_nWriteBufferSize));
+         }catch(boost::exception &e){
+            cout << diagnostic_information(e)<<endl;
+         }
     }
 }
 

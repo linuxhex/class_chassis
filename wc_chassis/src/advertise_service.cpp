@@ -1,6 +1,7 @@
 #include"advertise_service.h"
 #include"init.h"
 #include "parameter.h"
+
 bool StartRotate(autoscrubber_services::StartRotate::Request& req,
                  autoscrubber_services::StartRotate::Response& res) {
   rotate_angle = req.rotateAngle.data;

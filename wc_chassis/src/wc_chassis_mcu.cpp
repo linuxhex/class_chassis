@@ -48,8 +48,8 @@ WC_chassis_mcu::WC_chassis_mcu()
     last_speed_v_(0.0), last_speed_w_(0.0),
     counts_left_(0), counts_right_(0), first_odo_(true),
     direction(0), speed_v_(0), speed_w_(0), gyro_state_(0) {
-  memset(send_, 0, 10);
-  memset(rec_, 0, 20);
+    memset(send_, 0, 10);
+    memset(rec_, 0, 20);
 }
 
 WC_chassis_mcu::~WC_chassis_mcu() {
