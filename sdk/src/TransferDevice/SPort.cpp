@@ -35,22 +35,22 @@ Socket::~Socket() {
 
 bool Socket::open() {
 
-//    if (socket_ != NULL) {
-//      delete socket_;
-//      socket_ = NULL;
-//    }
+   if (socket_ != NULL) {
+      delete socket_;
+      socket_ = NULL;
+   }
    try {
-    socket_ = new boost::asio::ip::tcp::socket(ios_);
-    boost::asio::ip::tcp::resolver resolver(ios_);
-    boost::asio::connect(*socket_, resolver.resolve({host_name_.c_str(), port_.c_str()}));
-    ROS_INFO("[SOCKET] open socket successfully");
-    return true;
+      socket_ = new boost::asio::ip::tcp::socket(ios_);
+      boost::asio::ip::tcp::resolver resolver(ios_);
+      boost::asio::connect(*socket_, resolver.resolve({host_name_.c_str(), port_.c_str()}));
+      ROS_INFO("[SOCKET] open socket successfully");
+      return true;
   } catch (std::exception &e) {
     ROS_ERROR("[SOCKET] open socket failed");
-       if (socket_ != NULL) {
-        delete socket_;
-        socket_ = NULL;
-      }
+    if (socket_ != NULL) {
+       delete socket_;
+       socket_ = NULL;
+    }
     return false;
   }
 }
@@ -64,10 +64,6 @@ void Socket::Send_data(U8* s_data, U16 len) {
 }
 
 void Socket::read_callback(const boost::system::error_code& error, std::size_t bytes_transferred) {
-    if(socket_ != NULL){
-        delete socket_;
-        socket_ = NULL;
-    }
   if (error) {  // No data was read!
     ROS_ERROR("[SOCKET] read data error");
     return;
@@ -79,6 +75,7 @@ void Socket::read_callback(const boost::system::error_code& error, std::size_t b
 void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
   len = 0;
   int len_tmp = 0;
+
   while (1) {
     len_tmp = m_lReadBuffer.Size();
     if (len_tmp >= need){
@@ -97,12 +94,11 @@ void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
 int Socket::ThreadRun() {
   try {
     while (1) {
-      if (socket_== NULL && open()) {
+      if (open()) {
         read();
         ios_.run();
         ios_.reset();
       }
-
       boost::this_thread::interruption_point();
       SLEEP(1000);
     }
@@ -114,7 +110,6 @@ int Socket::ThreadRun() {
 
 bool Socket::BeginThread() {
   EndThread();
-
   thread_ = new boost::thread(boost::bind(&Socket::ThreadRun, this));
   return thread_ != NULL;
 }
@@ -124,7 +119,6 @@ void Socket::EndThread() {
     ios_.stop();
     thread_->interrupt();
     thread_->join();
-
     delete thread_;
     thread_ = NULL;
   }
