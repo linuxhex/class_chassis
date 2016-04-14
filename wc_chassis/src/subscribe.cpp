@@ -8,9 +8,7 @@ void DoNavigationCallback(const geometry_msgs::Twist& Navigation_msg) {
 
   m_speed_v = Navigation_msg.linear.x;
   m_speed_w = Navigation_msg.angular.z;
-
 //  ROS_INFO("Navigation.linear.x = %f, angular.z = %f", m_speed_v, m_speed_w);
-
   pthread_mutex_lock(&speed_mutex);
   double temp_v = Navigation_msg.linear.x;
   double temp_w = -1 * Navigation_msg.angular.z;
