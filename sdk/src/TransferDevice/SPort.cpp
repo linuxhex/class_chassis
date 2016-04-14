@@ -64,6 +64,10 @@ void Socket::Send_data(U8* s_data, U16 len) {
 }
 
 void Socket::read_callback(const boost::system::error_code& error, std::size_t bytes_transferred) {
+    if(socket_ != NULL){
+        delete socket_;
+        socket_ = NULL;
+    }
   if (error) {  // No data was read!
     ROS_ERROR("[SOCKET] read data error");
     return;
@@ -130,10 +134,7 @@ void Socket::read() {
   socket_->async_read_some(boost::asio::buffer(m_szReadTemp, 1024),
                             boost::bind(&Socket::read_callback, this,
                                         boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
-  if(socket_ != NULL){
-      delete socket_;
-      socket_ = NULL;
-  }
+
 }
 
 void Socket::write() {
