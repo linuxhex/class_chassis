@@ -15,16 +15,16 @@ pthread_mutex_t speed_mutex;
 ros::ServiceServer start_rotate_srv;
 ros::ServiceServer stop_rotate_srv;
 ros::ServiceServer check_rotate_srv;
-ros::Subscriber Navi_sub;
-ros::Subscriber remote_ret_sub;
-ros::Subscriber gyro_update_state_sub;
+ros::Subscriber    Navi_sub;
+ros::Subscriber    remote_ret_sub;
+ros::Subscriber    gyro_update_state_sub;
 
 /***
  * 初始化所有的Service和订阅服务
  */
 void InitService(){
     start_rotate_srv = p_device_nh->advertiseService("start_rotate", &StartRotate);
-    stop_rotate_srv = p_device_nh->advertiseService("stop_rotate", &StopRotate);
+    stop_rotate_srv  = p_device_nh->advertiseService("stop_rotate", &StopRotate);
     check_rotate_srv = p_device_nh->advertiseService("check_rotate", &CheckRotate);
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
     remote_ret_sub = p_device_nh->subscribe("/remote_ret", 10, RemoteRetCallback);
@@ -76,9 +76,9 @@ bool InitChassis(int argc, char **argv){
      p_n = new ros::NodeHandle();
      p_nh = new ros::NodeHandle("~");
      p_device_nh = new ros::NodeHandle("device");
+     p_loop_rate =  new ros::Rate(10);
 
      InitService();
      InitParameter();
-     p_loop_rate =  new ros::Rate(10);
      return true;
 }
