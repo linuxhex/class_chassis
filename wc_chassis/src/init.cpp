@@ -12,16 +12,23 @@ ros::NodeHandle *p_nh;
 ros::NodeHandle *p_device_nh;
 pthread_mutex_t speed_mutex;
 
+ros::ServiceServer start_rotate_srv;
+ros::ServiceServer stop_rotate_srv;
+ros::ServiceServer check_rotate_srv;
+ros::Subscriber Navi_sub;
+ros::Subscriber remote_ret_sub;
+ros::Subscriber gyro_update_state_sub;
+
 /***
  * 初始化所有的Service和订阅服务
  */
 void InitService(){
-    p_device_nh->advertiseService("start_rotate", &StartRotate);
-    p_device_nh->advertiseService("stop_rotate", &StopRotate);
-    p_device_nh->advertiseService("check_rotate", &CheckRotate);
-    p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
-    p_device_nh->subscribe("/remote_ret", 10, RemoteRetCallback);
-    p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
+    start_rotate_srv = p_device_nh->advertiseService("start_rotate", &StartRotate);
+    stop_rotate_srv = p_device_nh->advertiseService("stop_rotate", &StopRotate);
+    check_rotate_srv = p_device_nh->advertiseService("check_rotate", &CheckRotate);
+    Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
+    remote_ret_sub = p_device_nh->subscribe("/remote_ret", 10, RemoteRetCallback);
+    gyro_update_state_sub = p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
 }
 
 /*  ros参数服务器参数的初始化*/
