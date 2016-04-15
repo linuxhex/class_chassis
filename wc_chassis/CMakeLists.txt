@@ -47,7 +47,6 @@ set(WC_CHASSIS_SRC
     src/wc_chassis_mcu.cpp
     src/main.cpp
     src/init.cpp
-    src/tools.cpp
     src/publish.cpp
     src/advertise_service.cpp  
     src/subscribe.cpp
