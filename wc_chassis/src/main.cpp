@@ -276,7 +276,7 @@ void publish_device_status() {
   device_value.value = cur_emergency_status == 0 ? std::string("true") : std::string("false");
   device_status.values.push_back(device_value);
 
-  unsigned int battery_ADC = (g_ultrasonic[20] << 2) | (g_ultrasonic[21] & 0x03);
+  unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
   double battery_value = (0.2393 * battery_ADC - 125.04) * 100;
   int battery_capacity;
   if(battery_value <= battery_empty_level) {
@@ -346,6 +346,7 @@ void DoDIO() {
       going_back_pub.publish(msg); 
     }
     g_di_data_ = temp_di_data;
+    g_do_data_ = g_di_data_; 
   }
 }
 

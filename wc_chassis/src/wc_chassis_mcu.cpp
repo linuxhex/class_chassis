@@ -154,7 +154,7 @@ int getsign(int t) {
 bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
   comunication();
 
-//  std::cout << "left: " << counts_left_ << " right: " << counts_right_ << " dleft: " << delta_counts_left_ << " dright: " << delta_counts_right_ << " angle: " << yaw_angle_  << std::endl;
+  std::cout << "left: " << counts_left_ << " right: " << counts_right_ << " dleft: " << delta_counts_left_ << " dright: " << delta_counts_right_ << " angle: " << yaw_angle_  << std::endl;
 
   if (first_odo_) {
     odom_x_ = 0;
@@ -284,8 +284,8 @@ void WC_chassis_mcu::getUltra() {
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send ultra: " << str << std::endl;
 
-  // std::string str = cComm::ByteToHexString(rec, rlen);
-  // std::cout << "recv ultra: " << str << std::endl;
+   std::string str = cComm::ByteToHexString(rec, rlen);
+   std::cout << "recv ultra: " << str << std::endl;
   // std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
   if (rlen == 35) {
     for (int i = 0; i < rlen; ++i) {
@@ -369,13 +369,13 @@ void WC_chassis_mcu::getYawAngle(short& yaw, short& pitch, short& roll) {
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send ultra: " << str << std::endl;
 
-  // std::string str = cComm::ByteToHexString(rec, rlen);
-  // std::cout << "recv Yaw angle: " << str << std::endl;
+  std::string str = cComm::ByteToHexString(rec, rlen);
+  std::cout << "recv Yaw angle: " << str << std::endl;
   if (rlen == 17) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
         getYaw(yaw, pitch, roll);
-//        std::cout << "Yaw = " << yaw / 10.0 << "; Pitch = " << pitch / 10.0 << "; Roll = " << roll / 10.0 << std::endl;
+        std::cout << "Yaw = " << yaw / 10.0 << "; Pitch = " << pitch / 10.0 << "; Roll = " << roll / 10.0 << std::endl;
       }
     }
   } else {
