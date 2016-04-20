@@ -93,6 +93,7 @@ ros::Publisher gyro_pub;
 ros::Publisher remote_cmd_pub;
 ros::Publisher going_back_pub;
 ros::Publisher device_pub;
+ros::Publisher rotate_finished_pub;
 ros::Publisher yaw_pub;
 ros::Publisher ultrasonic0_pub;
 ros::Publisher ultrasonic1_pub;
@@ -174,7 +175,15 @@ void PublishUltrasonic() {
   publish_ultrasonic(ultrasonic4_pub, "ultrasonic4", g_ultrasonic[5]);
   publish_ultrasonic(ultrasonic5_pub, "ultrasonic5", g_ultrasonic[6]);
 }
-
+void PublishRotateFinished(void){
+    std_msgs::UInt32 msg;
+    if(is_rotate_finished){
+      msg.data = 1;
+    }else{
+      msg.data = 0;
+    }
+    rotate_finished_pub.publish(msg);
+}
 void PublishYaw(){
   std_msgs::Float32 msg;
   msg.data = g_odom_tha * 180.0 / M_PI;
@@ -429,7 +438,7 @@ int main(int argc, char **argv) {
   gyro_pub  = device_nh.advertise<sensor_msgs::Imu>("gyro", 50);
   remote_cmd_pub  = device_nh.advertise<std_msgs::UInt32>("remote_cmd", 50);
   going_back_pub  = device_nh.advertise<std_msgs::UInt32>("cmd_going_back", 50);
-  init_finished_pub = device_nh.advertise<std_msgs::UInt32>("finished",50); //scan init finished topic
+  rotate_finished_pub = device_nh.<std_msgs::UInt32>("rotate_finished", 50);
   device_pub = device_nh.advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
   ultrasonic0_pub = n.advertise<sensor_msgs::Range>("ultrasonic0", 50);
   ultrasonic1_pub = n.advertise<sensor_msgs::Range>("ultrasonic1", 50);
@@ -465,6 +474,7 @@ int main(int argc, char **argv) {
 
     if(start_rotate_flag) {
       DoRotate();
+      PublishRotateFinished();
     } else {
       if (time_now - last_cmd_vel_time >= max_cmd_interval) {
         g_chassis_mcu.setTwoWheelSpeed(0.0,0.0);
