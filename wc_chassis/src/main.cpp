@@ -31,7 +31,6 @@
 
 WC_chassis_mcu g_chassis_mcu;
 
-double ACC_LIM_TH = 3.0 / 2.0 * M_PI;
 double ultral_effective_range = 0.4;
 double g_odom_x   = 0;
 double g_odom_y   = 0;
@@ -117,20 +116,7 @@ void DoNavigation(const geometry_msgs::Twist& Navigation_msg) {
 
   m_speed_v = Navigation_msg.linear.x;
   m_speed_w = Navigation_msg.angular.z;
-
 //  ROS_INFO("Navigation.linear.x = %f, angular.z = %f", m_speed_v, m_speed_w);
-  
-  pthread_mutex_lock(&speed_mutex);
-  double temp_v = Navigation_msg.linear.x;
-  double temp_w = -1 * Navigation_msg.angular.z;
-//  ROS_INFO("Navigation.linear.x = %f, angular.z = %f", temp_v, temp_w);
-  int temp_v_index = (current_v_index + 1) % 3;
-  int temp_w_index = (current_w_index + 1) % 3;
-  g_speed_v[temp_v_index] = static_cast<float>(temp_v);
-  g_speed_w[temp_w_index] = static_cast<float>(temp_w);
-  current_v_index = temp_v_index;
-  current_w_index = temp_w_index;
-  pthread_mutex_unlock(&speed_mutex);
 }
 
 void RemoteRetCallback(const std_msgs::UInt32& ret) {
@@ -178,15 +164,7 @@ void PublishUltrasonic() {
   publish_ultrasonic(ultrasonic4_pub, "ultrasonic4", g_ultrasonic[5]);
   publish_ultrasonic(ultrasonic5_pub, "ultrasonic5", g_ultrasonic[6]);
 }
-void PublishRotateFinished(void){
-    std_msgs::UInt32 msg;
-    if(is_rotate_finished){
-      msg.data = 1;
-    }else{
-      msg.data = 0;
-    }
-    rotate_finished_pub.publish(msg);
-}
+
 void PublishYaw(){
   std_msgs::Float32 msg;
   msg.data = g_odom_tha * 180.0 / M_PI;
@@ -342,6 +320,9 @@ bool DoRotate() {
       is_rotate_finished = true;
       start_rotate_flag = false;
       g_chassis_mcu.setTwoWheelSpeed(0.0, 0.0);
+      std_msgs::UInt32 msg;
+      msg.data = 1;
+      rotate_finished_pub.publish(msg);
     }
   }
   return true;
@@ -413,11 +394,9 @@ int main(int argc, char **argv) {
   double timeWidth = 0;
   std::string host_name;
   int port;
-  std::string str_auto_topic;
   std::string str_odom = "odom";
 
   nh.param("odom", str_odom, str_odom);
-  nh.param("WC_Auto_topic", str_auto_topic, std::string("WC_AUTO"));
   nh.param("max_cmd_interval", max_cmd_interval, 1.0);
   nh.param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
   nh.param("B_DIA", b_dia, static_cast<double>(0.125));
@@ -429,7 +408,6 @@ int main(int argc, char **argv) {
   nh.param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
   nh.param("host_name", host_name, std::string("192.168.1.199"));
   nh.param("port", port, 5000);
-  nh.param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
   nh.param("battery_full_level", battery_full_level, static_cast<double>(27.5));
   nh.param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
   std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << " reduction_ratio: " << reduction_ratio << " speed_ratio:" << speed_ratio << std::endl;
@@ -439,7 +417,7 @@ int main(int argc, char **argv) {
   gyro_pub  = device_nh.advertise<sensor_msgs::Imu>("gyro", 50);
   remote_cmd_pub  = device_nh.advertise<std_msgs::UInt32>("remote_cmd", 50);
   going_back_pub  = device_nh.advertise<std_msgs::UInt32>("cmd_going_back", 50);
-  rotate_finished_pub = device_nh.<std_msgs::UInt32>("rotate_finished", 50);
+  rotate_finished_pub = device_nh.advertise<std_msgs::UInt32>("rotate_finished", 50);
   device_pub = device_nh.advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
   ultrasonic0_pub = n.advertise<sensor_msgs::Range>("ultrasonic0", 50);
   ultrasonic1_pub = n.advertise<sensor_msgs::Range>("ultrasonic1", 50);
@@ -475,15 +453,10 @@ int main(int argc, char **argv) {
 
     if(start_rotate_flag) {
       DoRotate();
-      PublishRotateFinished();
     } else {
       if (time_now - last_cmd_vel_time >= max_cmd_interval) {
         g_chassis_mcu.setTwoWheelSpeed(0.0,0.0);
       } else {
-        pthread_mutex_lock(&speed_mutex);
-        float speed_v = g_speed_v[current_v_index];
-        float speed_w = g_speed_w[current_w_index];
-        pthread_mutex_unlock(&speed_mutex);
         g_chassis_mcu.setTwoWheelSpeed(m_speed_v, m_speed_w);
       }
     }
