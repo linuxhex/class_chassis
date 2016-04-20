@@ -429,6 +429,7 @@ int main(int argc, char **argv) {
   gyro_pub  = device_nh.advertise<sensor_msgs::Imu>("gyro", 50);
   remote_cmd_pub  = device_nh.advertise<std_msgs::UInt32>("remote_cmd", 50);
   going_back_pub  = device_nh.advertise<std_msgs::UInt32>("cmd_going_back", 50);
+  init_finished_pub = device_nh.advertise<std_msgs::UInt32>("finished",50); //scan init finished topic
   device_pub = device_nh.advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
   ultrasonic0_pub = n.advertise<sensor_msgs::Range>("ultrasonic0", 50);
   ultrasonic1_pub = n.advertise<sensor_msgs::Range>("ultrasonic1", 50);
