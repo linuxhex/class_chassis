@@ -74,6 +74,9 @@ unsigned int g_do_data_ = 0;
 unsigned int cur_emergency_status = 1;
 double battery_full_level;
 double battery_empty_level;
+int sum_battery_capacity = 0;
+int display_battery_capacity = 0;
+int battery_count = -1;
 
 unsigned int remote_ret_ = 0x0a00;
 unsigned int remote_ret_cnt_ = 0;
@@ -277,27 +280,27 @@ void publish_device_status() {
   device_status.values.push_back(device_value);
 
   unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
-  double battery_value = (0.2393 * battery_ADC - 125.04) * 100;
-  int battery_capacity;
-  if(battery_value <= battery_empty_level) {
-    battery_capacity = 0;
-  } else if(battery_value >= battery_full_level) {
-    battery_capacity = 100;
-  } else {
-    battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
+//  double battery_value = 0.2393 * battery_ADC - 125.04;
+//  double battery_value = 0.22791 * (battery_ADC - 516);
+  double battery_value = 0.2393 * (battery_ADC - 516);
+  int current_battery_capacity;
+	current_battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
+  if(current_battery_capacity < 0) current_battery_capacity = 0; 
+  if(current_battery_capacity > 100) current_battery_capacity = 100; 
+  ++battery_count;
+  if(battery_count == 0) {
+    display_battery_capacity = current_battery_capacity;
+  } else if(battery_count > 0) {
+    sum_battery_capacity += current_battery_capacity;
+    if(battery_count == 300) {
+      display_battery_capacity = sum_battery_capacity / 300;
+      battery_count = 0;
+      sum_battery_capacity = 0;
+    }
   }
-/*
-  } else if(battery_value >= 2350) {
-    battery_capacity = (battery_value - 2350) * 40 / (2750 - 2350) + 60;
-  } else {
-    battery_capacity = (battery_value - 2000) * 60 / (3500 - 3100);
-  }
-  battery_capacity = battery_capacity > 100 ? 100 : battery_capacity;
-  battery_capacity = battery_capacity < 0 ? 0 : battery_capacity;
-*/
-  std::cout << "battery_ADC " << battery_ADC << "; battery_balue " << battery_value << "; battery_capacity " << battery_capacity << std::endl;
+  std::cout << "battery_ADC " << battery_ADC << "; battery_balue " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << std::endl;
   device_value.key = std::string("battery");
-  device_value.value = std::to_string(battery_capacity);
+  device_value.value = std::to_string(display_battery_capacity);
   device_status.values.push_back(device_value);
 
   device_value.key = std::string("mileage");
@@ -420,8 +423,6 @@ int main(int argc, char **argv) {
   nh.param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
   nh.param("battery_full_level", battery_full_level, static_cast<double>(27.5));
   nh.param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
-  battery_full_level *= 100.0;
-  battery_empty_level *= 100.0;
   std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << " reduction_ratio: " << reduction_ratio << " speed_ratio:" << speed_ratio << std::endl;
 
 //  yaw_pub = n.advertise<std_msgs::Float32>("yaw", 10);
