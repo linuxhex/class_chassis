@@ -19,6 +19,7 @@ endif()
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
+  gslib 
   autoscrubber_services
 )
 
@@ -26,6 +27,7 @@ catkin_package(
   CATKIN_DEPENDS
     roscpp
     tf
+    gslib 
     autoscrubber_services
 )
 

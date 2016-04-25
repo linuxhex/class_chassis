@@ -7,6 +7,7 @@
 #include <ros/ros.h>
 #include <string>
 #include <map>
+#include <gslib/gaussian_debug.h>
 
 #include "MyDefine.h"
 #include "TimerDiff.h"

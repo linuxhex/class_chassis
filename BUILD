@@ -28,6 +28,7 @@ cc_binary(
     linkopts = LINK_OPTS,
     linkstatic = True,
     deps = [
+        "//gslib:gslib",
         "//external:roscpp",
         "//external:tf",
         "//external:boost",

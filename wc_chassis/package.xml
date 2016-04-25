@@ -10,9 +10,11 @@
 
   <build_depend>roscpp</build_depend>
   <build_depend>tf</build_depend>
+  <build_depend>gslib</build_depend>
   <build_depend>autoscrubber_services</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>gslib</run_depend>
   <run_depend>autoscrubber_services</run_depend>
 </package>
