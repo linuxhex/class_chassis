@@ -23,14 +23,6 @@
 #define DELTA_SPEED_W_TH	(0.25) 
 #define DT                      (0.1)
 
-extern double ACC_LIM_TH;
-extern float g_spe;
-extern float g_angle;
-extern int current_v_index;
-extern int current_w_index;
-extern float g_speed_v[3];
-extern float g_speed_w[3];
-extern pthread_mutex_t speed_mutex;
 const float  H = 0.92;
 float current_v = 0.0;
 float current_theta = 0.0;
@@ -591,59 +583,6 @@ void CalculateAngleAndSpeed(float* angle, float* speed, float v, float w) {
   }
 }
 
-void do_auto_acc(float spe, float angle, float last_v, float last_w) {
-  int last_v_index = (current_v_index + 3 - 1) % 3;
-  int last_w_index = (current_w_index + 3 - 1) % 3;
-  int last_second_v_index = (current_v_index + 3 - 2) % 3;
-  int last_second_w_index = (current_w_index + 3 - 2) % 3;
-  // minimum vel is 0.04, so we use 0.07 here to represent in-place rotation, hope
-  // it works
-  if (IsInPlaceRotation(last_v, last_w)) {
-    if (IsInPlaceRotation(g_speed_v[last_v_index], g_speed_w[last_w_index])) {
-      if (angle > current_theta) {
-        g_angle = std::min(current_theta + ACC_LIM_TH * DT, static_cast<double>(angle));
-      } else {
-        g_angle = std::max(current_theta - ACC_LIM_TH * DT, static_cast<double>(angle));
-      }
-      // 0 speed for in-place rotation, but speed cannot be 0 when angle becomes M_PI_2 or -M_PI_2;
-      g_spe = current_v = fabs(fabs(g_angle) - M_PI_2) < 0.001 ? fabs(H * last_w) : 0.0;
-    } else {
-      g_spe = current_v = 0.0;
-    }
-  } else if (IsStop(last_v, last_w)) {
-    g_spe = spe;
-    return;
-  } else {
-    if (angle > current_theta) {
-      g_angle = std::min(current_theta + ACC_LIM_TH * DT, static_cast<double>(angle));
-    } else {
-      g_angle = std::max(current_theta - ACC_LIM_TH * DT, static_cast<double>(angle));
-    }
-    if (IsInPlaceRotation(g_speed_v[last_v_index], g_speed_w[last_w_index]) && fabs(angle - current_theta) > 0.1) {
-      current_v = 0.0;
-      if (!(!IsInPlaceRotation(g_speed_v[last_v_index], g_speed_w[last_w_index]) &&
-            !IsStop(g_speed_v[last_v_index], g_speed_w[last_w_index]) &&
-            IsInPlaceRotation(g_speed_v[last_second_v_index], g_speed_w[last_second_w_index]))) {
-        g_angle = current_theta;
-      }
-    } else {
-      double ACC_V = 0.15;
-      if (fabs(angle - current_theta) > 10e-3) {
-        if (fabs(angle - current_theta) > M_PI / 3.0) {
-          current_v = 0.0;
-        } else {
-          ACC_V = fabs(last_v - current_v) * ACC_LIM_TH / fabs(angle - current_theta);
-          current_v = current_v + ACC_V * DT;
-        }
-      } else {
-        current_v = last_v;
-      }
-    }
-    g_spe = current_v / cos(g_angle);
-  }
-  current_theta = g_angle;
-}
-
 int WC_chassis_mcu::GetCopleySpeed(float v) {       // 将m/s转换成RPM
   // max speed
   v = v > 0.8 ? 0.8 : v;
@@ -764,48 +703,6 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   last_speed_w_ = speed_w;
 }
 
-
-void WC_chassis_mcu::setSpeed(float speed_v, float speed_w, int planner_type) {
-  // calculate angle and speed
-  float angle = 0.0;
-  float speed = 0.0;
-  CalculateAngleAndSpeed(&angle, &speed, speed_v, speed_w);
-  // ROS_INFO("[CHASSIS] before auto_acc, speed: %lf, angle: %lf", speed, angle);
-  if (planner_type == 0) {
-    pthread_mutex_lock(&speed_mutex);
-    do_auto_acc(speed, angle, speed_v, speed_w);
-    pthread_mutex_unlock(&speed_mutex);
-  } else {
-    g_spe = speed;
-    if (!IsStop(speed_v, speed_w)) {
-      g_angle = angle;
-    }
-  }
-
-  int m_angle = GetCopleyAngle(g_angle);
-  int m_spe = GetCopleySpeed(g_spe);
-
-  // ROS_INFO("[CHASSIS] set speed: %d, angle: %d", m_spe, m_angle);
-
-  unsigned char send[1024] = {0};
-  int len = 0;
-
-  unsigned char rec[1024] = {0};
-  int rlen = 0;
-
-  if (m_spe > 0 && m_spe < 3) m_spe = 3;
-
-  CreateSpeed2(send, &len, m_spe, m_angle);
-
-  // std::string str = cComm::ByteToHexString(send, len);
-  // std::cout << "send speed: " << str << std::endl;
-
-  if (transfer_) {
-    transfer_->Send_data(send, len);
-    transfer_->Read_data(rec, rlen, 23, 500);
-  }
-  usleep(1000);
-}
 
 void WC_chassis_mcu::comunication(void) {
   delta_counts_left_ = getLPos();

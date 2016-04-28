@@ -51,15 +51,8 @@ unsigned int g_pc_control = 0;
 double last_cmd_vel_time = 0.0;
 double max_cmd_interval  = 1.0;
 
-int current_v_index = 0;
-int current_w_index = 0;
 float m_speed_v = 0.0;
 float m_speed_w = 0.0;
-float g_speed_v[3] = {0.0, 0.0, 0.0};
-float g_speed_w[3] = {0.0, 0.0, 0.0};
-float g_spe = 0.0;
-float g_angle = 0.0;
-pthread_mutex_t speed_mutex;
 
 unsigned int loop_count = 0;
 unsigned int rotate_angle = 0;
@@ -434,7 +427,6 @@ int main(int argc, char **argv) {
   ros::Subscriber remote_ret_sub = n.subscribe("/device/remote_ret", 10, RemoteRetCallback);
   ros::Subscriber gyro_update_state_sub = n.subscribe("/gyro_update_state", 10, GyroUpdateCallback);
 
-  pthread_mutex_init(&speed_mutex, NULL);
 
   ROS_INFO("waiting network w5500 start....");
 //  sleep(10);
