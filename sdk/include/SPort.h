@@ -17,14 +17,14 @@ class Socket {
 
   void Init(const std::string& host_name, const std::string& port);
 
-  void Send_data(U8* s_data, U16 len);
-  void Read_data(U8* r_data, int &len, int need, int timeout);
+  void Send_data(unsigned char* s_data, unsigned short  len);
+  void Read_data(unsigned char* r_data, int &len, int need, int timeout);
 
  private:
-  U8 m_szReadTemp[1024];
+  unsigned char m_szReadTemp[1024];
   ByteList m_lReadBuffer;
 
-  U8 m_szWriteBuffer[1024];
+  unsigned char m_szWriteBuffer[1024];
   int m_nWriteBufferSize;
 
   std::string port_;

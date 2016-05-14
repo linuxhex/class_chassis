@@ -22,14 +22,6 @@
 #define DELTA_SPEED_W_TH	    (0.25)
 #define DT                      (0.1)
 
-extern double ACC_LIM_TH;
-extern float g_spe;
-extern float g_angle;
-extern int current_v_index;
-extern int current_w_index;
-extern float g_speed_v[3];
-extern float g_speed_w[3];
-extern pthread_mutex_t speed_mutex;
 const float  H = 0.92;
 float current_v = 0.0;
 float current_theta = 0.0;

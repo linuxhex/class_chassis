@@ -14,7 +14,6 @@ sdk/include/Comm.h
 sdk/include/Crc.h
 sdk/include/Geometry.h
 sdk/include/Log.h
-sdk/include/MyDefine.h
 sdk/include/SPort.h
 sdk/include/TimerDiff.h
 sdk/src/Comm/Acc.cpp
@@ -22,7 +21,6 @@ sdk/src/Comm/Comm.cpp
 sdk/src/Comm/Crc.cpp
 sdk/src/Comm/Geometry.cpp
 sdk/src/Comm/Log.cpp
-sdk/src/Comm/my_math.cpp
 sdk/src/Comm/TimerDiff.cpp
 sdk/src/TransferDevice/SPort.cpp
 wc_chassis/include/buffer.h

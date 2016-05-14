@@ -8,13 +8,12 @@
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
-//�����ļ�
-#include <boost/algorithm/string.hpp> 
+
+#include <boost/algorithm/string.hpp>
 #include <boost/xpressive/xpressive_dynamic.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/math/common_factor_rt.hpp>
 
-#include "MyDefine.h"
 
 using namespace std;
 //using namespace boost;

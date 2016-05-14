@@ -69,6 +69,10 @@ extern unsigned int remote_ret_;
 extern unsigned int remote_ret_cnt_;
 extern unsigned char remote_cmd_;
 extern unsigned short remote_index_;
+extern std::string ultrasonic_str[15];
+extern std::vector<int> g_ultrasonic;
+extern pthread_mutex_t speed_mutex;
+
 
 
 #endif

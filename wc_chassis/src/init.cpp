@@ -6,12 +6,12 @@
 tf::TransformBroadcaster *p_odom_broadcaster;
 WC_chassis_mcu *g_chassis_mcu;
 ros::Rate *p_loop_rate;
-std::vector<int> g_ultrasonic;
+
 ros::NodeHandle *p_n;
 ros::NodeHandle *p_nh;
 ros::NodeHandle *p_device_nh;
-pthread_mutex_t speed_mutex;
 
+std::string *ultrasonic;
 ros::ServiceServer start_rotate_srv;
 ros::ServiceServer stop_rotate_srv;
 ros::ServiceServer check_rotate_srv;
@@ -40,6 +40,7 @@ void InitParameter(){
     double b_dia = 0;
     double axle  = 0;
     int counts = 0;
+    ultrasonic = new std::string();
     int reduction_ratio = 0;
     double speed_ratio = 1.0;
     double timeWidth = 0;
@@ -63,6 +64,8 @@ void InitParameter(){
     p_nh->param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
     p_nh->param("battery_full_level", battery_full_level, static_cast<double>(27.5));
     p_nh->param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
+    p_nh->param("ultrasonic",*ultrasonic,std::string(" "));
+
     battery_full_level *= 100.0;
     battery_empty_level *= 100.0;
 

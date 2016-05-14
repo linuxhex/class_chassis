@@ -34,4 +34,10 @@ unsigned int remote_ret_     = 0x0a00;
 unsigned int remote_ret_cnt_ = 0;
 unsigned char remote_cmd_    = 0;
 unsigned short remote_index_ = 0;
+pthread_mutex_t speed_mutex;
+std::vector<int> g_ultrasonic;
+//超声可配的比较
+std::string ultrasonic_str[] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
+                                "ultrasonic5","ultrasonic6","ultrasonic7","ultrasonic8","ultrasonic9",
+                                "ultrasonic10","ultrasonic11","ultrasonic12","ultrasonic13","ultrasonic14"};
 

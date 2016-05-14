@@ -35,19 +35,19 @@
 int main(int argc, char **argv) {
 
     InitChassis(argc, argv);
-    ros::Publisher ultrasonic_pubs[6];
+    ros::Publisher ultrasonic_pub[15];
     /* 获得Publish服务句柄*/
     ros::Publisher yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
     ros::Publisher odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
     ros::Publisher gyro_pub        = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
     ros::Publisher remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
     ros::Publisher device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
-    ultrasonic_pubs[0] = p_n->advertise<sensor_msgs::Range>("ultrasonic0", 50);
-    ultrasonic_pubs[1] = p_n->advertise<sensor_msgs::Range>("ultrasonic1", 50);
-    ultrasonic_pubs[2] = p_n->advertise<sensor_msgs::Range>("ultrasonic2", 50);
-    ultrasonic_pubs[3] = p_n->advertise<sensor_msgs::Range>("ultrasonic3", 50);
-    ultrasonic_pubs[4] = p_n->advertise<sensor_msgs::Range>("ultrasonic4", 50);
-    ultrasonic_pubs[5] = p_n->advertise<sensor_msgs::Range>("ultrasonic5", 50);
+
+    for(int i=0;i<15;i++){
+        if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
+            ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
+        }
+    }
 
    while (ros::ok()) {
     g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
     PublishOdom(p_odom_broadcaster,odom_pub);
     PublishYaw(yaw_pub);
     PublishGyro(gyro_pub);
-    PublishUltrasonic(ultrasonic_pubs);
+    PublishUltrasonic(ultrasonic_pub);
     ros::spinOnce();
     p_loop_rate->sleep();
   }

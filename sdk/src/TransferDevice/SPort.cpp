@@ -55,7 +55,7 @@ bool Socket::open() {
   }
 }
 
-void Socket::Send_data(U8* s_data, U16 len) {
+void Socket::Send_data(unsigned char* s_data, unsigned short len) {
   m_lReadBuffer.Clear();
   memset(m_szWriteBuffer, 0, 1024);
   m_nWriteBufferSize = len;
@@ -72,7 +72,7 @@ void Socket::read_callback(const boost::system::error_code& error, std::size_t b
   read();
 }
 
-void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
+void Socket::Read_data(unsigned char* r_data, int &len, int need, int timeout) {
   len = 0;
   int len_tmp = 0;
 

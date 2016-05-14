@@ -8,11 +8,8 @@
 #include <string>
 #include <map>
 
-#include "MyDefine.h"
 #include "TimerDiff.h"
-
-//#define SPEED_THRESHOLD		4095
-//#define PC_TEST_ONLY
+#include "parameter.h"
 
 class Socket;
 
@@ -75,14 +72,14 @@ class WC_chassis_mcu{
   double odom_v;
   double odom_w;
 
-  S32 delta_counts_left_;
-  S32 delta_counts_right_;
-  S32 last_delta_counts_left_;
-  S32 last_delta_counts_right_;
-  S32 counts_left_;
-  S32 counts_right_;
-  S32 last_counts_left_;
-  S32 last_counts_right_;
+  int delta_counts_left_;
+  int delta_counts_right_;
+  int last_delta_counts_left_;
+  int last_delta_counts_right_;
+  int counts_left_;
+  int counts_right_;
+  int last_counts_left_;
+  int last_counts_right_;
   short last_yaw_angle_;
   float last_speed_v_;
   float last_speed_w_;
@@ -90,8 +87,8 @@ class WC_chassis_mcu{
   ros::Publisher* pos_pub_left_;
   ros::Publisher* pos_pub_right_;
 
-  U8 send_[10];
-  U8 rec_[20];
+  unsigned char send_[10];
+  unsigned char rec_[20];
 
   int direction;
 

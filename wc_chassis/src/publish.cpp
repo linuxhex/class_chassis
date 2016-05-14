@@ -26,13 +26,12 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
 }
 
 
-void PublishUltrasonic(ros::Publisher *ultrasonic_pubs) {
-  publish_ultrasonic(ultrasonic_pubs[0], "ultrasonic0", g_ultrasonic[1]);
-  publish_ultrasonic(ultrasonic_pubs[1], "ultrasonic1", g_ultrasonic[2]);
-  publish_ultrasonic(ultrasonic_pubs[2], "ultrasonic2", g_ultrasonic[3]);
-  publish_ultrasonic(ultrasonic_pubs[3], "ultrasonic3", g_ultrasonic[4]);
-  publish_ultrasonic(ultrasonic_pubs[4], "ultrasonic4", g_ultrasonic[5]);
-  publish_ultrasonic(ultrasonic_pubs[5], "ultrasonic5", g_ultrasonic[6]);
+void PublishUltrasonic(ros::Publisher ultrasonic_pub[]) {
+    for(int i=0;i<15;i++){
+         if(ultrasonic_pub[i] != 0){  //==0表示不是文件里配置的超声
+             publish_ultrasonic(ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i]);
+         }
+    }
 }
 
 void PublishGyro(ros::Publisher &gyro_pub) {
