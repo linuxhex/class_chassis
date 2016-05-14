@@ -28,6 +28,8 @@ class WC_chassis_mcu{
   void setThaLeft(double left);
 
   unsigned int doDIO(unsigned int usdo);
+  unsigned int checkRemoteVerifyKey(unsigned int seed_key);
+  void setRemoteID(unsigned char id);
   void setRemoteRet(unsigned short ret);
   unsigned int getDI();
   void setSpeed(float speed_v, float speed_w, int plan_type);

@@ -50,6 +50,10 @@ typedef enum{
 	DA = 0x08,
 	SPEED3 = 0x09,
 	SPEED_TWO_WHEEL = 0x0a,
+	RREMOTE_ID = 0x40,
+	REMOTE_ID = 0x41,
+	RREMOTE_VERIFY_KEY = 0x42,
+	REMOTE_VERIFY_KEY = 0x43,
 	TIME = 0x7e,
 	RTIME = 0xfe,	
 	RCURRENT = 0x81,
@@ -224,6 +228,21 @@ typedef struct _YAWANGLE {
   short pitch;
 }YawAngleProtocol;
 
+typedef struct _RREMOTE_ID
+{
+  unsigned char id; 
+}RRemoteIDProtocol;
+
+typedef struct _RREMOTE_VERIFY_KEY
+{
+  unsigned int key; 
+}RRemoteVerifyKeyProtocol;
+
+typedef struct _REMOTE_VERIFY_KEY
+{
+  unsigned int check_key; 
+}RemoteVerifyKeyProtocol;
+
 typedef struct _RREMOTECMD {
 }RRemoteCmdProtocol;
 
@@ -261,6 +280,9 @@ typedef union _Data{
   RRemoteCmdProtocol r_remote_cmd_;
   RemoteCmdProtocol remote_cmd_;
   RemoteRetProtocol remote_ret_;
+  RRemoteIDProtocol r_remote_id_;
+  RRemoteVerifyKeyProtocol r_remote_verify_key_;
+  RemoteVerifyKeyProtocol remote_verify_key_;
 }Data;
 
 typedef struct _AGVProtocol
@@ -300,17 +322,20 @@ int GetDelta(int id);
 //short getYaw(void);
 void getYaw(short& yaw_angle, short& pitch_angle, short& roll_angle);
 void getRemote(unsigned char& cmd, unsigned short& index);
+unsigned int getRemoteVerifyKey(void);
 unsigned int GetDI();
 float GetAD(int id);
 float GetAngle(void);
 void CreateSpeed(unsigned char* ch,int* len,int id,float v);
+void CreateRemoteVerifyKey(unsigned char* ch,int* len,int id, unsigned int key);
+void CreateRemoteID(unsigned char* ch,int* len,int id, unsigned char remote_id);
 void CreateRemoteRet(unsigned char* ch,int* len,int id, unsigned short ret);
 void CreateTwoWheelSpeed(unsigned char* ch,int* len,short speedLeft, short speedRight);
 void CreateSpeed2(unsigned char* ch,int* len,int v,int w);
 void CreateSpeed3(unsigned char* ch,int* len,int v,int w, int plan_type);
 void CreateRUltra(unsigned char* ch, int* len);
-void createYawAngle(unsigned char* ch, int* len);
-void createRemoteCmd(unsigned char* ch, int* len);
+void CreateYawAngle(unsigned char* ch, int* len);
+void CreateRemoteCmd(unsigned char* ch, int* len);
 void CreatePos(unsigned char* ch,int* len,int id,int pos);
 void CreateAngle(unsigned char* ch,int* len,int id,float angle);
 void CreateDO(unsigned char* ch,int* len,int id,unsigned int usdo);

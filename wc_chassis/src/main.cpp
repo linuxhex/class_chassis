@@ -101,6 +101,7 @@ ros::ServiceServer start_rotate_srv;
 ros::ServiceServer stop_rotate_srv;
 ros::ServiceServer check_rotate_srv;
 //#define SETTING_PRIORITY
+#define VERIFY_REMOTE_KEY
 
 void DoNavigation(const geometry_msgs::Twist& Navigation_msg) {
   timeval tv;
@@ -361,6 +362,17 @@ bool CheckRotate(autoscrubber_services::CheckRotate::Request& req, autoscrubber_
   return true;
 }
 
+unsigned int GenerateJSHash(unsigned int seed) {
+  std::string str("NTM4N2I2YmFiOWIwNzgzYmViYWFjYjc2"); 
+  long hash = seed;
+  unsigned int hash_ret;
+  for(int i = 0; i < str.length(); i++) {
+    hash ^= ((hash << 5) + str[i] + (hash >> 2));
+  }
+  hash_ret = (unsigned int)((hash >> 6) & 0xDFFFFFFD); 
+  return hash_ret;
+}
+
 int main(int argc, char **argv) {
   ros::init(argc, argv, "wc_chassis");
 #ifdef SETTING_PRIORITY
@@ -370,6 +382,16 @@ int main(int argc, char **argv) {
     std::cout << "set priority failed" << std::endl;
   } else {
     std::cout << "set priority succeed" << std::endl;
+  }
+#endif
+#ifdef VERIFY_REMOTE_KEY 
+  srand((unsigned int)time(NULL));
+  unsigned int seed_key = rand();
+  unsigned int check_key = GenerateJSHash(seed_key);
+  unsigned int verify_key = g_chassis_mcu.checkRemoteVerifyKey(seed_key);
+  std::cout << "seed_key = " << seed_key << "; generate hash check key = " << check_key << "; verify_key = " << verify_key << std::endl;
+  if (check_key != verify_key) {
+    exit(0);
   }
 #endif
   ros::NodeHandle n;
@@ -383,12 +405,16 @@ int main(int argc, char **argv) {
   double axle  = 0;
   int counts = 0;
   int reduction_ratio = 0;
+  int remote_id = 1;
   double speed_ratio = 1.0;
   double timeWidth = 0;
   std::string host_name;
   int port;
   std::string str_odom = "odom";
 
+  nh.param("remote_id", remote_id, 1);
+  nh.param("host_name", host_name, std::string("192.168.1.199"));
+  nh.param("port", port, 5000);
   nh.param("odom", str_odom, str_odom);
   nh.param("max_cmd_interval", max_cmd_interval, 1.0);
   nh.param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
@@ -399,8 +425,6 @@ int main(int argc, char **argv) {
   nh.param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
   nh.param("TimeWidth", timeWidth, static_cast<double>(0.1));
   nh.param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
-  nh.param("host_name", host_name, std::string("192.168.1.199"));
-  nh.param("port", port, 5000);
   nh.param("battery_full_level", battery_full_level, static_cast<double>(27.5));
   nh.param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
   std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << " reduction_ratio: " << reduction_ratio << " speed_ratio:" << speed_ratio << std::endl;
@@ -430,7 +454,7 @@ int main(int argc, char **argv) {
 
   ROS_INFO("waiting network w5500 start....");
 //  sleep(10);
-
+  g_chassis_mcu.setRemoteID((unsigned char)remote_id);
   g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth, counts, reduction_ratio, speed_ratio);
 
 //  std::cout << "Start Main Loop!" << std::endl;

@@ -290,6 +290,49 @@ void WC_chassis_mcu::getUltra() {
   }
 }
 
+unsigned int WC_chassis_mcu::checkRemoteVerifyKey(unsigned int seed_key) {
+  unsigned char send[1024] = {0};
+  int len = 0;
+
+  unsigned char rec[1024] = {0};
+  int rlen = 0;
+
+  CreateRemoteVerifyKey(send, &len, 0, seed_key);
+
+  double start_time = GetTimeInSeconds();
+  if (transfer_) {
+    transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time > 0.002)
+      ROS_INFO("[CHASSIS] checkRemoteVerifyKey: send time = %lf", send_time - start_time);
+#endif
+    transfer_->Read_data(rec, rlen, 15, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time > 0.002)
+      ROS_INFO("[CHASSIS] checkRemoteVerifyKey: recv time = %lf", recv_time - send_time);
+#endif
+  }
+
+  std::string str_send = cComm::ByteToHexString(send, len);
+  std::cout << "send Remote verify key: " << str_send << std::endl;
+
+  std::string str_recv = cComm::ByteToHexString(rec, rlen);
+  std::cout << "recv Remote verify key: " << str_recv << std::endl;
+  if (rlen == 15) {
+    for (int i = 0; i < rlen; ++i) {
+      if (IRQ_CH(rec[i])) {
+        return getRemoteVerifyKey();
+        // ROS_INFO("[wc_chassis] cmd = %d; index = %d", cmd, index);
+      }
+    }
+  } else {
+    // sleep(1);
+  }
+  return 0;
+}
+
 void WC_chassis_mcu::getRemoteCmd(unsigned char& cmd, unsigned short& index) {
   unsigned char send[1024] = {0};
   int len = 0;
@@ -297,7 +340,7 @@ void WC_chassis_mcu::getRemoteCmd(unsigned char& cmd, unsigned short& index) {
   unsigned char rec[1024] = {0};
   int rlen = 0;
 
-  createRemoteCmd(send, &len);
+  CreateRemoteCmd(send, &len);
 
   double start_time = GetTimeInSeconds();
   if (transfer_) {
@@ -340,7 +383,7 @@ void WC_chassis_mcu::getYawAngle(short& yaw, short& pitch, short& roll) {
   unsigned char rec[1024] = {0};
   int rlen = 0;
 
-  createYawAngle(send, &len);
+  CreateYawAngle(send, &len);
 
   double start_time = GetTimeInSeconds();
   if (transfer_) {
@@ -390,13 +433,13 @@ int WC_chassis_mcu::getLPos() {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
     double send_time = GetTimeInSeconds(); 
-    if (send_time - start_time> 0.002)
+    if (send_time - start_time > 0.002)
       ROS_INFO("[CHASSIS] get left pos: send time = %lf", send_time - start_time);
 #endif
     transfer_->Read_data(rec, rlen, 23, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
-    if (recv_time - send_time> 0.002)
+    if (recv_time - send_time > 0.002)
       ROS_INFO("[CHASSIS] get left pos: recv time = %lf", recv_time - send_time);
 #endif
   }
@@ -511,6 +554,45 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
   return 0xffffffff;
 }
 
+void WC_chassis_mcu::setRemoteID(unsigned char id) {
+  
+  if (id < 1 || id > 9) { 
+    ROS_INFO("[wc_chassis] remote id = %d, beyond (1 ~ 9)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", id);
+    return ;
+  }
+  unsigned char send[1024] = {0};
+  int len = 0;
+
+  unsigned char rec[1024] = {0};
+  int rlen = 0;
+  
+  ROS_INFO("[wc_chassis] set chassis remote id = %d", id);
+
+  CreateRemoteID(send, &len, 0, id);
+
+  double start_time = GetTimeInSeconds();
+
+  if (transfer_) {
+    transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time> 0.002)
+      ROS_INFO("[CHASSIS] setRemoteID: send time = %lf", send_time - start_time);
+#endif
+    transfer_->Read_data(rec, rlen, 12, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time> 0.002)
+      ROS_INFO("[CHASSIS] setRemoteID: recv time = %lf", recv_time - send_time);
+#endif
+  }
+
+  // std::string str = cComm::ByteToHexString(send, len);
+  // std::cout << "send remote id: " << str << std::endl;
+
+  usleep(1000);
+}
+
 void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
   if (ret == 0) { 
     ROS_INFO("[wc_chassis] send remote ret == 0!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -534,7 +616,7 @@ void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
     if (send_time - start_time> 0.002)
       ROS_INFO("[CHASSIS] setRemoteRet: send time = %lf", send_time - start_time);
 #endif
-    transfer_->Read_data(rec, rlen, 14, 500);
+    transfer_->Read_data(rec, rlen, 12, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time> 0.002)

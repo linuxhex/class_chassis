@@ -51,6 +51,7 @@ short volatile m_pitch_angle = 0;
 short volatile m_roll_angle = 0;
 unsigned char volatile m_remote_cmd = 0;
 unsigned short volatile m_remote_index = 0;
+unsigned int volatile m_remote_check_key = 0;
 
 unsigned int m_di = 0;
 
@@ -189,6 +190,14 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
 		case RREMOTE_CMD:
 			protol->len = sizeof(RRemoteCmdProtocol);
       break;
+		case RREMOTE_ID:
+     	protol->data.r_remote_id_.id = data->r_remote_id_.id;
+     	protol->len = sizeof(RRemoteIDProtocol);
+    	break;
+		case RREMOTE_VERIFY_KEY:
+     	protol->data.r_remote_verify_key_.key = data->r_remote_verify_key_.key;
+     	protol->len = sizeof(RRemoteVerifyKeyProtocol);
+    	break;
 		case REMOTE_RET:
      	protol->data.remote_ret_.ret = data->remote_ret_.ret;
      	protol->len = sizeof(RemoteRetProtocol);
@@ -263,11 +272,14 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
 			m_roll_angle = protol->data.yaw_angle_.roll; 
 			m_pitch_angle = protol->data.yaw_angle_.pitch; 
 			break;
-		case REMOTE_CMD:
+    case REMOTE_CMD:
 			m_remote_cmd = protol->data.remote_cmd_.cmd; 
 			m_remote_index = (protol->data.remote_cmd_.index_H << 8) | protol->data.remote_cmd_.index_L; 
 			break;
-	    case ULTRASONIC:
+    case REMOTE_VERIFY_KEY:
+			m_remote_check_key = protol->data.remote_verify_key_.check_key;
+      break;
+    case ULTRASONIC:
 			g_ultrasonic.clear();
 			g_ultrasonic.resize(24);
 			for (int i = 0; i < 24; ++i) {
@@ -351,7 +363,7 @@ void CreateRUltra(unsigned char* ch, int* len) {
   Coder(ch,len,&sendProtocol,&data);
 }
 
-void createYawAngle(unsigned char* ch, int* len) {
+void CreateYawAngle(unsigned char* ch, int* len) {
   Data data;
 
   SInit_Proto(&sendProtocol,RYAW_ANGLE);
@@ -359,7 +371,7 @@ void createYawAngle(unsigned char* ch, int* len) {
   Coder(ch,len,&sendProtocol,&data);
 }
 
-void createRemoteCmd(unsigned char* ch, int* len) {
+void CreateRemoteCmd(unsigned char* ch, int* len) {
   Data data;
 
   SInit_Proto(&sendProtocol, RREMOTE_CMD);
@@ -375,6 +387,27 @@ void CreateDO(unsigned char* ch,int* len,int id,unsigned int usdo){
   SInit_Proto(&sendProtocol,DO);
 
   Coder(ch,len,&sendProtocol,&data);
+}
+
+void CreateRemoteID(unsigned char* ch,int* len,int id, unsigned char remote_id) {
+  Data data;
+
+  data.r_remote_id_.id = remote_id;
+
+  SInit_Proto(&sendProtocol, RREMOTE_ID);
+
+  Coder(ch, len, &sendProtocol, &data);
+}
+
+void CreateRemoteVerifyKey(unsigned char* ch,int* len,int id, unsigned int key) {
+  Data data;
+
+  data.r_remote_verify_key_.key = key;
+
+  SInit_Proto(&sendProtocol, RREMOTE_VERIFY_KEY);
+
+  Coder(ch, len, &sendProtocol, &data);
+
 }
 
 void CreateRemoteRet(unsigned char* ch,int* len,int id, unsigned short ret) {
@@ -482,6 +515,10 @@ void getRemote(unsigned char& cmd, unsigned short& index)
 {
   cmd = m_remote_cmd;
   index = m_remote_index;
+}
+
+unsigned int getRemoteVerifyKey(void) {
+  return m_remote_check_key;
 }
 
 int GetPos(int id){
