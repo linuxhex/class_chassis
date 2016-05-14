@@ -2,7 +2,6 @@
 #include "init.h"
 #include "parameter.h"
 
-extern std::vector<int> g_ultrasonic;
 void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int) {  // NOLINT
   sensor_msgs::Range range;
   range.header.seq = 0;
@@ -65,49 +64,64 @@ void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned
 }
 
 void publishDeviceStatus(ros::Publisher &device_pub) {
-  diagnostic_msgs::DiagnosticStatus device_status;
-  diagnostic_msgs::KeyValue device_value;
-  device_status.level = diagnostic_msgs::DiagnosticStatus::OK;
-  device_status.name = std::string("device_status");
-  device_status.message = std::string("status_msgs");
-  device_status.hardware_id = std::string("status_msgs");
+    diagnostic_msgs::DiagnosticStatus device_status;
+    diagnostic_msgs::KeyValue device_value;
+    device_status.level = diagnostic_msgs::DiagnosticStatus::OK;
+    device_status.name = std::string("device_status");
+    device_status.message = std::string("status_msgs");
+    device_status.hardware_id = std::string("status_msgs");
 
-  device_value.key = std::string("emergency_stop");
-  device_value.value = cur_emergency_status == 0 ? std::string("true") : std::string("false");
-  device_status.values.push_back(device_value);
+    device_value.key = std::string("emergency_stop");
+    device_value.value = cur_emergency_status == 0 ? std::string("true") : std::string("false");
+    device_status.values.push_back(device_value);
 
-  unsigned int battery_ADC = (g_ultrasonic[20] << 2) | (g_ultrasonic[21] & 0x03);
-  double battery_value = (0.2393 * battery_ADC - 125.04) * 100;
-  int battery_capacity;
-  if(battery_value <= battery_empty_level) {
-    battery_capacity = 0;
-  } else if(battery_value >= battery_full_level) {
-    battery_capacity = 100;
-  } else {
-    battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
-  }
-/*
-  } else if(battery_value >= 2350) {
-    battery_capacity = (battery_value - 2350) * 40 / (2750 - 2350) + 60;
-  } else {
-    battery_capacity = (battery_value - 2000) * 60 / (3500 - 3100);
-  }
-  battery_capacity = battery_capacity > 100 ? 100 : battery_capacity;
-  battery_capacity = battery_capacity < 0 ? 0 : battery_capacity;
-*/
-  std::cout << "battery_ADC " << battery_ADC << "; battery_balue " << battery_value << "; battery_capacity " << battery_capacity << std::endl;
-  device_value.key = std::string("battery");
-  device_value.value = std::to_string(battery_capacity);
-  device_status.values.push_back(device_value);
 
-  device_value.key = std::string("mileage");
-  unsigned int mileage = (unsigned int)((g_chassis_mcu->mileage_left_ + g_chassis_mcu->mileage_left_) / 2);
-  device_value.value = std::to_string(mileage);
-  device_status.values.push_back(device_value);
+    device_value.key = std::string("MCU_connection"); // 0:bad 1:good
+    device_value.value = (connection_status == 1 ? std::string("true") : std::string("false"));
+    device_status.values.push_back(device_value);
 
-  device_pub.publish(device_status);
+
+    unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
+  //  double battery_value = 0.2393 * battery_ADC - 125.04;
+  //  double battery_value = 0.22791 * (battery_ADC - 516);
+    double battery_value = 0.2393 * (battery_ADC - 516);
+    int current_battery_capacity;
+      current_battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
+    if(current_battery_capacity < 0) current_battery_capacity = 0;
+    if(current_battery_capacity > 100) current_battery_capacity = 100;
+    ++battery_count;
+    if(battery_count == 0) {
+      display_battery_capacity = current_battery_capacity;
+    } else if(battery_count > 0) {
+      sum_battery_capacity += current_battery_capacity;
+      if(battery_count == 300) {
+        display_battery_capacity = sum_battery_capacity / 300;
+        battery_count = 0;
+        sum_battery_capacity = 0;
+      }
+    }
+    std::cout << "battery_ADC " << battery_ADC << "; battery_balue " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << std::endl;
+    device_value.key = std::string("battery");
+    device_value.value = std::to_string(display_battery_capacity);
+    device_status.values.push_back(device_value);
+
+    device_value.key = std::string("mileage");
+    unsigned int mileage = (unsigned int)((g_chassis_mcu->mileage_left_ + g_chassis_mcu->mileage_left_) / 2);
+    device_value.value = std::to_string(mileage);
+    device_status.values.push_back(device_value);
+
+    device_pub.publish(device_status);
 }
-
+void publish_protector_status(ros::Publisher &protector_pub) {
+  std::bitset<32> status;
+  std::string str;
+  diagnostic_msgs::KeyValue value;
+  status = g_ultrasonic[0];
+  str = status.to_string();
+  value.key = std::string("protector_data"); // 0:on 1:off
+  value.value = str.substr(24, 8);
+  protector_pub.publish(value);
+}
 void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub ) {
   nav_msgs::Odometry odom;
   odom.header.stamp = ros::Time::now();;

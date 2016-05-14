@@ -6,6 +6,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <std_msgs/UInt32.h>
+#include <std_msgs/Int32.h>
 #include <std_msgs/Float32.h>
 #include <tf/message_filter.h>
 #include <tf/transform_broadcaster.h>
@@ -42,6 +43,9 @@ int main(int argc, char **argv) {
     ros::Publisher gyro_pub        = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
     ros::Publisher remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
     ros::Publisher device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
+    ros::Publisher rotate_finished_pub = p_device_nh->advertise<std_msgs::Int32>("rotate_finished", 5);
+    ros::Publisher protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
+
 
     for(int i=0;i<15;i++){
         if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
@@ -58,7 +62,7 @@ int main(int argc, char **argv) {
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
     if(start_rotate_flag) {
-      DoRotate();
+      DoRotate(rotate_finished_pub);
     } else {
       if (time_now - last_cmd_vel_time >= max_cmd_interval) {
         g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
@@ -85,6 +89,7 @@ int main(int argc, char **argv) {
     PublishYaw(yaw_pub);
     PublishGyro(gyro_pub);
     PublishUltrasonic(ultrasonic_pub);
+    publish_protector_status(protector_pub);
     ros::spinOnce();
     p_loop_rate->sleep();
   }

@@ -34,5 +34,6 @@ extern void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, u
 extern void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int);
 extern void PublishUltrasonic(ros::Publisher ultrasonic_pub[]);
 extern void PublishGyro(ros::Publisher &gyro_pub);
+extern void publish_protector_status(ros::Publisher &protector_pub);
 
 #endif

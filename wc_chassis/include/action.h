@@ -1,7 +1,8 @@
 #ifndef __ACTION__
 #define __ACTION__
+#include <ros/ros.h>
 
-extern bool DoRotate(void);
-extern void DoDIO(void);
-extern void DoRemoteRet(void);
+ bool DoRotate(ros::Publisher &rotate_finished_pub);
+ void DoDIO(void);
+ void DoRemoteRet(void);
 #endif

@@ -36,6 +36,11 @@ unsigned char remote_cmd_    = 0;
 unsigned short remote_index_ = 0;
 pthread_mutex_t speed_mutex;
 std::vector<int> g_ultrasonic;
+unsigned int connection_status = 1; // mcu ethernet connection status: 0>bad 1>good
+int battery_count = -1;
+int display_battery_capacity = 0;
+int sum_battery_capacity = 0;
+
 //超声可配的比较
 std::string ultrasonic_str[] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
                                 "ultrasonic5","ultrasonic6","ultrasonic7","ultrasonic8","ultrasonic9",

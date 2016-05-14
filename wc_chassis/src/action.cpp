@@ -1,13 +1,18 @@
 #include "action.h"
 #include "init.h"
 #include "parameter.h"
+#include <std_msgs/Int32.h>
 
-bool DoRotate(void) {
+bool DoRotate(ros::Publisher &rotate_finished_pub) {
   if (fabs(g_chassis_mcu->acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) ) {
     start_rotate_flag = false;
     is_rotate_finished = true;
     g_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
 //    ROS_INFO("[wc_chassis] rotate finished!");
+    std_msgs::Int32 msg;
+    msg.data = 1;
+    rotate_finished_pub.publish(msg);
+
     timeval tv;
     gettimeofday(&tv, NULL);
     last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
@@ -23,6 +28,9 @@ bool DoRotate(void) {
     } else {
       is_rotate_finished = true;
       start_rotate_flag = false;
+      std_msgs::Int32 msg;
+      msg.data = 1;
+      rotate_finished_pub.publish(msg);
       g_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
     }
   }

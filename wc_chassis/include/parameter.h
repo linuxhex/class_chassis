@@ -72,7 +72,11 @@ extern unsigned short remote_index_;
 extern std::string ultrasonic_str[15];
 extern std::vector<int> g_ultrasonic;
 extern pthread_mutex_t speed_mutex;
+extern int battery_count;
+extern int display_battery_capacity ;
+extern int sum_battery_capacity;
 
+extern unsigned int connection_status; // mcu ethernet connection status: 0>bad 1>good
 
 
 #endif
