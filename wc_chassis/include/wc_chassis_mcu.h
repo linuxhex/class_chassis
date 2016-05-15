@@ -93,8 +93,8 @@ class WC_chassis_mcu{
   ros::Publisher* pos_pub_left_;
   ros::Publisher* pos_pub_right_;
 
-  U8 send_[10];
-  U8 rec_[20];
+  unsigned char send_[10];
+  unsigned char rec_[20];
 
   int direction;
 

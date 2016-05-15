@@ -1,7 +1,7 @@
 # ros_comm
 git_repository(
     name = "ros_common_git",
-    remote = "http://139.196.192.21/ros_common/ros_common.git",
+    remote = "http://git.gs-robot.com/ros_common/ros_common.git",
     init_submodules = True,
     commit = "81955d71c70920b04f38702b7998a565c4e3b5ad",
 )
@@ -54,7 +54,7 @@ bind(
 # from ros_comm
 git_repository(
     name = "ros_base_git",
-    remote = "http://139.196.192.21/ros_common/ros_base.git",
+    remote = "http://git.gs-robot.com/ros_common/ros_base.git",
     init_submodules = True,
     commit = "dea81814878bf2754b2be930fdaddfaed3bc4a5d",
 )
@@ -105,7 +105,7 @@ bind(
 
 git_repository(
     name = "boost_git",
-    remote = "http://139.196.192.21/common/boost_lib.git",
+    remote = "http://git.gs-robot.com/common/boost_lib.git",
     commit = "0735ab0744cdc258d45af55328fe8c489f134aa2",
 )
 
@@ -116,7 +116,7 @@ bind(
 
 git_repository(
     name = "glog_git",
-    remote = "http://139.196.192.21/common/glog.git",
+    remote = "http://git.gs-robot.com/common/glog.git",
     init_submodules = True,
     commit = "625005d09e687430b4935716a9199ff53be6d2fc",
 )
@@ -154,7 +154,7 @@ bind(
 
 git_repository(
     name = "python_git",
-    remote = "http://139.196.192.21/common/python_lib.git",
+    remote = "http://git.gs-robot.com/common/python_lib.git",
     commit = "084091a77290bd4686ebd0a0a439b9362ca655bd",
 )
 

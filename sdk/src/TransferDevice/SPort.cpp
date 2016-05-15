@@ -10,6 +10,9 @@
 #include "SPort.h"
 #include "Comm.h"
 #include <boost/exception/all.hpp>
+
+extern unsigned int connection_status; // mcu ethernet connection status: 0>bad 1>good
+
 Socket::Socket() {
   socket_ = NULL;
   thread_ = NULL;
@@ -77,11 +80,13 @@ void Socket::read_callback(const boost::system::error_code& error, std::size_t b
 void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
   len = 0;
   int len_tmp = 0;
-
+  connection_status = 0;
   while (1) {
     len_tmp = m_lReadBuffer.Size();
-    if (len_tmp >= need)
-      break;
+    if (len_tmp >= need){
+        connection_status = 1;
+        break;
+    }
     if (timeout--) {
       SLEEP(1);
     } else {

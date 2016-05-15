@@ -7,6 +7,7 @@
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <std_msgs/UInt32.h>
+#include <std_msgs/Int32.h>
 #include <std_msgs/Float32.h>
 #include <tf/message_filter.h>
 #include <tf/transform_broadcaster.h>
@@ -39,6 +40,7 @@ double g_odom_tha = 0;
 double g_odom_v = 0;
 double g_odom_w = 0;
 std::vector<int> g_ultrasonic;
+std::string ultrasonic;
 /********************
   byte     0        1-13          14-17            18               19           20           21          22        23      24
        protector ultrasonic   reserve_ultra  hardware_status   device_status  battery_H    battery_L   charge_H   charge_L
@@ -50,6 +52,8 @@ unsigned int g_pc_control = 0;
 
 double last_cmd_vel_time = 0.0;
 double max_cmd_interval  = 1.0;
+unsigned int connection_status = 1; // mcu ethernet connection status: 0>bad 1>good
+double ACC_LIM_TH = 3.0 / 2.0 * M_PI;
 
 float m_speed_v = 0.0;
 float m_speed_w = 0.0;
@@ -83,6 +87,11 @@ enum Device_ID{
   Device_MAX
 };
 
+ std::string ultrasonic_str[15] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
+                                   "ultrasonic5","ultrasonic6","ultrasonic7","ultrasonic8","ultrasonic9",
+                                   "ultrasonic10","ultrasonic11","ultrasonic12","ultrasonic13","ultrasonic14"
+                                   "ultrasonic15"};
+
 ros::Publisher odom_pub;
 ros::Publisher gyro_pub;
 ros::Publisher remote_cmd_pub;
@@ -90,12 +99,10 @@ ros::Publisher going_back_pub;
 ros::Publisher device_pub;
 ros::Publisher rotate_finished_pub;
 ros::Publisher yaw_pub;
-ros::Publisher ultrasonic0_pub;
-ros::Publisher ultrasonic1_pub;
-ros::Publisher ultrasonic2_pub;
-ros::Publisher ultrasonic3_pub;
-ros::Publisher ultrasonic4_pub;
-ros::Publisher ultrasonic5_pub;
+ros::Publisher ultrasonic_pub[15];
+ros::Publisher protector_pub;
+
+
 
 ros::ServiceServer start_rotate_srv;
 ros::ServiceServer stop_rotate_srv;
@@ -127,7 +134,16 @@ void GyroUpdateCallback(const std_msgs::UInt32& state) {
   }
   ROS_INFO("[wc_chassis] set gyro state = %d", g_chassis_mcu.gyro_state_);
 }
-
+void publish_protector_status() {
+  std::bitset<32> status;
+  std::string str;
+  diagnostic_msgs::KeyValue value;
+  status = g_ultrasonic[0];
+  str = status.to_string();
+  value.key = std::string("protector_data"); // 0:on 1:off
+  value.value = str.substr(24, 8);
+  protector_pub.publish(value);
+}
 void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int) {  // NOLINT
   sensor_msgs::Range range;
   range.header.seq = 0;
@@ -140,7 +156,12 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
   range.max_range = 1.0;
 
   float dis_meter = recv_int * 5.44 / 1000.0;
-  if (dis_meter < range.min_range) {
+
+  if((strcmp(frame_id,"ultrasonic8") == 0) || (strcmp(frame_id,"ultrasonic9") == 0)){
+      dis_meter = dis_meter - 0.20;
+  }
+
+  if(dis_meter < range.min_range) {
     range.range = range.min_range;
   } else if (dis_meter > ultral_effective_range) {  // effective range
     range.range = range.max_range;
@@ -151,12 +172,12 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
 }
 
 void PublishUltrasonic() {
-  publish_ultrasonic(ultrasonic0_pub, "ultrasonic0", g_ultrasonic[1]);
-  publish_ultrasonic(ultrasonic1_pub, "ultrasonic1", g_ultrasonic[2]);
-  publish_ultrasonic(ultrasonic2_pub, "ultrasonic2", g_ultrasonic[3]);
-  publish_ultrasonic(ultrasonic3_pub, "ultrasonic3", g_ultrasonic[4]);
-  publish_ultrasonic(ultrasonic4_pub, "ultrasonic4", g_ultrasonic[5]);
-  publish_ultrasonic(ultrasonic5_pub, "ultrasonic5", g_ultrasonic[6]);
+
+  for(int i=0;i<15;i++){
+      if((ultrasonic.find(ultrasonic_str[i]) != std::string::npos) && (ultrasonic_pub[i] != 0)){
+          publish_ultrasonic(ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i]);
+      }
+  }
 }
 
 void PublishYaw(){
@@ -260,6 +281,10 @@ void publish_device_status() {
   device_value.value = cur_emergency_status == 0 ? std::string("true") : std::string("false");
   device_status.values.push_back(device_value);
 
+  device_value.key = std::string("MCU_connection"); // 0:bad 1:good
+  device_value.value = connection_status == 1 ? std::string("true") : std::string("false");
+  device_status.values.push_back(device_value);
+
   unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
 //  double battery_value = 0.2393 * battery_ADC - 125.04;
 //  double battery_value = 0.22791 * (battery_ADC - 516);
@@ -292,12 +317,19 @@ void publish_device_status() {
   device_pub.publish(device_status);
 }
 
+void PublishRotateFinished(int is_finished) {
+  std_msgs::Int32 msg;
+  msg.data = is_finished;
+  rotate_finished_pub.publish(msg);
+}
+
 bool DoRotate() {
-  if (fabs(g_chassis_mcu.acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) ) {
+  if (fabs(g_chassis_mcu.acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI) ) {
     start_rotate_flag = false;
     is_rotate_finished = true;
     g_chassis_mcu.setTwoWheelSpeed(0.0, 0.0);
 //    ROS_INFO("[wc_chassis] rotate finished!");
+    PublishRotateFinished(1);
     timeval tv;
     gettimeofday(&tv, NULL);
     last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
@@ -314,9 +346,7 @@ bool DoRotate() {
       is_rotate_finished = true;
       start_rotate_flag = false;
       g_chassis_mcu.setTwoWheelSpeed(0.0, 0.0);
-      std_msgs::UInt32 msg;
-      msg.data = 1;
-      rotate_finished_pub.publish(msg);
+      PublishRotateFinished(1);
     }
   }
   return true;
@@ -338,7 +368,7 @@ void DoDIO() {
 }
 
 void DoRemoteRet() {
-  if (++remote_ret_cnt_ > 15) {
+  if (++remote_ret_cnt_ > 8) {
     remote_ret_ &= 0xff00;
   }
   g_chassis_mcu.setRemoteRet(remote_ret_);
@@ -362,16 +392,19 @@ bool CheckRotate(autoscrubber_services::CheckRotate::Request& req, autoscrubber_
   return true;
 }
 
+#ifdef VERIFY_REMOTE_KEY 
 unsigned int GenerateJSHash(unsigned int seed) {
-  std::string str("NTM4N2I2YmFiOWIwNzgzYmViYWFjYjc2"); 
-  long hash = seed;
-  unsigned int hash_ret;
-  for(int i = 0; i < str.length(); i++) {
-    hash ^= ((hash << 5) + str[i] + (hash >> 2));
+  unsigned char ch[] = "NTM4N2I2YmFiOWIwNzgzYmViYWFjYjc2"; 
+  unsigned int hash = seed;
+  for(int i = 0; i < 32; i++) {
+    hash ^= ((hash << 5) + ch[i] + (hash >> 2));
   }
-  hash_ret = (unsigned int)((hash >> 6) & 0xDFFFFFFD); 
-  return hash_ret;
+  for(int i = 0; i < 32; i++) {
+    hash ^= (((hash - ch[i]) >> 2) + (hash << 3));
+  }
+  return hash;
 }
+#endif
 
 int main(int argc, char **argv) {
   ros::init(argc, argv, "wc_chassis");
@@ -382,16 +415,6 @@ int main(int argc, char **argv) {
     std::cout << "set priority failed" << std::endl;
   } else {
     std::cout << "set priority succeed" << std::endl;
-  }
-#endif
-#ifdef VERIFY_REMOTE_KEY 
-  srand((unsigned int)time(NULL));
-  unsigned int seed_key = rand();
-  unsigned int check_key = GenerateJSHash(seed_key);
-  unsigned int verify_key = g_chassis_mcu.checkRemoteVerifyKey(seed_key);
-  std::cout << "seed_key = " << seed_key << "; generate hash check key = " << check_key << "; verify_key = " << verify_key << std::endl;
-  if (check_key != verify_key) {
-    exit(0);
   }
 #endif
   ros::NodeHandle n;
@@ -413,7 +436,7 @@ int main(int argc, char **argv) {
   std::string str_odom = "odom";
 
   nh.param("remote_id", remote_id, 1);
-  nh.param("host_name", host_name, std::string("192.168.1.199"));
+  nh.param("host_name", host_name, std::string("10.7.5.199"));
   nh.param("port", port, 5000);
   nh.param("odom", str_odom, str_odom);
   nh.param("max_cmd_interval", max_cmd_interval, 1.0);
@@ -427,6 +450,7 @@ int main(int argc, char **argv) {
   nh.param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
   nh.param("battery_full_level", battery_full_level, static_cast<double>(27.5));
   nh.param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
+  nh.param("ultrasonic",ultrasonic,std::string(" "));
   std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << " reduction_ratio: " << reduction_ratio << " speed_ratio:" << speed_ratio << std::endl;
 
 //  yaw_pub = n.advertise<std_msgs::Float32>("yaw", 10);
@@ -434,14 +458,15 @@ int main(int argc, char **argv) {
   gyro_pub  = device_nh.advertise<sensor_msgs::Imu>("gyro", 50);
   remote_cmd_pub  = device_nh.advertise<std_msgs::UInt32>("remote_cmd", 50);
   going_back_pub  = device_nh.advertise<std_msgs::UInt32>("cmd_going_back", 50);
-  rotate_finished_pub = device_nh.advertise<std_msgs::UInt32>("rotate_finished", 50);
+  rotate_finished_pub = device_nh.advertise<std_msgs::Int32>("rotate_finished", 5);
   device_pub = device_nh.advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
-  ultrasonic0_pub = n.advertise<sensor_msgs::Range>("ultrasonic0", 50);
-  ultrasonic1_pub = n.advertise<sensor_msgs::Range>("ultrasonic1", 50);
-  ultrasonic2_pub = n.advertise<sensor_msgs::Range>("ultrasonic2", 50);
-  ultrasonic3_pub = n.advertise<sensor_msgs::Range>("ultrasonic3", 50);
-  ultrasonic4_pub = n.advertise<sensor_msgs::Range>("ultrasonic4", 50);
-  ultrasonic5_pub = n.advertise<sensor_msgs::Range>("ultrasonic5", 50);
+  protector_pub = device_nh.advertise<diagnostic_msgs::KeyValue>("protector", 50);
+
+  for(int i=0;i<15;i++){
+    if(ultrasonic.find(ultrasonic_str[i]) != std::string::npos) {
+      ultrasonic_pub[i] = n.advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
+    }
+  }
 
   start_rotate_srv = device_nh.advertiseService("start_rotate", &StartRotate);
   stop_rotate_srv = device_nh.advertiseService("stop_rotate", &StopRotate);
@@ -454,9 +479,22 @@ int main(int argc, char **argv) {
 
   ROS_INFO("waiting network w5500 start....");
 //  sleep(10);
-  g_chassis_mcu.setRemoteID((unsigned char)remote_id);
   g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth, counts, reduction_ratio, speed_ratio);
 
+  sleep(1);
+
+#ifdef VERIFY_REMOTE_KEY 
+  srand((unsigned int)time(NULL));
+  unsigned int seed_key = rand();
+  unsigned int check_key = GenerateJSHash(seed_key);
+  unsigned int verify_key = g_chassis_mcu.checkRemoteVerifyKey(seed_key);
+  std::cout << "seed_key = " << seed_key << "; generate hash check key = " << check_key << "; verify_key = " << verify_key << std::endl;
+  if (check_key != verify_key) {
+    std::cout << "check key failed, return directly" << std::endl;
+    exit(0);
+  }
+#endif
+  g_chassis_mcu.setRemoteID((unsigned char)remote_id);
 //  std::cout << "Start Main Loop!" << std::endl;
   ros::Rate loop_rate(10);
   while (ros::ok()) {
@@ -491,6 +529,8 @@ int main(int argc, char **argv) {
     PublishGyro();
     // publish ultrasonic data
     PublishUltrasonic();
+    // publish protector status
+    publish_protector_status();
     ros::spinOnce();
     loop_rate.sleep();
   }

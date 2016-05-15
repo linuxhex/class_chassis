@@ -587,8 +587,8 @@ void WC_chassis_mcu::setRemoteID(unsigned char id) {
 #endif
   }
 
-  // std::string str = cComm::ByteToHexString(send, len);
-  // std::cout << "send remote id: " << str << std::endl;
+  std::string str = cComm::ByteToHexString(send, len);
+  std::cout << "send remote id: " << str << std::endl;
 
   usleep(1000);
 }
