@@ -29,6 +29,12 @@
 #include <sstream>
 #include <vector>
 #include "wc_chassis_mcu.h"  // NOLINT
+#if defined(VERIFY_REMTOE_ID)
+#include "gs/file_util.h"
+#endif
+
+//#define SETTING_PRIORITY
+#define VERIFY_REMOTE_KEY
 
 WC_chassis_mcu g_chassis_mcu;
 
@@ -71,8 +77,9 @@ unsigned int cur_emergency_status = 1;
 double battery_full_level;
 double battery_empty_level;
 int sum_battery_capacity = 0;
-int display_battery_capacity = 0;
+int display_battery_capacity = 50;
 int battery_count = -1;
+int battery_level_ = 3;
 
 unsigned int remote_ret_ = 0x0a00;
 unsigned int remote_ret_cnt_ = 0;
@@ -102,13 +109,9 @@ ros::Publisher yaw_pub;
 ros::Publisher ultrasonic_pub[15];
 ros::Publisher protector_pub;
 
-
-
 ros::ServiceServer start_rotate_srv;
 ros::ServiceServer stop_rotate_srv;
 ros::ServiceServer check_rotate_srv;
-//#define SETTING_PRIORITY
-#define VERIFY_REMOTE_KEY
 
 void DoNavigation(const geometry_msgs::Twist& Navigation_msg) {
   timeval tv;
@@ -134,6 +137,7 @@ void GyroUpdateCallback(const std_msgs::UInt32& state) {
   }
   ROS_INFO("[wc_chassis] set gyro state = %d", g_chassis_mcu.gyro_state_);
 }
+
 void publish_protector_status() {
   std::bitset<32> status;
   std::string str;
@@ -144,6 +148,7 @@ void publish_protector_status() {
   value.value = str.substr(24, 8);
   protector_pub.publish(value);
 }
+
 void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int) {  // NOLINT
   sensor_msgs::Range range;
   range.header.seq = 0;
@@ -304,7 +309,17 @@ void publish_device_status() {
       sum_battery_capacity = 0;
     }
   }
-  std::cout << "battery_ADC " << battery_ADC << "; battery_balue " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << std::endl;
+  if (display_battery_capacity < 10) {
+    battery_level_ = 0;
+  } else if (display_battery_capacity < 40) {
+    battery_level_ = 1;
+  } else if (display_battery_capacity < 75) {
+    battery_level_ = 2;
+  } else {
+    battery_level_ = 3;
+  }
+
+  std::cout << "battery_ADC " << battery_ADC << "; battery_balue " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << " battery_level_" << battery_level_ << std::endl;
   device_value.key = std::string("battery");
   device_value.value = std::to_string(display_battery_capacity);
   device_status.values.push_back(device_value);
@@ -462,8 +477,8 @@ int main(int argc, char **argv) {
   device_pub = device_nh.advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
   protector_pub = device_nh.advertise<diagnostic_msgs::KeyValue>("protector", 50);
 
-  for(int i=0;i<15;i++){
-    if(ultrasonic.find(ultrasonic_str[i]) != std::string::npos) {
+  for (int i = 0; i < 15; i++) {
+    if (ultrasonic.find(ultrasonic_str[i]) != std::string::npos) {
       ultrasonic_pub[i] = n.advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
     }
   }
@@ -472,10 +487,21 @@ int main(int argc, char **argv) {
   stop_rotate_srv = device_nh.advertiseService("stop_rotate", &StopRotate);
   check_rotate_srv = device_nh.advertiseService("check_rotate", &CheckRotate);
 
-  ros::Subscriber Navi_sub   = n.subscribe("cmd_vel", 10, DoNavigation);
+  ros::Subscriber Navi_sub = n.subscribe("cmd_vel", 10, DoNavigation);
   ros::Subscriber remote_ret_sub = n.subscribe("/device/remote_ret", 10, RemoteRetCallback);
   ros::Subscriber gyro_update_state_sub = n.subscribe("/gyro_update_state", 10, GyroUpdateCallback);
 
+#if defined(VERIFY_REMTOE_ID)
+  std::string str_id;
+  if (!gs::file::ReadFile("param_device", str_id)) {
+    remote_id = 1;
+  } else {
+    str_id = str_id.substr(str_id.find(' ') + 1, str_id.size());
+	  int temp_id = std::atoi(str_id.c_str());
+    remote_id = temp_id > 0 && temp_id < 10 ? temp_id : 1;
+    std::cout << "remote_id = " << remote_id << std::endl;
+  }
+#endif
 
   ROS_INFO("waiting network w5500 start....");
 //  sleep(10);
@@ -494,7 +520,7 @@ int main(int argc, char **argv) {
     exit(0);
   }
 #endif
-  g_chassis_mcu.setRemoteID((unsigned char)remote_id);
+  g_chassis_mcu.setRemoteID((unsigned char)((remote_id & 0x3f) | (battery_level_ << 6)));
 //  std::cout << "Start Main Loop!" << std::endl;
   ros::Rate loop_rate(10);
   while (ros::ok()) {
@@ -521,6 +547,9 @@ int main(int argc, char **argv) {
       g_chassis_mcu.getRemoteCmd(remote_cmd_, remote_index_);
       PublisheRemoteCmd(remote_cmd_, remote_index_); 
       publish_device_status();
+    }
+    if (loop_count % 10) {
+      g_chassis_mcu.setRemoteID((unsigned char)((remote_id & 0x3f) | (battery_level_ << 6)));
       loop_count = 0;
     }
     //发布里程计

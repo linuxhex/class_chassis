@@ -361,8 +361,8 @@ void WC_chassis_mcu::getRemoteCmd(unsigned char& cmd, unsigned short& index) {
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send Remote cmd: " << str << std::endl;
 
-  // std::string str = cComm::ByteToHexString(rec, rlen);
-  // std::cout << "recv Remote cmd: " << str << std::endl;
+  std::string str = cComm::ByteToHexString(rec, rlen);
+  std::cout << "recv Remote cmd: " << str << std::endl;
   if (rlen == 14) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
@@ -555,9 +555,9 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
 }
 
 void WC_chassis_mcu::setRemoteID(unsigned char id) {
-  
-  if (id < 1 || id > 9) { 
-    ROS_INFO("[wc_chassis] remote id = %d, beyond (1 ~ 9)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", id);
+  unsigned char remote_id = id & 0x3f;  
+  if (remote_id < 1 || remote_id > 9) { 
+    ROS_INFO("[wc_chassis] remote id = %d, beyond (1 ~ 9)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", remote_id);
     return ;
   }
   unsigned char send[1024] = {0};
@@ -566,7 +566,7 @@ void WC_chassis_mcu::setRemoteID(unsigned char id) {
   unsigned char rec[1024] = {0};
   int rlen = 0;
   
-  ROS_INFO("[wc_chassis] set chassis remote id = %d", id);
+  ROS_INFO("[wc_chassis] set chassis remote id = %d", remote_id);
 
   CreateRemoteID(send, &len, 0, id);
 

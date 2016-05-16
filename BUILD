@@ -26,6 +26,9 @@ cc_binary(
     ],
     copts = COPTS,
     linkopts = LINK_OPTS,
+    defines = [
+        "VERIFY_REMTOE_ID=0",
+    ],
     linkstatic = True,
     deps = [
         "//gslib:gslib",
@@ -34,6 +37,7 @@ cc_binary(
         "//external:boost",
         "//external:nav_msgs",
         "//autoscrubber_services:autoscrubber_services",
+        "//gs:gs",
     ],
     visibility = ["//visibility:public"],
 )
