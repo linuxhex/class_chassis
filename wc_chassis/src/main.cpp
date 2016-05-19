@@ -94,10 +94,10 @@ enum Device_ID{
   Device_MAX
 };
 
- std::string ultrasonic_str[15] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
-                                   "ultrasonic5","ultrasonic6","ultrasonic7","ultrasonic8","ultrasonic9",
-                                   "ultrasonic10","ultrasonic11","ultrasonic12","ultrasonic13","ultrasonic14"
-                                   "ultrasonic15"};
+std::string ultrasonic_str[15] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
+                                  "ultrasonic5","ultrasonic6","ultrasonic7","ultrasonic8","ultrasonic9",
+                                  "ultrasonic10","ultrasonic11","ultrasonic12","ultrasonic13","ultrasonic14"
+                                  "ultrasonic15"};
 
 ros::Publisher odom_pub;
 ros::Publisher gyro_pub;
@@ -177,11 +177,10 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
 }
 
 void PublishUltrasonic() {
-
-  for(int i=0;i<15;i++){
-      if((ultrasonic.find(ultrasonic_str[i]) != std::string::npos) && (ultrasonic_pub[i] != 0)){
-          publish_ultrasonic(ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i]);
-      }
+  for (int i=0;i<15;i++) {
+    if ((ultrasonic.find(ultrasonic_str[i]) != std::string::npos) && (ultrasonic_pub[i] != 0)) {
+      publish_ultrasonic(ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i]);
+    }
   }
 }
 
@@ -450,7 +449,7 @@ int main(int argc, char **argv) {
   int port;
   std::string str_odom = "odom";
 
-  nh.param("remote_id", remote_id, 1);
+//  nh.param("remote_id", remote_id, 1);
   nh.param("host_name", host_name, std::string("10.7.5.199"));
   nh.param("port", port, 5000);
   nh.param("odom", str_odom, str_odom);
@@ -514,9 +513,9 @@ int main(int argc, char **argv) {
   unsigned int seed_key = rand();
   unsigned int check_key = GenerateJSHash(seed_key);
   unsigned int verify_key = g_chassis_mcu.checkRemoteVerifyKey(seed_key);
-  std::cout << "seed_key = " << seed_key << "; generate hash check key = " << check_key << "; verify_key = " << verify_key << std::endl;
+//  std::cout << "seed_key = " << seed_key << "; generate hash check key = " << check_key << "; verify_key = " << verify_key << std::endl;
   if (check_key != verify_key) {
-    std::cout << "check key failed, return directly" << std::endl;
+//    std::cout << "check key failed, return directly" << std::endl;
     exit(0);
   }
 #endif
