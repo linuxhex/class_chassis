@@ -292,7 +292,7 @@ void publish_device_status() {
   unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
 //  double battery_value = 0.2393 * battery_ADC - 125.04;
 //  double battery_value = 0.22791 * (battery_ADC - 516);
-  double battery_value = 0.2393 * (battery_ADC - 516);
+  double battery_value = 0.2298 * (battery_ADC - 516);
   int current_battery_capacity;
 	current_battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
   if(current_battery_capacity < 0) current_battery_capacity = 0; 
