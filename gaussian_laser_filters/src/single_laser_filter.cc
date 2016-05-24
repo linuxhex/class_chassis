@@ -77,6 +77,7 @@ bool SingleLaserFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
         i += 1;
         continue;
       }
+/*
       if (scan_in.ranges[i] < check_distance_min_
           && fabs(scan_in.ranges[i] - scan_in.ranges[i - 1]) > double_isolated_distance_min_ 
           && fabs(scan_in.ranges[i] - scan_in.ranges[i + 2]) > double_isolated_distance_min_ 
@@ -89,6 +90,7 @@ bool SingleLaserFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msg
         i += 1;
         continue;
       }
+*/
     }
     pair_queue_.pop();
   }
