@@ -38,7 +38,7 @@ bool AngleLimitFilter::update(const sensor_msgs::LaserScan& scan_in, sensor_msgs
     double angle = scan_out.angle_min;
     for (unsigned int i = 0; i < scan_out.ranges.size(); ++i) {
       if (angle <= angle_min_ || angle >= angle_max_) {
-        scan_out.ranges[i] = 0.0;
+        scan_out.ranges[i] = range_outside_;
       }
       angle += scan_out.angle_increment;
     }

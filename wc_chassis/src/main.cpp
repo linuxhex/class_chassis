@@ -493,7 +493,7 @@ int main(int argc, char **argv) {
 #if defined(VERIFY_REMTOE_ID)
   std::string str_id;
   if (!gs::file::ReadFile("param_device", str_id)) {
-    remote_id = 1;
+    remote_id = 2;
   } else {
     str_id = str_id.substr(str_id.find(' ') + 1, str_id.size());
 	  int temp_id = std::atoi(str_id.c_str());
