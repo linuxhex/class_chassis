@@ -402,7 +402,7 @@ void WC_chassis_mcu::getYawAngle(short& yaw, short& pitch, short& roll) {
   }
 
   // std::string str = cComm::ByteToHexString(send, len);
-  // std::cout << "send ultra: " << str << std::endl;
+  // std::cout << "send yaw: " << str << std::endl;
 
   std::string str = cComm::ByteToHexString(rec, rlen);
   std::cout << "recv Yaw angle: " << str << std::endl;
@@ -536,10 +536,10 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
       ROS_INFO("[CHASSIS] get_DI: cost time = %lf", recv_time - send_time);
 #endif
   }
-  // std::string str = cComm::ByteToHexString(send, len);
-  // std::cout << "send do: " << str << std::endl;
-  std::string str = cComm::ByteToHexString(rec, len);
-  std::cout << "get di: " << str << std::endl;
+  std::string str_send = cComm::ByteToHexString(send, len);
+  std::cout << "send do: " << str_send << std::endl;
+  std::string str_recv = cComm::ByteToHexString(rec, len);
+  std::cout << "get di: " << str_recv << std::endl;
 
   if (rlen == 15) {
     for (int i = 0 ; i < rlen ; ++i) {
@@ -624,8 +624,8 @@ void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
 #endif
   }
 
-  // std::string str = cComm::ByteToHexString(send, len);
-  // std::cout << "send remote ret: " << str << std::endl;
+  std::string str = cComm::ByteToHexString(send, len);
+  std::cout << "send remote ret: " << str << std::endl;
 
   usleep(1000);
 }
@@ -747,11 +747,11 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
       speed_left = 2 * speed_v - speed_right;
     }
   }
-//  ROS_INFO("[CHASSIS] raw speed Left: %.2f, Right: %.2f", speed_left, speed_right);
+  ROS_INFO("[CHASSIS] raw speed Left: %.2f, Right: %.2f", speed_left, speed_right);
   m_speed_left = getMotorSpeed(speed_left);
   m_speed_right= getMotorSpeed(speed_right);
   
-//  ROS_INFO("[CHASSIS] set motor cmd Left: %d, Right: %d", m_speed_left, m_speed_right);
+  ROS_INFO("[CHASSIS] set motor cmd Left: %d, Right: %d", m_speed_left, m_speed_right);
 
   unsigned char send[1024] = {0};
   int len = 0;
@@ -761,8 +761,8 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
 
   CreateTwoWheelSpeed(send, &len, m_speed_left, m_speed_right);
 
-  // std::string str = cComm::ByteToHexString(send, len);
-  // std::cout << "send speed: " << str << std::endl;
+  std::string str = cComm::ByteToHexString(send, len);
+  std::cout << "send speed: " << str << std::endl;
   //  std::cout << "send speed: " << str.substr(42, 12) << std::endl;
   double start_time = GetTimeInSeconds();
  if (transfer_) {
