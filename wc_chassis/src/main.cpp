@@ -445,6 +445,9 @@ int main(int argc, char **argv) {
   int remote_id = 1;
   double speed_ratio = 1.0;
   double timeWidth = 0;
+  double max_speed_v, max_speed_w; 
+  double speed_v_acc, speed_v_dec;
+  double speed_w_acc, speed_w_dec;
   std::string host_name;
   int port;
   std::string str_odom = "odom";
@@ -461,6 +464,14 @@ int main(int argc, char **argv) {
   nh.param("REDUCTION_RATIO", reduction_ratio, 30);
   nh.param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
   nh.param("TimeWidth", timeWidth, static_cast<double>(0.1));
+
+  nh.param("max_speed_v", max_speed_v, static_cast<double>(0.6));
+  nh.param("max_speed_w", max_speed_w, static_cast<double>(0.6));
+  nh.param("speed_v_acc", speed_v_acc, static_cast<double>(0.025));
+  nh.param("speed_v_dec", speed_v_dec, static_cast<double>(-0.12));
+  nh.param("speed_w_acc", speed_w_acc, static_cast<double>(0.25));
+  nh.param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));
+
   nh.param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
   nh.param("battery_full_level", battery_full_level, static_cast<double>(27.5));
   nh.param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
@@ -504,7 +515,8 @@ int main(int argc, char **argv) {
 
   ROS_INFO("waiting network w5500 start....");
 //  sleep(10);
-  g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth, counts, reduction_ratio, speed_ratio);
+  g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth, counts, reduction_ratio, speed_ratio, 
+                     max_speed_v, max_speed_w, speed_v_acc, speed_v_dec, speed_w_acc, speed_w_dec);
 
   sleep(1);
 

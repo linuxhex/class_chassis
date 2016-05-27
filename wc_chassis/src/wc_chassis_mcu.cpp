@@ -14,8 +14,7 @@
 
 #include "wc_chassis_mcu.h"  // NOLINT
 
-#define REDUCTION_RATIO	        (25)
-#define SPEED_TH	        (1000)	
+#define SPEED_CMD_TH	          (1000)	
 #define SPEED_V_TH		(0.52)
 #define SPEED_W_TH		(0.6)
 #define DELTA_SPEED_V_INC_TH    (0.025)
@@ -46,7 +45,7 @@ WC_chassis_mcu::WC_chassis_mcu()
 
 WC_chassis_mcu::~WC_chassis_mcu() { }
 
-void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio) {
+void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_w_acc, double speed_w_dec) {
   if (!transfer_) {
     transfer_ = new Socket();
     transfer_->Init(host_name, port);
@@ -98,6 +97,49 @@ void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,
   } else {
     std::cout << "TimeWidth err value:" <<TimeWidth<< std::endl;
   }
+
+  if (max_speed_v > 0) {
+    max_speed_v_ = max_speed_v;
+  } else {
+    max_speed_v_ = 0.5;
+    std::cout << "max_speed_v err value:" <<max_speed_v<< std::endl;
+  }
+
+  if (max_speed_w > 0) {
+    max_speed_w_ = max_speed_w;
+  } else {
+    max_speed_w_ = 0.5;
+    std::cout << "max_speed_w err value:" <<max_speed_w<< std::endl;
+  }
+
+  if ((speed_v_acc > 0) && (speed_v_acc < max_speed_v_)) {
+    speed_v_acc_ = speed_v_acc;
+  } else {
+    speed_v_acc_ = 0.05;
+    std::cout << "speed_v_acc err value:" <<speed_v_acc<< std::endl;
+  }
+
+  if ((speed_v_dec < 0) && (speed_v_dec > (-1.0 * max_speed_v_))) {
+    speed_v_dec_ = speed_v_dec;
+  } else {
+    speed_v_dec_ = -0.12;
+    std::cout << "speed_v_dec err value:" <<speed_v_dec<< std::endl;
+  }
+
+  if ((speed_w_acc > 0) && (speed_w_acc < max_speed_w_)) {
+    speed_w_acc_ = speed_w_acc;
+  } else {
+    speed_w_acc_ = 0.25;
+    std::cout << "speed_w_acc err value:" <<speed_w_acc<< std::endl;
+  }
+
+  if ((speed_w_dec < 0) && (speed_w_dec > (-1.0 * max_speed_w_))) {
+    speed_w_dec_ = speed_w_dec;
+  } else {
+    speed_w_dec_ = -0.25;
+    std::cout << "speed_w_dec err value:" <<speed_w_dec<< std::endl;
+  }
+
 }
 
 int WC_chassis_mcu::V2RPM(float v) {
@@ -681,8 +723,8 @@ int WC_chassis_mcu::GetCopleyAngle(float angle) {
 short WC_chassis_mcu::getMotorSpeed(float speed) {
   // transfer real speed to motor comond
   short ret = (short)(speed / (Dia_B_ * M_PI) * Reduction_ratio_ / 3.0 * 60.0);
-  ret = ret > SPEED_TH ? SPEED_TH : ret;
-  ret = ret < ((-1) * SPEED_TH) ? ((-1) * SPEED_TH) : ret;
+  ret = ret > SPEED_CMD_TH ? SPEED_CMD_TH : ret;
+  ret = ret < ((-1) * SPEED_CMD_TH) ? ((-1) * SPEED_CMD_TH) : ret;
   return ret;
 }
 	
@@ -697,18 +739,18 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   float speed_right = 0.0;
   short m_speed_left = 0;
   short m_speed_right = 0;
-  speed_v = fabs(speed_v) > SPEED_V_TH ?  sign(speed_v) * SPEED_V_TH : speed_v;
-  speed_w = fabs(speed_w) > SPEED_W_TH ?  sign(speed_w) * SPEED_W_TH : speed_w;
+  speed_v = fabs(speed_v) > max_speed_v_ ?  sign(speed_v) * max_speed_v_ : speed_v;
+  speed_w = fabs(speed_w) > max_speed_w_ ?  sign(speed_w) * max_speed_w_ : speed_w;
   
   float delta_speed_v = speed_v - last_speed_v_;
   float delta_speed_w = speed_w - last_speed_w_;  
   // speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;  
   
   if(delta_speed_v > 0.0) { 
-    float delta_speed_v_inc = fabs(speed_v) < 0.01 ? 0.25 : DELTA_SPEED_V_INC_TH;
-    speed_v = delta_speed_v > delta_speed_v_inc ? (last_speed_v_ + delta_speed_v_inc) : speed_v;  
+    float delta_speed_v_acc = fabs(speed_v) < 0.01 ? 0.25 : speed_v_acc_;
+    speed_v = delta_speed_v > delta_speed_v_acc ? (last_speed_v_ + delta_speed_v_acc) : speed_v;  
  } else {
-    float delta_speed_v_dec = fabs(speed_v) < 0.01 ? -0.20 : DELTA_SPEED_V_DEC_TH;
+    float delta_speed_v_dec = fabs(speed_v) < 0.01 ? -0.20 : speed_v_dec_;
     speed_v = delta_speed_v < delta_speed_v_dec ? (last_speed_v_ + delta_speed_v_dec) : speed_v;  
   }
 /*  if(delta_speed_w > 0.0) { 
@@ -717,7 +759,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
      speed_w = delta_speed_w < DELTA_SPEED_W_DEC_TH ? (last_speed_w_ + DELTA_SPEED_W_DEC_TH) : speed_w;  
   }
 */
-  speed_w = fabs(delta_speed_w) > DELTA_SPEED_W_TH ? (last_speed_w_ + sign(delta_speed_w) * DELTA_SPEED_W_TH) : speed_w;  
+  speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;  
 
   // calculate angle and speed
 //  CalculateAngleAndSpeed(&angle, &speed, speed_v, speed_w);	  
