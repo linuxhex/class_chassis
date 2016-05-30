@@ -22,7 +22,7 @@ class WC_chassis_mcu{
   WC_chassis_mcu();
   ~WC_chassis_mcu();
 
-  void Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_w_acc, double speed_w_dec);
+  void Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec);
 
   void setThaZero(double zero);
   void setThaLeft(double left);
@@ -68,7 +68,7 @@ class WC_chassis_mcu{
   int Reduction_ratio_;
   double Speed_ratio_; 
   double max_speed_v_, max_speed_w_;
-  double speed_v_acc_, speed_v_dec_;
+  double speed_v_acc_, speed_v_dec_, speed_v_dec_zero_;
   double speed_w_acc_, speed_w_dec_; 
 
   Socket* transfer_;

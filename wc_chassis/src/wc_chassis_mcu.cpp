@@ -45,7 +45,7 @@ WC_chassis_mcu::WC_chassis_mcu()
 
 WC_chassis_mcu::~WC_chassis_mcu() { }
 
-void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_w_acc, double speed_w_dec) {
+void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec) {
   if (!transfer_) {
     transfer_ = new Socket();
     transfer_->Init(host_name, port);
@@ -124,6 +124,13 @@ void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,
   } else {
     speed_v_dec_ = -0.12;
     std::cout << "speed_v_dec err value:" <<speed_v_dec<< std::endl;
+  }
+
+  if ((speed_v_dec_zero < 0) && (speed_v_dec_zero > (-1.0 * max_speed_v_))) {
+    speed_v_dec_zero_ = speed_v_dec_zero;
+  } else {
+    speed_v_dec_zero_ = -0.12;
+    std::cout << "speed_v_dec_zero err value:" <<speed_v_dec_zero<< std::endl;
   }
 
   if ((speed_w_acc > 0) && (speed_w_acc < max_speed_w_)) {
@@ -357,11 +364,11 @@ unsigned int WC_chassis_mcu::checkRemoteVerifyKey(unsigned int seed_key) {
 #endif
   }
 
-  std::string str_send = cComm::ByteToHexString(send, len);
-  std::cout << "send Remote verify key: " << str_send << std::endl;
+//  std::string str_send = cComm::ByteToHexString(send, len);
+//  std::cout << "send Remote verify key: " << str_send << std::endl;
 
-  std::string str_recv = cComm::ByteToHexString(rec, rlen);
-  std::cout << "recv Remote verify key: " << str_recv << std::endl;
+//  std::string str_recv = cComm::ByteToHexString(rec, rlen);
+//  std::cout << "recv Remote verify key: " << str_recv << std::endl;
   if (rlen == 15) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
@@ -735,6 +742,7 @@ double sign(double t){
 void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
 //  float angle = 0.0;
 //  float speed = 0.0;
+  ROS_INFO("[CHASSIS] get speed v = %.2f, w = %.2f", speed_v, speed_w);
   float speed_left = 0.0;
   float speed_right = 0.0;
   short m_speed_left = 0;
@@ -750,7 +758,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
     float delta_speed_v_acc = fabs(speed_v) < 0.01 ? 0.25 : speed_v_acc_;
     speed_v = delta_speed_v > delta_speed_v_acc ? (last_speed_v_ + delta_speed_v_acc) : speed_v;  
  } else {
-    float delta_speed_v_dec = fabs(speed_v) < 0.01 ? -0.20 : speed_v_dec_;
+    float delta_speed_v_dec = fabs(speed_v) < 0.01 ? speed_v_dec_zero_ : speed_v_dec_;
     speed_v = delta_speed_v < delta_speed_v_dec ? (last_speed_v_ + delta_speed_v_dec) : speed_v;  
   }
 /*  if(delta_speed_w > 0.0) { 
@@ -761,6 +769,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
 */
   speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;  
 
+  ROS_INFO("[CHASSIS] set real speed v = %.2f, w = %.2f", speed_v, speed_w);
   // calculate angle and speed
 //  CalculateAngleAndSpeed(&angle, &speed, speed_v, speed_w);	  
 

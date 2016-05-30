@@ -446,7 +446,7 @@ int main(int argc, char **argv) {
   double speed_ratio = 1.0;
   double timeWidth = 0;
   double max_speed_v, max_speed_w; 
-  double speed_v_acc, speed_v_dec;
+  double speed_v_acc, speed_v_dec, speed_v_dec_zero;
   double speed_w_acc, speed_w_dec;
   std::string host_name;
   int port;
@@ -469,6 +469,7 @@ int main(int argc, char **argv) {
   nh.param("max_speed_w", max_speed_w, static_cast<double>(0.6));
   nh.param("speed_v_acc", speed_v_acc, static_cast<double>(0.025));
   nh.param("speed_v_dec", speed_v_dec, static_cast<double>(-0.12));
+  nh.param("speed_v_dec_to_zero", speed_v_dec_zero, static_cast<double>(-0.12));
   nh.param("speed_w_acc", speed_w_acc, static_cast<double>(0.25));
   nh.param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));
 
@@ -477,6 +478,7 @@ int main(int argc, char **argv) {
   nh.param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
   nh.param("ultrasonic",ultrasonic,std::string(" "));
   std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << " reduction_ratio: " << reduction_ratio << " speed_ratio:" << speed_ratio << std::endl;
+  std::cout << "max_speed_v:" << max_speed_v << " max_speed_w:" << max_speed_w << " speed_v_acc:" << speed_v_acc << " speed_v_dec: " << speed_v_dec << " speed_w_dec_to_zero:" << speed_v_dec_zero << " speed_w_acc:" << speed_w_acc  << " speed_w_dec:" << speed_w_dec << std::endl;
 
 //  yaw_pub = n.advertise<std_msgs::Float32>("yaw", 10);
   odom_pub  = n.advertise<nav_msgs::Odometry>("odom", 50);
@@ -516,7 +518,7 @@ int main(int argc, char **argv) {
   ROS_INFO("waiting network w5500 start....");
 //  sleep(10);
   g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth, counts, reduction_ratio, speed_ratio, 
-                     max_speed_v, max_speed_w, speed_v_acc, speed_v_dec, speed_w_acc, speed_w_dec);
+                     max_speed_v, max_speed_w, speed_v_acc, speed_v_dec, speed_v_dec_zero, speed_w_acc, speed_w_dec);
 
   sleep(1);
 
