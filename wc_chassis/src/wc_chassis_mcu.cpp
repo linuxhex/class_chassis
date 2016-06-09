@@ -45,7 +45,7 @@ WC_chassis_mcu::WC_chassis_mcu()
 
 WC_chassis_mcu::~WC_chassis_mcu() { }
 
-void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed) {
+void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th) {
   if (!transfer_) {
     transfer_ = new Socket();
     transfer_->Init(host_name, port);
@@ -150,9 +150,16 @@ void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,
   if ((full_speed > 0) && (full_speed < 20)) {
     full_speed_ = full_speed;
   } else {
-    full_speed_ = -0.25;
+    full_speed_ = 3.0;
     std::cout << "full_speed err value:" <<full_speed<< std::endl;
   }
+  if ((delta_counts_th > 0) && (delta_counts_th < 200)) {
+    delta_counts_th_ = delta_counts_th;
+  } else {
+    delta_counts_th_ = 40;
+    std::cout << "delta_counts_th err value:" <<delta_counts_th<< std::endl;
+  }
+
 }
 
 int WC_chassis_mcu::V2RPM(float v) {
@@ -243,10 +250,13 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
 
   // std::cout << "dleft: " << delta_counts_left << " dright: " << delta_counts_right << std::endl;
 
-  if (abs(delta_counts_right) > 800) {
+  //防止码盘抖动
+  if (abs(delta_counts_right) > delta_counts_th_) {
+    delta_counts_right = 2 * last_delta_counts_right_;
     std::cout << "err delta_counts_right: " << delta_counts_right << std::endl;
   }
-  if (abs(delta_counts_left) > 800) {
+  if (abs(delta_counts_left) > delta_counts_th_) {
+    delta_counts_left = 2 * last_delta_counts_left_;
     std::cout << "err delta_counts_left: " << delta_counts_left << std::endl;
   }
 

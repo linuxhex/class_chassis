@@ -449,6 +449,7 @@ int main(int argc, char **argv) {
   double speed_v_acc, speed_v_dec, speed_v_dec_zero;
   double speed_w_acc, speed_w_dec;
   double full_speed;
+  int delta_counts_th;
   std::string host_name;
   int port;
   std::string str_odom = "odom";
@@ -474,6 +475,7 @@ int main(int argc, char **argv) {
   nh.param("speed_w_acc", speed_w_acc, static_cast<double>(0.25));
   nh.param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));
   nh.param("full_speed",full_speed,static_cast<double>(3.0));
+  nh.param("delta_counts_th",delta_counts_th,40);
 
   nh.param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
   nh.param("battery_full_level", battery_full_level, static_cast<double>(27.5));
@@ -520,7 +522,7 @@ int main(int argc, char **argv) {
   ROS_INFO("waiting network w5500 start....");
 //  sleep(10);
   g_chassis_mcu.Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle, timeWidth, counts, reduction_ratio, speed_ratio, 
-                     max_speed_v, max_speed_w, speed_v_acc, speed_v_dec, speed_v_dec_zero, speed_w_acc, speed_w_dec,full_speed);
+                     max_speed_v, max_speed_w, speed_v_acc, speed_v_dec, speed_v_dec_zero, speed_w_acc, speed_w_dec,full_speed,delta_counts_th);
 
   sleep(1);
 
