@@ -70,6 +70,7 @@ class WC_chassis_mcu{
   double max_speed_v_, max_speed_w_;
   double speed_v_acc_, speed_v_dec_, speed_v_dec_zero_;
   double speed_w_acc_, speed_w_dec_; 
+  double full_speed_;
 
   Socket* transfer_;
 
