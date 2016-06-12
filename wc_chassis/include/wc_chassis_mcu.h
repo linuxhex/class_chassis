@@ -22,7 +22,7 @@ class WC_chassis_mcu{
   WC_chassis_mcu();
   ~WC_chassis_mcu();
 
-  void Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio);
+  void Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th);
 
   void setThaZero(double zero);
   void setThaLeft(double left);
@@ -67,6 +67,11 @@ class WC_chassis_mcu{
   int Counts_;
   int Reduction_ratio_;
   double Speed_ratio_; 
+  double max_speed_v_, max_speed_w_;
+  double speed_v_acc_, speed_v_dec_, speed_v_dec_zero_;
+  double speed_w_acc_, speed_w_dec_; 
+  double full_speed_;
+  int delta_counts_th_;
 
   Socket* transfer_;
 
@@ -82,6 +87,8 @@ class WC_chassis_mcu{
   S32 delta_counts_right_;
   S32 last_delta_counts_left_;
   S32 last_delta_counts_right_;
+  int last_odo_delta_counts_left_;
+  int last_odo_delta_counts_right_;
   S32 counts_left_;
   S32 counts_right_;
   S32 last_counts_left_;
