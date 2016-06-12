@@ -195,7 +195,8 @@ int getsign(int t) {
 bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
   comunication();
 
-  std::cout << "left: " << counts_left_ << " right: " << counts_right_ << " dleft: " << delta_counts_left_ << " dright: " << delta_counts_right_ << " angle: " << yaw_angle_  << std::endl;
+  // std::cout << "left: " << counts_left_ << " right: " << counts_right_ << " dleft: " << delta_counts_left_ << " dright: " << delta_counts_right_ << " angle: " << yaw_angle_  << std::endl;
+	ROS_INFO("[WC CHASSIS] left: %d right: %d dleft: %d dright: %d angle: %d", counts_left_, counts_right_, delta_counts_left_, delta_counts_right_, yaw_angle_);
 
   if (first_odo_) {
     odom_x_ = 0;
