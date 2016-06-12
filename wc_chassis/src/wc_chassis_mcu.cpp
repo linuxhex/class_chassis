@@ -209,7 +209,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
   comunication();
 
   // std::cout << "left: " << counts_left_ << " right: " << counts_right_ << " dleft: " << delta_counts_left_ << " dright: " << delta_counts_right_ << " angle: " << yaw_angle_  << std::endl;
-	ROS_INFO("[WC CHASSIS] left: %d right: %d dleft: %d dright: %d angle: %d", counts_left_, counts_right_, delta_counts_left_, delta_counts_right_, yaw_angle_);
+	ROS_INFO("[WC CHASSIS] left: %d right: %d dleft: %d dright: %d ddleft: %d ddright: %d ngle: %f", counts_left_, counts_right_, delta_counts_left_, delta_counts_right_, delta_counts_left_ - last_odo_delta_counts_left_, delta_counts_right_ - last_odo_delta_counts_right_, yaw_angle_ / 10.0);
 
   if (first_odo_) {
     odom_x_ = 0;
@@ -217,6 +217,9 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     odom_a_ = 0;
     odom_a_gyro_ = 0;
     acc_odom_theta_ = 0.0;
+
+    last_odo_delta_counts_right_ = delta_counts_right_;
+    last_odo_delta_counts_left_ = delta_counts_left_;
 
     last_counts_left_ = counts_left_;
     last_counts_right_ = counts_right_;
@@ -253,13 +256,16 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
 
   //防止码盘抖动
   if (abs(delta_counts_right) > delta_counts_th_) {
-    delta_counts_right = 2 * last_delta_counts_right_;
-    std::cout << "err delta_counts_right: " << delta_counts_right << std::endl;
+    ROS_ERROR("err delta_counts_right: %d", delta_counts_right);
+    delta_counts_right = last_odo_delta_counts_right_;
   }
   if (abs(delta_counts_left) > delta_counts_th_) {
-    delta_counts_left = 2 * last_delta_counts_left_;
-    std::cout << "err delta_counts_left: " << delta_counts_left << std::endl;
+    ROS_ERROR("err delta_counts_left: %d", delta_counts_left);
+    delta_counts_left = last_odo_delta_counts_left_;
   }
+
+  last_odo_delta_counts_right_ = delta_counts_right;
+  last_odo_delta_counts_left_ = delta_counts_left;
 
   double l_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_left * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
   double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920

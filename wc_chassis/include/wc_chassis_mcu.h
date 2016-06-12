@@ -87,6 +87,8 @@ class WC_chassis_mcu{
   S32 delta_counts_right_;
   S32 last_delta_counts_left_;
   S32 last_delta_counts_right_;
+  int last_odo_delta_counts_left_;
+  int last_odo_delta_counts_right_;
   S32 counts_left_;
   S32 counts_right_;
   S32 last_counts_left_;
