@@ -85,6 +85,7 @@ unsigned int remote_ret_ = 0x0a00;
 unsigned int remote_ret_cnt_ = 0;
 unsigned char remote_cmd_;
 unsigned short remote_index_;
+int remote_speed_level_ = 0;
 
 enum Device_ID{
   Emergency_stop = 0,
@@ -476,6 +477,7 @@ int main(int argc, char **argv) {
   nh.param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));
   nh.param("full_speed",full_speed,static_cast<double>(3.0));
   nh.param("delta_counts_th",delta_counts_th,40);
+  nh.param("remote_speed_level", remote_speed_level_, 1);
 
   nh.param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
   nh.param("battery_full_level", battery_full_level, static_cast<double>(27.5));
@@ -537,7 +539,7 @@ int main(int argc, char **argv) {
     exit(0);
   }
 #endif
-  g_chassis_mcu.setRemoteID((unsigned char)((remote_id & 0x3f) | (battery_level_ << 6)));
+  g_chassis_mcu.setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
 //  std::cout << "Start Main Loop!" << std::endl;
   ros::Rate loop_rate(10);
   while (ros::ok()) {
@@ -566,7 +568,7 @@ int main(int argc, char **argv) {
       publish_device_status();
     }
     if (loop_count % 10) {
-      g_chassis_mcu.setRemoteID((unsigned char)((remote_id & 0x3f) | (battery_level_ << 6)));
+      g_chassis_mcu.setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
       loop_count = 0;
     }
     //发布里程计
