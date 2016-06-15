@@ -484,7 +484,8 @@ void WC_chassis_mcu::getYawAngle(short& yaw, short& pitch, short& roll) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
         getYaw(yaw, pitch, roll);
-        std::cout << "Yaw = " << yaw / 10.0 << "; Pitch = " << pitch / 10.0 << "; Roll = " << roll / 10.0 << std::endl;
+        // std::cout << "Yaw = " << yaw / 10.0 << "; Pitch = " << pitch / 10.0 << "; Roll = " << roll / 10.0 << std::endl;
+				ROS_INFO("[WC CHASSIS] yaw: %lf, pitch: %lf, roll: %lf", yaw / 10.0, pitch / 10.0, roll / 10.0);
       }
     }
   } else {
