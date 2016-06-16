@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 
     InitChassis(argc, argv);
     ros::Publisher ultrasonic_pub[15];
-    /* 获得Publish服务句柄*/
+    /*********************************publish handle init ******************************/
     ros::Publisher yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
     ros::Publisher odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
     ros::Publisher gyro_pub        = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
             ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
         }
     }
-
+    /*********************************  主循环  ******************************/
    while (ros::ok()) {
     g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
     g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
@@ -67,10 +67,6 @@ int main(int argc, char **argv) {
       if (time_now - last_cmd_vel_time >= max_cmd_interval) {
         g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
       } else {
-//        pthread_mutex_lock(&speed_mutex);
-//        float speed_v = g_speed_v[current_v_index];
-//        float speed_w = g_speed_w[current_w_index];
-//        pthread_mutex_unlock(&speed_mutex);
         g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
       }
     }
