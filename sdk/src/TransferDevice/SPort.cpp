@@ -78,23 +78,24 @@ void Socket::read_callback(const boost::system::error_code& error, std::size_t b
 }
 
 void Socket::Read_data(U8* r_data, int &len, int need, int timeout) {
-  len = 0;
-  int len_tmp = 0;
-  connection_status = 0;
-  while (1) {
-    len_tmp = m_lReadBuffer.Size();
-    if (len_tmp >= need){
-        connection_status = 1;
+    len = 0;
+    int len_tmp = 0;
+    while (1) {
+      connection_status = 1;
+      len_tmp = m_lReadBuffer.Size();
+      if (len_tmp >= need){
+          break;
+      }
+      if (timeout--) {
+        connection_status = 2;
+        SLEEP(1);
+      } else {
+        connection_status = 0;
+        ROS_INFO("[SOCKET] time out");
         break;
+      }
     }
-    if (timeout--) {
-      SLEEP(1);
-    } else {
-      ROS_ERROR("[SOCKET] time out");
-      break;
-    }
-  }
-  m_lReadBuffer.Read(r_data, len);
+    m_lReadBuffer.Read(r_data, len);
 }
 
 int Socket::ThreadRun() {
@@ -146,7 +147,7 @@ void Socket::write() {
 
   try{
      if (socket_) {
-        size_t len = socket_->write_some(boost::asio::buffer(m_szWriteBuffer, m_nWriteBufferSize));
+        socket_->write_some(boost::asio::buffer(m_szWriteBuffer, m_nWriteBufferSize));
      }
   }catch(boost::exception &e){
     cout << diagnostic_information(e)<<endl; 

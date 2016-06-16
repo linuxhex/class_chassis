@@ -19,6 +19,7 @@
 #include <autoscrubber_services/StartRotate.h>
 #include <autoscrubber_services/StopRotate.h>
 #include <autoscrubber_services/CheckRotate.h>
+#include <autoscrubber_services/CheckHardware.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -94,6 +95,9 @@ enum Device_ID{
   Device_MAX
 };
 
+ std::string hardware_id;
+
+
 std::string ultrasonic_str[15] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
                                   "ultrasonic5","ultrasonic6","ultrasonic7","ultrasonic8","ultrasonic9",
                                   "ultrasonic10","ultrasonic11","ultrasonic12","ultrasonic13","ultrasonic14"
@@ -112,6 +116,7 @@ ros::Publisher protector_pub;
 ros::ServiceServer start_rotate_srv;
 ros::ServiceServer stop_rotate_srv;
 ros::ServiceServer check_rotate_srv;
+ros::ServiceServer check_hardware_srv;
 
 void DoNavigation(const geometry_msgs::Twist& Navigation_msg) {
   timeval tv;
@@ -272,6 +277,26 @@ void PublisheRemoteCmd(unsigned char cmd, unsigned short index) {
   remote_cmd.data = (index << 8) | cmd; 
   remote_cmd_pub.publish(remote_cmd);
 }
+/*
+ *硬件模块的状态,service服务函数
+ */
+bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrubber_services::CheckHardware::Response& res) {
+
+  int hardware_s = g_ultrasonic[19];
+
+  diagnostic_msgs::DiagnosticStatus hardware_status;
+  diagnostic_msgs::KeyValue value;
+  hardware_status.name = std::string("hardware_status");
+  hardware_status.message = std::string("status_msgs");
+  hardware_status.hardware_id = hardware_id;
+
+  value.key = std::string("MCU_connection"); // 0:bad 1:good
+  value.value = (connection_status == 1) ? std::string("true") : std::string("false");
+  hardware_status.values.push_back(value);
+
+  res.hardwareStatus = hardware_status;
+  return true;
+}
 
 void publish_device_status() {
   diagnostic_msgs::DiagnosticStatus device_status;
@@ -285,9 +310,6 @@ void publish_device_status() {
   device_value.value = cur_emergency_status == 0 ? std::string("true") : std::string("false");
   device_status.values.push_back(device_value);
 
-  device_value.key = std::string("MCU_connection"); // 0:bad 1:good
-  device_value.value = connection_status == 1 ? std::string("true") : std::string("false");
-  device_status.values.push_back(device_value);
 
   unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
 //  double battery_value = 0.2393 * battery_ADC - 125.04;
@@ -481,6 +503,8 @@ int main(int argc, char **argv) {
   nh.param("battery_full_level", battery_full_level, static_cast<double>(27.5));
   nh.param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
   nh.param("ultrasonic",ultrasonic,std::string(" "));
+  nh.param("hardware_id", hardware_id, std::string(" "));
+
   std::cout << "F_DIA:" << f_dia << " B_DIA:" << b_dia << " AXLE:" << axle << " reduction_ratio: " << reduction_ratio << " speed_ratio:" << speed_ratio << std::endl;
   std::cout << "max_speed_v:" << max_speed_v << " max_speed_w:" << max_speed_w << " speed_v_acc:" << speed_v_acc << " speed_v_dec: " << speed_v_dec << " speed_w_dec_to_zero:" << speed_v_dec_zero << " speed_w_acc:" << speed_w_acc  << " speed_w_dec:" << speed_w_dec << std::endl;
 
@@ -502,6 +526,7 @@ int main(int argc, char **argv) {
   start_rotate_srv = device_nh.advertiseService("start_rotate", &StartRotate);
   stop_rotate_srv = device_nh.advertiseService("stop_rotate", &StopRotate);
   check_rotate_srv = device_nh.advertiseService("check_rotate", &CheckRotate);
+  check_hardware_srv  = device_nh.advertiseService("check_hardware", &CheckHardware);
 
   ros::Subscriber Navi_sub = n.subscribe("cmd_vel", 10, DoNavigation);
   ros::Subscriber remote_ret_sub = n.subscribe("/device/remote_ret", 10, RemoteRetCallback);
