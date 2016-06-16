@@ -264,6 +264,8 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     delta_counts_left = last_odo_delta_counts_left_;
   }
 
+	ROS_INFO("[WC CHASSIS] gotOdo:: delta_counts_left: %d delta_counts_right: %d last_odo_delta_counts_left_: %d last_odo_delta_counts_right_: %d", delta_counts_left, delta_counts_right, last_odo_delta_counts_left_, last_odo_delta_counts_right_);
+
   last_odo_delta_counts_right_ = delta_counts_right;
   last_odo_delta_counts_left_ = delta_counts_left;
 
@@ -482,7 +484,8 @@ void WC_chassis_mcu::getYawAngle(short& yaw, short& pitch, short& roll) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
         getYaw(yaw, pitch, roll);
-        std::cout << "Yaw = " << yaw / 10.0 << "; Pitch = " << pitch / 10.0 << "; Roll = " << roll / 10.0 << std::endl;
+        // std::cout << "Yaw = " << yaw / 10.0 << "; Pitch = " << pitch / 10.0 << "; Roll = " << roll / 10.0 << std::endl;
+				ROS_INFO("[WC CHASSIS] yaw: %lf, pitch: %lf, roll: %lf", yaw / 10.0, pitch / 10.0, roll / 10.0);
       }
     }
   } else {
@@ -627,9 +630,9 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
 }
 
 void WC_chassis_mcu::setRemoteID(unsigned char id) {
-  unsigned char remote_id = id & 0x3f;  
+  unsigned char remote_id = id & 0x0f;  
   if (remote_id < 1 || remote_id > 9) { 
-    ROS_INFO("[wc_chassis] remote id = %d, beyond (1 ~ 9)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", remote_id);
+    ROS_ERROR("[wc_chassis] remote id = %d, beyond (1 ~ 9)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", remote_id);
     return ;
   }
   unsigned char send[1024] = {0};
@@ -638,7 +641,8 @@ void WC_chassis_mcu::setRemoteID(unsigned char id) {
   unsigned char rec[1024] = {0};
   int rlen = 0;
   
-  ROS_INFO("[wc_chassis] set chassis remote id = %d", remote_id);
+  ROS_INFO("[wc_chassis] set chassis remote id = %d, speed_level = %d, power_level = %d", remote_id, (remote_id >> 4) & 0x03, (remote_id >> 6) & 0x03);
+
 
   CreateRemoteID(send, &len, 0, id);
 
