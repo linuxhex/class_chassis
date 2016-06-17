@@ -113,9 +113,9 @@ int cComm::HexStringToByte(unsigned char** pChar,int& iLen,string strHex) {
   *pChar = new unsigned char[v_str.size()];
   memset(*pChar,0,v_str.size());
 
-  int index(0);
+  unsigned int index(0);
   for (;it != v_str.end();++it) {
-    if ((*it).length() > 2 ||(index >= v_str.size()))
+    if (((*it).length() > 2) ||(index >= v_str.size()))
     {
       continue;
     }
@@ -158,17 +158,14 @@ int cComm::HexStringToByte(unsigned char** pChar,int& iLen,string strHex) {
 
 void cComm::Find_files(const string &strdir,const string& filename,vector<string>& v) {
   path dir(strdir);
-  typedef recursive_directory_iterator rd_iterator;
-  static xpressive::sregex_compiler rc;  //���򹤳�
+  static xpressive::sregex_compiler rc;
   if(!rc[filename].regex_id()) {
-    string str = replace_all_copy(replace_all_copy(filename,".","\\."),"*",".*"); //�����ļ���
-    rc[filename] = rc.compile(str);  //����������ʽ
+    string str = replace_all_copy(replace_all_copy(filename,".","\\."),"*",".*");
+    rc[filename] = rc.compile(str);
   }
-  typedef vector<path> result_type;
   if (!exists(dir) || !is_directory(dir)) {
     return;
   }
-  rd_iterator end;
 }
 
 string cComm::GetRunPath() {

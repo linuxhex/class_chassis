@@ -37,6 +37,7 @@ int main(int argc, char **argv) {
 
     ROS_INFO("[wc_chassis] chassis version: 1.1.2.9");
     InitChassis(argc, argv,"wc_chassis");
+    ROS_INFO("[wc_chassis] chassis init completed");
 
     ros::Publisher ultrasonic_pub[15];
     /*********************************publish handle init ******************************/

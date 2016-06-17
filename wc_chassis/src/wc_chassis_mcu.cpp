@@ -32,14 +32,34 @@ double GetTimeInSeconds() {
   return t.tv_sec + 0.000001 * t.tv_usec;
 }
 
-WC_chassis_mcu::WC_chassis_mcu()
-  : transfer_(0), H_(0.5), Dia_F_(0.2), Dia_B_(0.2), Axle_(0.6), Counts_(4000), Reduction_ratio_(25), Speed_ratio_(1.0),
-    odom_x_(0.0), odom_y_(0.0), odom_a_(0.0), odom_a_gyro_(0.0), acc_odom_theta_(0.0),
-    delta_counts_left_(0), delta_counts_right_(0), mileage_left_(0.0), mileage_right_(0.0),
-    yaw_angle_(0), pitch_angle_(0), roll_angle_(0),
-    last_speed_v_(0.0), last_speed_w_(0.0),
-    counts_left_(0), counts_right_(0), first_odo_(true),
-    direction(0), speed_v_(0), speed_w_(0), gyro_state_(0) {
+WC_chassis_mcu::WC_chassis_mcu(){
+    this->H_     = 0.5;
+    this->Dia_F_ = 0.2;
+    this->Dia_B_ = 0.2;
+    this->Axle_  = 0.6;
+    this->Counts_=4000;
+    this->Reduction_ratio_ = 25;
+    this->Speed_ratio_     =1.0;
+    this->odom_x_          =0.0;
+    this->odom_y_ = 0.0;
+    this->odom_a_ = 0.0;
+    this->odom_a_gyro_ = 0.0;
+    this->acc_odom_theta_= 0.0;
+    this->delta_counts_left_ = 0;
+    this->delta_counts_right_ = 0;
+    this->mileage_left_ = 0.0;
+    this->mileage_right_ = 0.0;
+    this->yaw_angle_ = 0;
+    this->pitch_angle_ = 0;
+    this->roll_angle_ = 0;
+    this->last_speed_v_ = 0.0;
+    this->last_speed_w_ = 0.0;
+    this->counts_left_ = 0;
+    this->counts_right_ = 0;
+    this->first_odo_ = true;
+    this->direction = 0;
+    this->speed_v_ = 0;
+    this->speed_w_ =0;
     memset(send_, 0, 10);
     memset(rec_, 0, 20);
 }
@@ -721,44 +741,6 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
 
       last_speed_v_ = speed_v;
       last_speed_w_ = speed_w;
-}
-
-
-void WC_chassis_mcu::setSpeed(float speed_v, float speed_w, int planner_type) {
-  // calculate angle and speed
-  float angle = 0.0;
-  float speed = 0.0;
-  CalculateAngleAndSpeed(&angle, &speed, speed_v, speed_w);
-  // ROS_INFO("[CHASSIS] before auto_acc, speed: %lf, angle: %lf", speed, angle);
-  if (planner_type == 0) {
-    pthread_mutex_lock(&speed_mutex);
-    do_auto_acc(speed, angle, speed_v, speed_w);
-    pthread_mutex_unlock(&speed_mutex);
-  } else {
-    g_spe = speed;
-    if (!IsStop(speed_v, speed_w)) {
-      g_angle = angle;
-    }
-  }
-
-  int m_angle = GetCopleyAngle(g_angle);
-  int m_spe = GetCopleySpeed(g_spe);
-
-  unsigned char send[1024] = {0};
-  int len = 0;
-
-  unsigned char rec[1024] = {0};
-  int rlen = 0;
-
-  if (m_spe > 0 && m_spe < 3) m_spe = 3;
-
-  CreateSpeed2(send, &len, m_spe, m_angle);
-
-  if (transfer_) {
-    transfer_->Send_data(send, len);
-    transfer_->Read_data(rec, rlen, 23, 500);
-  }
-  usleep(1000);
 }
 
 void WC_chassis_mcu::comunication(void) {

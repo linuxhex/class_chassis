@@ -27,7 +27,7 @@ void DoNavigationCallback(const geometry_msgs::Twist& Navigation_msg) {
 
 void RemoteRetCallback(const std_msgs::UInt32& ret) {
   remote_ret_ = ret.data;
-  if (remote_ret_ & 0xff != 0) {
+  if ((remote_ret_ & 0xff) != 0) {
     remote_ret_cnt_ = 0;
   }
   ROS_INFO("[wc_chassis] get remote ret cmd = %d, state = %d", (remote_ret_ & 0xff), (remote_ret_ >> 8) & 0xff);

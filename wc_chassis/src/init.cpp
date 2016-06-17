@@ -69,7 +69,7 @@ void InitParameter(){
     p_nh->param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
     p_nh->param("TimeWidth", timeWidth, static_cast<double>(0.1));
     p_nh->param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
-    p_nh->param("host_name", host_name, std::string("192.168.1.199"));
+    p_nh->param("host_name", host_name, std::string("10.7.5.88"));
     p_nh->param("port", port, 5000);
     p_nh->param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
     p_nh->param("battery_full_level", battery_full_level, static_cast<double>(27.5));

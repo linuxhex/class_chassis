@@ -26,7 +26,6 @@ class WC_chassis_mcu{
   unsigned int doDIO(unsigned int usdo);
   void setRemoteRet(unsigned short ret);
   unsigned int getDI();
-  void  setSpeed(float speed_v, float speed_w, int plan_type);
   void  setTwoWheelSpeed(float speed_v, float speed_w);
   short getMotorSpeed(float speed);
   bool  getOdo(double &x, double &y, double &a);  // NOLINT

@@ -137,7 +137,7 @@ void Socket::read() {
 void Socket::write() {
     if (socket_) {
         try{
-            size_t len = socket_->write_some(boost::asio::buffer(m_szWriteBuffer, m_nWriteBufferSize));
+            socket_->write_some(boost::asio::buffer(m_szWriteBuffer, m_nWriteBufferSize));
          }catch(boost::exception &e){
             cout << diagnostic_information(e)<<endl;
          }

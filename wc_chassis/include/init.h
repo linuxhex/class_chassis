@@ -31,7 +31,6 @@
 #include "wc_chassis_mcu.h"
 
 
-extern pthread_mutex_t speed_mutex;
 extern WC_chassis_mcu *g_chassis_mcu;
 extern tf::TransformBroadcaster *p_odom_broadcaster;
 extern ros::Rate *p_loop_rate;
