@@ -22,3 +22,32 @@ bool CheckRotate(autoscrubber_services::CheckRotate::Request& req,
   res.isFinished.data = is_rotate_finished;
   return true;
 }
+
+/*
+ *硬件模块的状态,service服务函数
+ */
+bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrubber_services::CheckHardware::Response& res) {
+
+  diagnostic_msgs::DiagnosticStatus hardware_status;
+  diagnostic_msgs::KeyValue value;
+  hardware_status.name = std::string("hardware_status");
+  hardware_status.message = std::string("status_msgs");
+  hardware_status.hardware_id = hardware_id;
+
+  value.key = std::string("MCU_connection"); // 0:bad 1:good
+  value.value = (connection_status == 1) ? std::string("true") : std::string("false");
+  hardware_status.values.push_back(value);
+
+  //超声状态
+  for (int i = 0; i < ultrasonic_num; ++i) {
+     if (g_ultrasonic[i + 1] == 0xff) {
+       value.key   = ultrasonic_str[i];
+　　　　value.value = std::string("false");
+     } else{
+       value.key   = ultrasonic_str[i];
+       value.value = std::string("true");
+     }
+  }
+  res.hardwareStatus = hardware_status;
+  return true;
+}

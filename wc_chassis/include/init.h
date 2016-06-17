@@ -38,7 +38,7 @@ extern ros::NodeHandle *p_nh;
 extern ros::NodeHandle *p_device_nh;
 extern std::string *ultrasonic;
 
-extern bool InitChassis(int argc, char **argv);
+extern bool InitChassis(int argc, char **argv,const char *node_name);
 
 
 #endif

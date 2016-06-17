@@ -10,8 +10,8 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
 
   range.radiation_type = sensor_msgs::Range::ULTRASOUND;
   range.field_of_view = M_PI / 90.0;
-  range.min_range = 0.04;
-  range.max_range = 1.0;
+  range.min_range = ultrasonic_min_range;
+  range.max_range = ultrasonic_max_range;
 
   float dis_meter = recv_int * 5.44 / 1000.0;
   if (dis_meter < range.min_range) {

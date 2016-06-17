@@ -65,6 +65,9 @@ void InitParameter(){
     p_nh->param("battery_full_level", battery_full_level, static_cast<double>(27.5));
     p_nh->param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
     p_nh->param("ultrasonic",*ultrasonic,std::string(" "));
+    p_nh->param("ultrasonic_min_range",ultrasonic_min_range,static_cast<float>(0.04));
+    p_nh->param("ultrasonic_max_range",ultrasonic_max_range,static_cast<float>(1.0));
+
 
     battery_full_level *= 100.0;
     battery_empty_level *= 100.0;
@@ -74,8 +77,10 @@ void InitParameter(){
 
 }
 /* chassis的初始化*/
-bool InitChassis(int argc, char **argv){
-     ros::init(argc, argv, "wc_chassis");
+bool InitChassis(int argc, char **argv,const char *node_name){
+
+    ROS_INFO("[wc_chassis] init ros!");
+    ros::init(argc, argv, node_name);
      p_n = new ros::NodeHandle();
      p_nh = new ros::NodeHandle("~");
      p_device_nh = new ros::NodeHandle("device");

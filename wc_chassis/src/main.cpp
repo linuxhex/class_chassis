@@ -22,12 +22,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
-#include <sched.h>  // for setting priority
+#include <sched.h>
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>
-#include "wc_chassis_mcu.h"  // NOLINT
+#include "wc_chassis_mcu.h"
 #include "init.h"
 #include "publish.h"
 #include "action.h"
@@ -35,7 +35,9 @@
 
 int main(int argc, char **argv) {
 
-    InitChassis(argc, argv);
+    ROS_INFO("[wc_chassis] chassis version: 1.1.2.9");
+    InitChassis(argc, argv,"wc_chassis");
+
     ros::Publisher ultrasonic_pub[15];
     /*********************************publish handle init ******************************/
     ros::Publisher yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
@@ -46,10 +48,10 @@ int main(int argc, char **argv) {
     ros::Publisher rotate_finished_pub = p_device_nh->advertise<std_msgs::Int32>("rotate_finished", 5);
     ros::Publisher protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
 
-
     for(int i=0;i<15;i++){
         if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
             ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
+            ultrasonic_num ++;
         }
     }
     /*********************************  主循环  ******************************/

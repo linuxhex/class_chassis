@@ -76,7 +76,10 @@ extern int battery_count;
 extern int display_battery_capacity ;
 extern int sum_battery_capacity;
 
-extern unsigned int connection_status; // mcu ethernet connection status: 0>bad 1>good
 
+extern unsigned int connection_status; // mcu ethernet connection status: 0>bad 1>good
+extern int ultrasonic_num;
+extern float ultrasonic_min_range;  //超声检测的最小距离  默认值0.04
+extern float ultrasonic_max_range;   //超声检测的最大距离  默认值1.0
 
 #endif

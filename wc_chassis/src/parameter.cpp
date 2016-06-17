@@ -45,4 +45,7 @@ int sum_battery_capacity = 0;
 std::string ultrasonic_str[] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
                                 "ultrasonic5","ultrasonic6","ultrasonic7","ultrasonic8","ultrasonic9",
                                 "ultrasonic10","ultrasonic11","ultrasonic12","ultrasonic13","ultrasonic14"};
-
+float ultrasonic_min_range = 0.04;  //超声检测的最小距离  默认值0.04
+float ultrasonic_max_range = 1.0;   //超声检测的最大距离  默认值1.0
+//超声接入的数量
+int ultrasonic_num=0;
