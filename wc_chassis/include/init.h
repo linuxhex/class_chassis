@@ -17,6 +17,7 @@
 #include <autoscrubber_services/StartRotate.h>
 #include <autoscrubber_services/StopRotate.h>
 #include <autoscrubber_services/CheckRotate.h>
+#include <autoscrubber_services/CheckHardware.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -25,6 +26,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include "gs/file_util.h"
 #include <vector>
 #include "wc_chassis_mcu.h"
 
@@ -38,8 +40,10 @@ extern ros::NodeHandle *p_nh;
 extern ros::NodeHandle *p_device_nh;
 extern std::string *ultrasonic;
 
-extern bool InitChassis(int argc, char **argv,const char *node_name);
-
+bool InitChassis(int argc, char **argv,const char *node_name);
+void InitDevice(void);
+void InitParameter(void);
+void InitService(void);
 
 #endif
 

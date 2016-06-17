@@ -40,30 +40,34 @@ typedef enum{
 
 typedef enum{
   NONE = 0x00,
-	CURRENT = 0x01,
-	SPEED = 0x02,
-	POS = 0x03,
-	ANGLE = 0x04,
-	SPEED2 = 0x05,
-	DO = 0x06,
-	DI = 0x07,
-	DA = 0x08,
-	SPEED3 = 0x09,
-	SPEED_TWO_WHEEL = 0x0a,
-	TIME = 0x7e,
-	RTIME = 0xfe,	
-	RCURRENT = 0x81,
-	RSPEED = 0x82,
-	RPOS = 0x83,
-	RANGLE = 0x84,
-	RSPEED2 = 0x85,
-  RULTRASONIC = 0x86,	
+    CURRENT = 0x01,
+    SPEED = 0x02,
+    POS = 0x03,
+    ANGLE = 0x04,
+    SPEED2 = 0x05,
+    DO = 0x06,
+    DI = 0x07,
+    DA = 0x08,
+    SPEED3 = 0x09,
+    SPEED_TWO_WHEEL = 0x0a,
+    RREMOTE_ID = 0x40,
+    REMOTE_ID = 0x41,
+    RREMOTE_VERIFY_KEY = 0x42,
+    REMOTE_VERIFY_KEY = 0x43,
+    TIME = 0x7e,
+    RTIME = 0xfe,
+    RCURRENT = 0x81,
+    RSPEED = 0x82,
+    RPOS = 0x83,
+    RANGLE = 0x84,
+    RSPEED2 = 0x85,
+  RULTRASONIC = 0x86,
   RDI = 0x87,
   ULTRASONIC = 0x88,
   RAD = 0x89,
   RYAW_ANGLE = 0x8a, 	//Request for Yaw
   YAW_ANGLE = 0x8b,
-  RREMOTE_CMD = 0x8c, 	//Request for remote cmd 
+  RREMOTE_CMD = 0x8c, 	//Request for remote cmd
   REMOTE_CMD = 0x8d,
   REMOTE_RET = 0x8e   //send remote ret
 //  REMOTE_RET = 0x8f
@@ -85,25 +89,25 @@ typedef struct _MsgState
 
 typedef struct _Current
 {
-	int system_time; //ʱ���
-	int axis_id;     //Ŀ����id
-	int current;     //��������ֵ
+    int system_time;
+    int axis_id;
+    int current;
 
 }CurrentProtocol;
 
 typedef struct _Speed
 {
-	int system_time; //ʱ���
-	int axis_id;     //Ŀ����id
-	int velocity;  //�ٶ�����ֵ
+    int system_time;
+    int axis_id;
+    int velocity;
 
 }SpeedProtocol;
 
 typedef struct _Speed2
 {
-    int system_time; //ʱ���
-    int speed_v;     //Ŀ����id
-    int speed_w;  //�ٶ�����ֵ
+    int system_time;
+    int speed_v;
+    int speed_w;
 
 }SpeedProtocol2;
 
@@ -125,90 +129,90 @@ typedef struct _Speed3
 
 typedef struct _Pos
 {
-  int system_time; //ʱ���
-  int axis_id;     //Ŀ����id
-  int position;    //λ������ֵ
+  int system_time;
+  int axis_id;
+  int position;
 
 }PosProtocol;
 
 typedef struct _Angle
 {
-	int system_time; //ʱ���
-	int axis_id;     //Ŀ����id
-	int angle;       //�Ƕ�����ֵ
+    int system_time;
+    int axis_id;
+    int angle;
 
 }AngleProtocol;
 
 typedef struct _DO
 {
-  unsigned int usdo;       //�Ƕ�����ֵ
+  unsigned int usdo;
 }DoProtocol;
 
 typedef struct _DI
 {
-  unsigned int usdi;       //�Ƕ�����ֵ
+  unsigned int usdi;
 }DiProtocol;
 
 typedef struct _RAD
 {
-  int system_time; //ʱ���
-  int axis_id;     //Ŀ����id
-  unsigned int ad_value;       //�Ƕ�����ֵ
+  int system_time;
+  int axis_id;
+  unsigned int ad_value;
 }RAdProtocol;
 
 typedef struct _DA
 {
-  int system_time; //ʱ���
-  int axis_id;     //Ŀ����id
-  unsigned int da_value;       //�Ƕ�����ֵ
+  int system_time;
+  int axis_id;
+  unsigned int da_value;
 }DaProtocol;
 
 typedef struct _Time
 {
-	int system_time; //ʱ���
-	int remote_system_time;     //��ѯ��ϵͳʱ��
+    int system_time;
+    int remote_system_time;
 
 }TimeProtocol;
 
 typedef struct _RCurrent
 {
-	int system_time; //���ͷ���ǰϵͳʱ��
-	int axis_id;     //Ŀ����id
+    int system_time;
+    int axis_id;
 
 }RCurrentProtocol;
 
 typedef struct _RSpeed
 {
-	int system_time; //���ͷ���ǰϵͳʱ��
-	int axis_id;     //Ŀ����id
+    int system_time;
+    int axis_id;
 
 }RSpeedProtocol;
 
 typedef struct _RPos
 {
-	int system_time; //���ͷ���ǰϵͳʱ��
-	int axis_id;     //Ŀ����id
+    int system_time;
+    int axis_id;
 
 }RPosProtocol;
 
 typedef struct _RAngle
 {
-	int system_time; //���ͷ���ǰϵͳʱ��
-	int axis_id;     //Ŀ����id
+    int system_time;
+    int axis_id;
 
 }RAngleProtocol;
 
 typedef struct _RDI
 {
-    int system_time; //���ͷ���ǰϵͳʱ��
-    int axis_id;     //Ŀ����id
+    int system_time;
+    int axis_id;
     unsigned int usdi;
 
 }RDiProtocol;
 
 typedef struct _RTime
 {
-	int system_time; //���ͷ���ǰϵͳʱ��
+    int system_time;
 
 }RTimeProtocol;
 
@@ -241,6 +245,21 @@ typedef struct _Ultra {
   uint8_t length[24];
 }UltraProtocol;
 
+typedef struct _RREMOTE_ID
+{
+  unsigned char id;
+}RRemoteIDProtocol;
+
+typedef struct _RREMOTE_VERIFY_KEY
+{
+  unsigned int key;
+}RRemoteVerifyKeyProtocol;
+
+typedef struct _REMOTE_VERIFY_KEY
+{
+  unsigned int check_key;
+}RemoteVerifyKeyProtocol;
+
 typedef union _Data{
   SpeedProtocol speed_;
   SpeedProtocol2 speed2_;
@@ -261,6 +280,9 @@ typedef union _Data{
   RRemoteCmdProtocol r_remote_cmd_;
   RemoteCmdProtocol remote_cmd_;
   RemoteRetProtocol remote_ret_;
+  RRemoteIDProtocol r_remote_id_;
+  RRemoteVerifyKeyProtocol r_remote_verify_key_;
+  RemoteVerifyKeyProtocol remote_verify_key_;
 }Data;
 
 typedef struct _AGVProtocol
@@ -268,8 +290,7 @@ typedef struct _AGVProtocol
 	unsigned char header[6];
 	unsigned char srcaddr;
 	unsigned char dstaddr;
-	//char *data;
-	//TransData DataProtocol;
+
 	CMDTypes type;
 	Data data;
 	int len;
@@ -297,7 +318,6 @@ extern int m_right_pos;
 float GetSpeed(void);
 int GetPos(int id);
 int GetDelta(int id);
-//short getYaw(void);
 void getYaw(short& yaw_angle, short& pitch_angle, short& roll_angle);
 void getRemote(unsigned char& cmd, unsigned short& index);
 unsigned int GetDI();
@@ -318,10 +338,11 @@ void CreateDA(unsigned char* ch,int* len,int id,float v);
 void CreateRAD(unsigned char* ch,int* len,int id);
 void CreateRPos(unsigned char* ch,int* len,int id);
 void CreateRDI(unsigned char* ch,int* len,int id);
-//int RecSpeed(unsigned char c,int* id,float* v);
+void CreateRemoteVerifyKey(unsigned char* ch,int* len,int id, unsigned int key);
+void CreateRemoteID(unsigned char* ch,int* len,unsigned char remote_id);
+unsigned int getRemoteVerifyKey(void);
 unsigned char checksum(unsigned char* ch ,int len);
 int IRQ_CH(unsigned char c);
-//int Coder(unsigned char* ch,int* len,AGVProtocol* proto,CMDTypes type,Data* data);
-//int Decoder(AGVProtocol* proto,unsigned char* ch,int len);
+
 
 #endif//_PROTOCOL_WANGHONGTAO_2015_01_16_

@@ -1,7 +1,6 @@
 #ifndef __PARAMETER__
 #define __PARAMETER__
 #include <ros/ros.h>
-#include <std_msgs/String.h>
 #include <geometry_msgs/Twist.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
@@ -81,5 +80,21 @@ extern unsigned int connection_status; // mcu ethernet connection status: 0>bad 
 extern int ultrasonic_num;
 extern float ultrasonic_min_range;  //超声检测的最小距离  默认值0.04
 extern float ultrasonic_max_range;   //超声检测的最大距离  默认值1.0
+
+extern double max_speed_v;
+extern double max_speed_w;
+extern double speed_v_acc;
+extern double speed_v_dec;
+extern double speed_v_dec_zero;
+extern double speed_w_acc;
+extern double speed_w_dec;
+extern double full_speed;
+extern int    delta_counts_th;
+extern int remote_speed_level_;
+extern int battery_level_;
+extern int remote_id ;
+extern std::string hardware_id;
+
+
 
 #endif

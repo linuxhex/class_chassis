@@ -1,3 +1,5 @@
+/* action.cpp 所有的设备的控制动作逻辑
+ */
 #include "action.h"
 #include "init.h"
 #include "parameter.h"

@@ -44,3 +44,5 @@ wc_chassis/src/action.cpp
 wc_chassis/include/action.h
 wc_chassis/src/parameter.cpp
 wc_chassis/include/parameter.h
+wc_chassis/src/common_function.cpp
+wc_chassis/include/common_function.h

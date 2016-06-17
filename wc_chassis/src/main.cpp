@@ -83,6 +83,10 @@ int main(int argc, char **argv) {
       publishDeviceStatus(device_pub);
       loop_count = 0;
     }
+    if (loop_count % 10) {//设置遥控器id
+      g_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
+      loop_count = 0;
+    }
     PublishOdom(p_odom_broadcaster,odom_pub);
     PublishYaw(yaw_pub);
     PublishGyro(gyro_pub);

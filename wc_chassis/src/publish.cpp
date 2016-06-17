@@ -1,3 +1,7 @@
+/*publish.cpp 所有的topic的发布
+ */
+
+
 #include "publish.h"
 #include "init.h"
 #include "parameter.h"
@@ -44,9 +48,7 @@ void PublishGyro(ros::Publisher &gyro_pub) {
   pitch = g_chassis_mcu->pitch_angle_ / 10.0 / 180.0 * M_PI;
   yaw = g_chassis_mcu->yaw_angle_ / 10.0 / 180.0 * M_PI;
   temp.setRPY(roll, pitch, yaw);
-//#ifdef DEBUG_PRINT
-//  std::cout << "roll = " << roll * 57.6 << "; pitch = " << pitch << ";yaw = " << std::endl;
-//#endif
+
   imu_msg.orientation.x = temp.getX();
   imu_msg.orientation.y = temp.getY();
   imu_msg.orientation.z = temp.getZ();
@@ -64,6 +66,7 @@ void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned
 }
 
 void publishDeviceStatus(ros::Publisher &device_pub) {
+
     diagnostic_msgs::DiagnosticStatus device_status;
     diagnostic_msgs::KeyValue device_value;
     device_status.level = diagnostic_msgs::DiagnosticStatus::OK;
@@ -75,16 +78,8 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
     device_value.value = cur_emergency_status == 0 ? std::string("true") : std::string("false");
     device_status.values.push_back(device_value);
 
-
-    device_value.key = std::string("MCU_connection"); // 0:bad 1:good
-    device_value.value = (connection_status == 1 ? std::string("true") : std::string("false"));
-    device_status.values.push_back(device_value);
-
-
     unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
-  //  double battery_value = 0.2393 * battery_ADC - 125.04;
-  //  double battery_value = 0.22791 * (battery_ADC - 516);
-    double battery_value = 0.2393 * (battery_ADC - 516);
+    double battery_value = 0.2298 * (battery_ADC - 516);
     int current_battery_capacity;
       current_battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
     if(current_battery_capacity < 0) current_battery_capacity = 0;
@@ -100,7 +95,17 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
         sum_battery_capacity = 0;
       }
     }
-    std::cout << "battery_ADC " << battery_ADC << "; battery_balue " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << std::endl;
+    if (display_battery_capacity < 10) {
+      battery_level_ = 0;
+    } else if (display_battery_capacity < 40) {
+      battery_level_ = 1;
+    } else if (display_battery_capacity < 75) {
+      battery_level_ = 2;
+    } else {
+      battery_level_ = 3;
+    }
+
+    std::cout << "battery_ADC " << battery_ADC << "; battery_balue " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << " battery_level_" << battery_level_ << std::endl;
     device_value.key = std::string("battery");
     device_value.value = std::to_string(display_battery_capacity);
     device_status.values.push_back(device_value);
@@ -127,7 +132,6 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
   odom.header.stamp = ros::Time::now();;
 
   odom.header.frame_id = "base_odom";
-  // set the position
   odom.pose.pose.position.x = g_odom_x;
   odom.pose.pose.position.y = g_odom_y;
   odom.pose.pose.position.z = 0.0;

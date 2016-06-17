@@ -1,3 +1,6 @@
+/* parameter.cpp  wc_chassis工程所有的全局参数定义
+*/
+
 #include"parameter.h"
 
 double ACC_LIM_TH = 3.0 / 2.0 * M_PI;
@@ -49,3 +52,15 @@ float ultrasonic_min_range = 0.04;  //超声检测的最小距离  默认值0.04
 float ultrasonic_max_range = 1.0;   //超声检测的最大距离  默认值1.0
 //超声接入的数量
 int ultrasonic_num=0;
+
+double max_speed_v, max_speed_w; //最大速度＆角速度
+double speed_v_acc, speed_v_dec, speed_v_dec_zero; //速度加速度，减速度
+double speed_w_acc, speed_w_dec; //角速度加速度，减速度
+double full_speed;  //满转速度
+int delta_counts_th; //满盘变化阀值（用于码盘防抖动）
+int remote_speed_level_ = 0; //遥控器控制速度等级
+int battery_level_ = 3;
+int remote_id = 1;
+std::string hardware_id;
+
+

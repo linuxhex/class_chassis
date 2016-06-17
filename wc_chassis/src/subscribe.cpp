@@ -1,3 +1,6 @@
+/*subscribe.cpp 所有接收topic处理函数
+ */
+
 #include"subscribe.h"
 #include"init.h"
 #include "parameter.h"

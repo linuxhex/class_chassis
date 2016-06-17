@@ -1,4 +1,5 @@
-
+/* buffer.cpp 数据缓存
+*/
 #include "iostream"
 #include "string.h"
 

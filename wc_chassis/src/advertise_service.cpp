@@ -1,3 +1,6 @@
+/* advertise_service.cpp 所有的 ros service的回调函数
+*/
+
 #include"advertise_service.h"
 #include"init.h"
 #include "parameter.h"
@@ -41,8 +44,8 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
   //超声状态
   for (int i = 0; i < ultrasonic_num; ++i) {
      if (g_ultrasonic[i + 1] == 0xff) {
-       value.key   = ultrasonic_str[i];
-　　　　value.value = std::string("false");
+       value.key  = ultrasonic_str[i];
+       value.value = std::string("false");
      } else{
        value.key   = ultrasonic_str[i];
        value.value = std::string("true");

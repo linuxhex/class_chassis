@@ -1,8 +1,4 @@
-/*
- * protocol.c
- *
- *  Created on: Feb 19, 2011
- *      Author: Cao Rui
+/*protocol.cpp 数据协议的处理
  */
 #include "string.h"
 #include "iostream"
@@ -51,6 +47,7 @@ short volatile m_pitch_angle = 0;
 short volatile m_roll_angle = 0;
 unsigned char volatile m_remote_cmd = 0;
 unsigned short volatile m_remote_index = 0;
+unsigned int volatile m_remote_check_key = 0;
 
 unsigned int m_di = 0;
 
@@ -265,6 +262,9 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
             m_remote_cmd   = protol->data.remote_cmd_.cmd;
 			m_remote_index = (protol->data.remote_cmd_.index_H << 8) | protol->data.remote_cmd_.index_L; 
 			break;
+        case REMOTE_VERIFY_KEY:
+            m_remote_check_key = protol->data.remote_verify_key_.check_key;
+            break;
 	    case ULTRASONIC:
 			g_ultrasonic.clear();
 			g_ultrasonic.resize(24);
@@ -303,7 +303,6 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
 	}
 
 		return 1;
-	return 0;
 }
 
 void CreateTwoWheelSpeed(unsigned char* ch,int* len,short speedLeft, short speedRight){
@@ -465,10 +464,24 @@ float GetAD(int id){
 int GetDelta(int id) {
   if (id == 0) {
     return m_left_delta;
-  } else if (id == 1) {
+  } else{
     return m_right_delta;
   }
 }
+unsigned int getRemoteVerifyKey(void) {
+  return m_remote_check_key;
+}
+void CreateRemoteVerifyKey(unsigned char* ch,int* len,int id, unsigned int key) {
+  Data data;
+
+  data.r_remote_verify_key_.key = key;
+
+  SInit_Proto(&sendProtocol, RREMOTE_VERIFY_KEY);
+
+  Coder(ch, len, &sendProtocol, &data);
+
+}
+
 void getYaw(short& yaw_angle, short& pitch_angle, short& roll_angle)
 {
   yaw_angle = m_yaw_angle;
@@ -484,12 +497,20 @@ void getRemote(unsigned char& cmd, unsigned short& index)
 
 int GetPos(int id){
 	if(id == 0){
-	    //std::cout<<"left_pos:"<<m_left_pos<<std::endl;
 		return m_left_pos;
-	}else if( id == 1){
-	  //std::cout<<"right_pos:"<<m_right_pos<<std::endl;
+    }else {
 		return m_right_pos;
 	}
+}
+
+void CreateRemoteID(unsigned char* ch,int* len,unsigned char remote_id) {
+  Data data;
+
+  data.r_remote_id_.id = remote_id;
+
+  SInit_Proto(&sendProtocol, RREMOTE_ID);
+
+  Coder(ch, len, &sendProtocol, &data);
 }
 
 int IRQ_CH(unsigned char c){
@@ -576,7 +597,6 @@ int IRQ_CH(unsigned char c){
 		if(c == checksum(&tmp[0],len)){
 		  //std::cout<<" check sum"<<std::endl;
 			if(!Decoder(&recProtocol,&tmp[0],len)){
-				//����ʧ��
 				rstatus = SYNCHEAD0;
 #ifdef MCU
 				zyIrqEnable();
@@ -606,118 +626,3 @@ int IRQ_CH(unsigned char c){
 }
 
 
-//
-//
-//void initms(MsgState *ms)
-//{
-//	ms->GoodPack=0;
-//	ms->State = SYNCHEAD0;
-//	ms->chk = 0;
-//	ms->sz = 0;
-//}
-//#ifdef MCU
-//int DecodeMsg(volatile CBuf *CBufptr, MACProtocol *msgptr, MsgState *ms)
-//#else
-//int DecodeMsg(CBuf *CBufptr, MACProtocol *msgptr, MsgState *ms)
-//#endif
-//{
-//	char c,*temp;
-//#ifdef MCU
-//	DISIRQ();
-//#endif
-//	while(CanGetCBuf(CBufptr)){
-//		ReadCBuf(CBufptr, (char *)&c, 1);
-//#ifdef MCU
-//		ENIRQ();
-//#endif
-////		printf("%02x [%04x] ",c,ms->chk);
-//		switch(ms->State){
-//			case SYNCHEAD0:
-//				ms->chk=c;
-//				ms->sz=0;
-//				ms->GoodPack=0;
-//				if(c==HEADER0) ms->State = SYNCHEAD1;
-//				else ms->State = SYNCHEAD0;
-//				break;
-//			case SYNCHEAD1:
-//				ms->GoodPack =0;
-//				ms->chk+=c;
-//				if(c==HEADER1) ms->State = SYNCHEAD2;
-//				else ms->State = SYNCHEAD0;
-//				break;
-//			case SYNCHEAD2:
-//				ms->chk+=c;
-//				if(c==HEADER2) ms->State = SYNCHEAD3;
-//				else ms->State = SYNCHEAD0;
-//				break;
-//			case SYNCHEAD3:
-//				ms->chk+=c;
-//				if(c==HEADER3) ms->State = SYNCHEAD4;
-//				else ms->State = SYNCHEAD0;
-//				break;
-//			case SYNCHEAD4:
-//				ms->chk+=c;
-//				if(c==HEADER4) ms->State = SYNCHEAD5;
-//				else ms->State = SYNCHEAD0;
-//				break;
-//			case SYNCHEAD5:
-//				ms->chk+=c;
-//				if(c==HEADER5) ms->State = SRCADDR;
-//				else ms->State = SYNCHEAD0;
-//				break;
-//			case SRCADDR:
-//				ms->chk+=c;
-//				msgptr->srcaddr=c;
-//				ms->State = DSTADDR;
-//				break;
-//			case DSTADDR:
-//				ms->chk+=c;
-//				msgptr->dstaddr=c;
-//				ms->State = CMDFIELD;
-//				break;
-//			case CMDFIELD:
-//				ms->chk+=c;
-//				msgptr->cmd=c;
-//				ms->State = DATLEN;
-//				break;
-//			case DATLEN:
-//				ms->chk+=c;
-//				msgptr->dlen=c;
-//				ms->State = DATFIELD;
-//				ms->sz=0;
-//				//temp=(char*)&(msgptr->datapackage);// assign msg struct data point to *temp
-//				break;
-//			case DATFIELD:
-//				if(ms->sz<msgptr->dlen){
-//					ms->chk+=c;
-//					ms->State = DATFIELD;
-//					temp[ms->sz++]=c;// fill in the msg structure data field.
-////					printf("%x ",temp[ms->sz-1]);
-//				}
-//				else {
-//					ms->State = CHKSUM;
-//					msgptr->chksum=(unsigned short)c;
-//				}
-//				break;
-//			case CHKSUM:
-//				ms->State = SYNCHEAD0;
-//				msgptr->chksum+=(unsigned short)(c<<8);
-//				if(msgptr->chksum==ms->chk) ms->GoodPack = 1;
-//				else ms->GoodPack = -1;
-//				break;
-//			default:
-//				ms->State = SYNCHEAD0;
-//				ms->chk = 0;
-//				ms->sz = 0;
-//				ms->GoodPack = 0;
-//				break;
-//			}
-//#ifdef MCU
-//		DISIRQ();
-//#endif
-//	}
-//#ifdef MCU
-//	ENIRQ();
-//#endif
-//	return ms->GoodPack;
-//}
