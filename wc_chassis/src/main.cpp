@@ -48,6 +48,7 @@ int main(int argc, char **argv) {
     ros::Publisher device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
     ros::Publisher rotate_finished_pub = p_device_nh->advertise<std_msgs::Int32>("rotate_finished", 5);
     ros::Publisher protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
+    ros::Publisher going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
 
     for(int i=0;i<15;i++){
         if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
@@ -74,7 +75,7 @@ int main(int argc, char **argv) {
       }
     }
 
-    DoDIO();
+    DoDIO(going_back_pub);
     DoRemoteRet();
     if (++loop_count % 2) {
       g_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);
