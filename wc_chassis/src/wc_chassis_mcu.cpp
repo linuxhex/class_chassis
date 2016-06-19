@@ -273,28 +273,28 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
   double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
 
   double dx = (r_wheel_pos + l_wheel_pos) * 0.5;
-  double da = (r_wheel_pos - l_wheel_pos) / Axle_ * odom_a_ratio;
-//  double da = asin((r_wheel_pos - l_wheel_pos) / Axle_);
+  //double da = (r_wheel_pos - l_wheel_pos) / Axle_ * odom_a_ratio;
+  double da = asin((r_wheel_pos - l_wheel_pos) / Axle_);
   odom_x_ += dx * cos(odom_a_);
   odom_y_ += dx * sin(odom_a_);
-//  odom_a_ += da;
-//  acc_odom_theta_ += da;
+  odom_a_ += da;
+  acc_odom_theta_ += fabs(da);
 
 //  if (!(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta)) {
-  if (!gyro_state_ || (gyro_state_ && !(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta))) {
-    double temp_dtheta = yaw_angle_ - last_yaw_angle_;
-    if(temp_dtheta > 3000.0) {
-      temp_dtheta = -1.0 * (3600.0 - temp_dtheta);
-    } else if(temp_dtheta <= -3000.0) {
-      temp_dtheta = 3600.0 + temp_dtheta;
-    }
+//  if (!gyro_state_ || (gyro_state_ && !(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta))) {
+//    double temp_dtheta = yaw_angle_ - last_yaw_angle_;
+//    if(temp_dtheta > 3000.0) {
+//      temp_dtheta = -1.0 * (3600.0 - temp_dtheta);
+//    } else if(temp_dtheta <= -3000.0) {
+//      temp_dtheta = 3600.0 + temp_dtheta;
+//    }
 
-    double gyro_dtheta =  (temp_dtheta / 10.0) / 180.0 * M_PI;
-    odom_a_ += gyro_dtheta;
-    acc_odom_theta_ += fabs(gyro_dtheta);
+//    double gyro_dtheta =  (temp_dtheta / 10.0) / 180.0 * M_PI;
+    //odom_a_ += gyro_dtheta;
+   // acc_odom_theta_ += fabs(gyro_dtheta);
 //    std::cout << "temp_theta: " << temp_dtheta << " ;odom_dtheta: " << gyro_dtheta << " acc_odom_theta_: " << acc_odom_theta_ << std::endl;
     odom_a_gyro_ = odom_a_; 
-  }
+  //}
 
   while (odom_a_ <= - M_PI) {
     odom_a_ += M_PI*2;
@@ -309,7 +309,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     odom_a_gyro_ -= M_PI*2;
   }
 
-  double yaw = odom_a_ * 180.0 / M_PI;
+ //double yaw = odom_a_ * 180.0 / M_PI;
   //ROS_INFO("yaw angle = %lf", yaw);
   //ROS_INFO("odom_a=%lf, odom_a_gyro=%lf", odom_a_ * 57.3, odom_a_gyro_ * 57.3); 
   x = odom_x_;
@@ -776,10 +776,10 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   short m_speed_left = 0;
   short m_speed_right = 0;
   speed_v = fabs(speed_v) > max_speed_v_ ?  sign(speed_v) * max_speed_v_ : speed_v;
-  speed_w = fabs(speed_w) > max_speed_w_ ?  sign(speed_w) * max_speed_w_ : speed_w;
+  //speed_w = fabs(speed_w) > max_speed_w_ ?  sign(speed_w) * max_speed_w_ : speed_w;
   ROS_INFO("[CHASSIS]  cc get max_speed_v_  = %.2f, max_speed_w_ = %.2f", max_speed_v_, max_speed_w_);
   float delta_speed_v = speed_v - last_speed_v_;
-  float delta_speed_w = speed_w - last_speed_w_;  
+  //float delta_speed_w = speed_w - last_speed_w_;
   // speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;  
   
   if(delta_speed_v > 0.0) { 
@@ -795,7 +795,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
      speed_w = delta_speed_w < DELTA_SPEED_W_DEC_TH ? (last_speed_w_ + DELTA_SPEED_W_DEC_TH) : speed_w;  
   }
 */
-  speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;  
+ // speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;
 
   ROS_INFO("[CHASSIS] set real speed v = %.2f, w = %.2f", speed_v, speed_w);
   // calculate angle and speed
