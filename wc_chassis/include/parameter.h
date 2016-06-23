@@ -56,7 +56,7 @@ extern float g_speed_w[3];
 extern float g_spe;
 extern float g_angle;
 extern unsigned int loop_count;
-extern unsigned int rotate_angle;
+extern  int rotate_angle;
 extern bool start_rotate_flag;
 extern bool stop_rotate_flag;
 extern bool is_rotate_finished;
