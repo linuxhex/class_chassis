@@ -5,6 +5,7 @@
 #define VERIFY_REMTOE_ID
 
 unsigned int GenerateJSHash(unsigned int seed);
-
+bool ping(const char* ip);
+void checkConnectionHealthThread(void);
 
 #endif // COMMON_FUNCTION_H

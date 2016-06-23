@@ -18,7 +18,7 @@ class WC_chassis_mcu{
    WC_chassis_mcu();
   ~WC_chassis_mcu();
 
-  void Init(const std::string& host_name, const std::string& port, float H, float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th);
+  void Init(const std::string& host_name, const std::string& port,float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th);
 
   void setThaZero(double zero);
   void setThaLeft(double left);
@@ -52,8 +52,6 @@ class WC_chassis_mcu{
  private:
   int getLPos();
   int getRPos();
-
-  float  H_;
   float  Dia_F_;
   float  Dia_B_;
   float  Axle_;

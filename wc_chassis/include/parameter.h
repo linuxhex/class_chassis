@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
+#include <thread>
 #include <sched.h>
 #include <iostream>
 #include <string>
@@ -94,6 +95,11 @@ extern int remote_speed_level_;
 extern int battery_level_;
 extern int remote_id ;
 extern std::string hardware_id;
+extern std::string router_ip;
+extern std::string laser_ip;
+extern std::string laser_connection_status;
+extern std::string router_connection_status;
+extern std::thread *checkConnectionThread;
 
 
 

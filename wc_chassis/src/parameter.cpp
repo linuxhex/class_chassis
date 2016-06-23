@@ -62,5 +62,10 @@ int remote_speed_level_ = 0; //遥控器控制速度等级
 int battery_level_ = 3;
 int remote_id = 1;
 std::string hardware_id;
+std::string router_ip = std::string("10.7.5.1");
+std::string laser_ip = std::string("10.7.5.100");
+std::string laser_connection_status = std::string("true");
+std::string router_connection_status = std::string("true");
+std::thread *checkConnectionThread;
 
 

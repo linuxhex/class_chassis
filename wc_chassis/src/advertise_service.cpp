@@ -41,14 +41,24 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
   value.value = (connection_status == 1) ? std::string("true") : std::string("false");
   hardware_status.values.push_back(value);
 
+  value.key = std::string("laser_connection");
+  value.value = laser_connection_status;
+  hardware_status.values.push_back(value);
+
+  value.key = std::string("router_connection");
+  value.value = router_connection_status;
+  hardware_status.values.push_back(value);
+
   //超声状态
   for (int i = 0; i < ultrasonic_num; ++i) {
      if (g_ultrasonic[i + 1] == 0xff) {
        value.key  = ultrasonic_str[i];
        value.value = std::string("false");
+       hardware_status.values.push_back(value);
      } else{
        value.key   = ultrasonic_str[i];
        value.value = std::string("true");
+       hardware_status.values.push_back(value);
      }
   }
   res.hardwareStatus = hardware_status;

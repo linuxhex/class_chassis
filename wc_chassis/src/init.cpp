@@ -39,6 +39,8 @@ void InitService(){
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
     remote_ret_sub = p_device_nh->subscribe("/remote_ret", 10, RemoteRetCallback);
     gyro_update_state_sub = p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
+    ROS_INFO("[wc_chassis] init service & topic caller completed");
+
 }
 
 /*  ros参数服务器参数的初始化*/
@@ -90,18 +92,19 @@ void InitParameter(){
     p_nh->param("remote_speed_level", remote_speed_level_, 1);
     p_nh->param("hardware_id", hardware_id, std::string("   "));
 
+    p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));
+    p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));
 
-    battery_full_level *= 100.0;
-    battery_empty_level *= 100.0;
 
     pthread_mutex_init(&speed_mutex, NULL);
-
-    g_chassis_mcu->Init(host_name, std::to_string(port), 0.975, f_dia, b_dia, axle,
+    checkConnectionThread  = new std::thread(checkConnectionHealthThread);
+    sleep(1);
+    g_chassis_mcu->Init(host_name, std::to_string(port),f_dia, b_dia, axle,
                         timeWidth, counts, reduction_ratio, speed_ratio,
                         max_speed_v, max_speed_w, speed_v_acc, speed_v_dec,
                         speed_v_dec_zero, speed_w_acc, speed_w_dec,full_speed,delta_counts_th);
 
-    sleep(1);
+    ROS_INFO("[wc_chassis] init param completed");
 }
 
 /* 设备的初始化*/
@@ -128,8 +131,9 @@ void InitDevice(void){
     std::cout << "remote_id = " << remote_id << std::endl;
   }
 #endif
-
   g_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
+  ROS_INFO("[wc_chassis] init device completed");
+
 }
 
 /* chassis的初始化*/
