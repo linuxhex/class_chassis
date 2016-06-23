@@ -10,7 +10,6 @@
 tf::TransformBroadcaster *p_odom_broadcaster;
 WC_chassis_mcu *g_chassis_mcu;
 ros::Rate *p_loop_rate;
-std::string *ultrasonic;
 ros::NodeHandle *p_n;
 ros::NodeHandle *p_nh;
 ros::NodeHandle *p_device_nh;
@@ -37,7 +36,7 @@ void InitService(){
 
 
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
-    remote_ret_sub = p_device_nh->subscribe("/remote_ret", 10, RemoteRetCallback);
+    remote_ret_sub = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);
     gyro_update_state_sub = p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
     ROS_INFO("[wc_chassis] init service & topic caller completed");
 
@@ -98,7 +97,8 @@ void InitParameter(){
 
     pthread_mutex_init(&speed_mutex, NULL);
     checkConnectionThread  = new std::thread(checkConnectionHealthThread);
-    sleep(1);
+    checkConnectionThread->detach();
+    sleep(2);
     g_chassis_mcu->Init(host_name, std::to_string(port),f_dia, b_dia, axle,
                         timeWidth, counts, reduction_ratio, speed_ratio,
                         max_speed_v, max_speed_w, speed_v_acc, speed_v_dec,

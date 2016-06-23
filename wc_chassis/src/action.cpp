@@ -10,7 +10,6 @@ bool DoRotate(ros::Publisher &rotate_finished_pub) {
     start_rotate_flag = false;
     is_rotate_finished = true;
     g_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
-//    ROS_INFO("[wc_chassis] rotate finished!");
     std_msgs::Int32 msg;
     msg.data = 1;
     rotate_finished_pub.publish(msg);
@@ -20,13 +19,10 @@ bool DoRotate(ros::Publisher &rotate_finished_pub) {
     last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
   } else {
     is_rotate_finished = false;
-//    ROS_INFO("[wc_chassis] inplace rotation: cur_yaw = %lf, targer_yaw = %d ", g_chassis_mcu->acc_odom_theta_ * 57.3, rotate_angle);
     if (rotate_angle > 0) {
       g_chassis_mcu->setTwoWheelSpeed(0.0, 0.2);
-//      ROS_INFO("[wc_chassis] rotate to left");
     } else if (rotate_angle < 0) {
       g_chassis_mcu->setTwoWheelSpeed(0.0, -0.2);
-//      ROS_INFO("[wc_chassis] rotate to right");
     } else {
       is_rotate_finished = true;
       start_rotate_flag = false;
@@ -55,7 +51,7 @@ void DoDIO(ros::Publisher going_back_pub) {
 }
 
 void DoRemoteRet(void) {
-  if (++remote_ret_cnt_ > 15) {
+  if (++remote_ret_cnt_ > 8) {
     remote_ret_ &= 0xff00;
   }
   g_chassis_mcu->setRemoteRet(remote_ret_);

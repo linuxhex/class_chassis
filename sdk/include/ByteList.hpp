@@ -11,8 +11,7 @@ protected:
 public:
 	ByteList(): m_pBuffer(NULL),m_iMax(0),m_iOffset(0){};
 	~ByteList(){
-		if (m_pBuffer != NULL)
-		{
+		if (m_pBuffer != NULL){
 			delete[] m_pBuffer;
 			m_pBuffer = NULL;
 		}
@@ -23,14 +22,11 @@ public:
 	};
 	int Write(unsigned char* pWrite,int len){
 		boost::mutex::scoped_lock lock(m_mutex);
-		if ( len > (m_iMax - m_iOffset) )
-		{
+		if ( len > (m_iMax - m_iOffset) ){
 			len = m_iMax - m_iOffset;
 		}
 
-		if (m_pBuffer == NULL)
-		{
-			//LOGS_ERROR("TransferDevice")<<"write bufferP is null :"<<len;
+		if (m_pBuffer == NULL){
 			return 0;
 		}
 		assert(m_pBuffer!=NULL);
@@ -43,15 +39,13 @@ public:
 	};
 	int Read(unsigned char* pRead,int& len){
 		boost::mutex::scoped_lock lock(m_mutex);
-		if (m_iOffset>0)
-		{
+		if (m_iOffset>0){
 			assert(m_pBuffer!=NULL);
 			memset(pRead,0,m_iOffset);
 			memcpy(pRead,m_pBuffer,m_iOffset);
 			len = m_iOffset;
 
-			if (m_pBuffer != NULL)
-			{
+			if (m_pBuffer != NULL){
 				memset(m_pBuffer,0,m_iMax);
 			}
 
@@ -64,16 +58,15 @@ public:
 			return 0;
 		}
 	}
-	void Init(int iLen){
+    void Init(int iLen)
+    {
 
-		if (m_pBuffer != NULL)
-		{
+		if (m_pBuffer != NULL){
 			delete m_pBuffer;
 			m_pBuffer = NULL;
 		}
 
-		if (iLen>0 && iLen<1025)
-		{
+		if (iLen>0 && iLen<1025){
 			boost::mutex::scoped_lock lock(m_mutex);
 			m_pBuffer = new unsigned char[iLen];
 			m_iMax = iLen;
@@ -89,14 +82,12 @@ public:
 
 		m_iOffset = 0;
 	}
-	bool IsPull(){
+    bool IsPull()
+    {
 		boost::mutex::scoped_lock lock(m_mutex);
-		if (m_iOffset == m_iMax )
-		{
+		if (m_iOffset == m_iMax ){
 			return true;
-		}
-		else
-		{
+		}else{
 			return false;
 		}
 

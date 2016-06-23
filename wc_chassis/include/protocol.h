@@ -22,20 +22,19 @@
 
 
 #define BUF_SIZE 256
-
 typedef enum{
-	SYNCHEAD0,
-	SYNCHEAD1,
-	SYNCHEAD2,
-	SYNCHEAD3,
-	SYNCHEAD4,
-	SYNCHEAD5,
-	SRCADDR,
-	DSTADDR,
-	CMDFIELD,
-	DATLEN,
-	DATFIELD,
-	CHKSUM
+    SYNCHEAD0,
+    SYNCHEAD1,
+    SYNCHEAD2,
+    SYNCHEAD3,
+    SYNCHEAD4,
+    SYNCHEAD5,
+    SRCADDR,
+    DSTADDR,
+    CMDFIELD,
+    DATLEN,
+    DATFIELD,
+    CHKSUM
 }MSGStates;
 
 typedef enum{
@@ -70,21 +69,14 @@ typedef enum{
   RREMOTE_CMD = 0x8c, 	//Request for remote cmd
   REMOTE_CMD = 0x8d,
   REMOTE_RET = 0x8e   //send remote ret
-//  REMOTE_RET = 0x8f
 }CMDTypes;
 
 typedef struct _MsgState
 {
-//   unsigned short SC;           //decode msg byte counter
    unsigned short sz;           //decode size of data in the msg as per header
    MSGStates  State;        //decode state of msg decode
    unsigned short  chk;          //decode check sum data
    int  GoodPack;
-//   unsigned char  Free;         //indicates buffer state 1-> buffer not free(got data)
-//                                // 0->buffer free can use.
-//   unsigned short AckTracker;   //used to track acks in order to throttle/halt msg sending
-//   unsigned short MsgCounter;   //counts how many msgs have been sent and the reference for this one
-//   unsigned char  Trn;          //fsk only indicates buffer is being transmitted.
 }MsgState;                      //trn is =1 xms after transmit mode, and 0 at end of packet transmit
 
 typedef struct _Current
@@ -108,7 +100,6 @@ typedef struct _Speed2
     int system_time;
     int speed_v;
     int speed_w;
-
 }SpeedProtocol2;
 
 typedef struct _SpeedTwoWheel
@@ -228,23 +219,6 @@ typedef struct _YAWANGLE {
   short pitch;
 }YawAngleProtocol;
 
-typedef struct _RREMOTECMD {
-}RRemoteCmdProtocol;
-
-typedef struct _REMOTECMD {
-  unsigned char cmd; 
-  unsigned char index_H; 
-  unsigned char index_L;
-}RemoteCmdProtocol;
-
-typedef struct _REMOTERET {
-  unsigned short ret;
-}RemoteRetProtocol;
-
-typedef struct _Ultra {
-  uint8_t length[24];
-}UltraProtocol;
-
 typedef struct _RREMOTE_ID
 {
   unsigned char id;
@@ -259,6 +233,23 @@ typedef struct _REMOTE_VERIFY_KEY
 {
   unsigned int check_key;
 }RemoteVerifyKeyProtocol;
+
+typedef struct _RREMOTECMD {
+}RRemoteCmdProtocol;
+
+typedef struct _REMOTECMD {
+  unsigned char cmd;
+  unsigned char index_H;
+  unsigned char index_L;
+}RemoteCmdProtocol;
+
+typedef struct _REMOTERET {
+  unsigned short ret;
+}RemoteRetProtocol;
+
+typedef struct _Ultra {
+  uint8_t length[24];
+}UltraProtocol;
 
 typedef union _Data{
   SpeedProtocol speed_;
@@ -287,17 +278,18 @@ typedef union _Data{
 
 typedef struct _AGVProtocol
 {
-	unsigned char header[6];
-	unsigned char srcaddr;
-	unsigned char dstaddr;
+    unsigned char header[6];
+    unsigned char srcaddr;
+    unsigned char dstaddr;
+    //char *data;
+    //TransData DataProtocol;
+    CMDTypes type;
+    Data data;
+    int len;
 
-	CMDTypes type;
-	Data data;
-	int len;
+    BufList buflist;
 
-	BufList buflist;
-
-	unsigned char chksum;
+    unsigned char chksum;
 
 }AGVProtocol;
 

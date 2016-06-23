@@ -67,5 +67,7 @@ std::string laser_ip = std::string("10.7.5.100");
 std::string laser_connection_status = std::string("true");
 std::string router_connection_status = std::string("true");
 std::thread *checkConnectionThread;
+std::string *ultrasonic;
+
 
 

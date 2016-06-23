@@ -32,6 +32,7 @@
 #include "publish.h"
 #include "action.h"
 #include "parameter.h"
+#include "common_function.h"
 
 int main(int argc, char **argv) {
 
@@ -83,7 +84,6 @@ int main(int argc, char **argv) {
       std::cout<<"remote_index_   "<<remote_index_<<std::endl;
       PublishRemoteCmd(remote_cmd_pub,remote_cmd_, remote_index_);
       publishDeviceStatus(device_pub);
-      loop_count = 0;
     }
     if (loop_count % 10) {//设置遥控器id
       g_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
@@ -97,6 +97,8 @@ int main(int argc, char **argv) {
     ros::spinOnce();
     p_loop_rate->sleep();
   }
+
+  freeResource();
   return 0;
 }
 

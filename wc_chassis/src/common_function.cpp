@@ -30,11 +30,11 @@ bool ping(const char* ip) {
         } else if (1 == ping_ret) {
             return false;
         } else {
-            ROS_ERROR("[checker] unknown ping status:%d", ping_ret);
+            ROS_ERROR("[chassis] unknown ping status:%d", ping_ret);
             return false;
         }
     } else {
-        ROS_ERROR("[checker] ping program can not use");
+        ROS_ERROR("[chassis] ping program can not use");
         return false;
     }
 }
@@ -57,6 +57,17 @@ void checkConnectionHealthThread(void) {
           laser_connection_status = std::string("true");
           router_connection_status = std::string("true");
         }
-        sleep(15);
+        sleep(30);
     }
+}
+
+void freeResource(void){
+
+  std::stringstream ss;
+  std::string str;
+  ss << checkConnectionThread->get_id();
+  ss >> str;
+  ROS_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
+  delete checkConnectionThread;
+  delete g_chassis_mcu;
 }

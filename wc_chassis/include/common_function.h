@@ -7,5 +7,5 @@
 unsigned int GenerateJSHash(unsigned int seed);
 bool ping(const char* ip);
 void checkConnectionHealthThread(void);
-
+void freeResource(void);
 #endif // COMMON_FUNCTION_H

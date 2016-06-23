@@ -37,7 +37,6 @@ extern ros::Rate *p_loop_rate;
 extern ros::NodeHandle *p_n;
 extern ros::NodeHandle *p_nh;
 extern ros::NodeHandle *p_device_nh;
-extern std::string *ultrasonic;
 
 bool InitChassis(int argc, char **argv,const char *node_name);
 void InitDevice(void);
