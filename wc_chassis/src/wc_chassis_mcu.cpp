@@ -313,7 +313,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
       delta_counts_left = last_odo_delta_counts_left_;
     }
 
-      ROS_INFO("[WC CHASSIS] gotOdo:: delta_counts_left: %d delta_counts_right: %d last_odo_delta_counts_left_: %d last_odo_delta_counts_right_: %d", delta_counts_left, delta_counts_right, last_odo_delta_counts_left_, last_odo_delta_counts_right_);
+    ROS_INFO("[WC CHASSIS] gotOdo:: delta_counts_left: %d delta_counts_right: %d last_odo_delta_counts_left_: %d last_odo_delta_counts_right_: %d", delta_counts_left, delta_counts_right, last_odo_delta_counts_left_, last_odo_delta_counts_right_);
 
     last_odo_delta_counts_right_ = delta_counts_right;
     last_odo_delta_counts_left_ = delta_counts_left;
@@ -325,7 +325,6 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     odom_x_ += dx * cos(odom_a_);
     odom_y_ += dx * sin(odom_a_);
 
-  //  if (!(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta)) {
     if (!gyro_state_ || (gyro_state_ && !(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta))) {
       double temp_dtheta = yaw_angle_ - last_yaw_angle_;
       if(temp_dtheta > 3000.0) {
@@ -589,57 +588,6 @@ void CalculateAngleAndSpeed(float* angle, float* speed, float v, float w) {
   }
 }
 
-void do_auto_acc(float spe, float angle, float last_v, float last_w) {
-  int last_v_index = (current_v_index + 3 - 1) % 3;
-  int last_w_index = (current_w_index + 3 - 1) % 3;
-  int last_second_v_index = (current_v_index + 3 - 2) % 3;
-  int last_second_w_index = (current_w_index + 3 - 2) % 3;
-  // minimum vel is 0.04, so we use 0.07 here to represent in-place rotation, hope
-  if (IsInPlaceRotation(last_v, last_w)) {
-    if (IsInPlaceRotation(g_speed_v[last_v_index], g_speed_w[last_w_index])) {
-      if (angle > current_theta) {
-        g_angle = std::min(current_theta + ACC_LIM_TH * DT, static_cast<double>(angle));
-      } else {
-        g_angle = std::max(current_theta - ACC_LIM_TH * DT, static_cast<double>(angle));
-      }
-      // 0 speed for in-place rotation, but speed cannot be 0 when angle becomes M_PI_2 or -M_PI_2;
-      g_spe = current_v = fabs(fabs(g_angle) - M_PI_2) < 0.001 ? fabs(H * last_w) : 0.0;
-    } else {
-      g_spe = current_v = 0.0;
-    }
-  } else if (IsStop(last_v, last_w)) {
-    g_spe = spe;
-    return;
-  } else {
-    if (angle > current_theta) {
-      g_angle = std::min(current_theta + ACC_LIM_TH * DT, static_cast<double>(angle));
-    } else {
-      g_angle = std::max(current_theta - ACC_LIM_TH * DT, static_cast<double>(angle));
-    }
-    if (IsInPlaceRotation(g_speed_v[last_v_index], g_speed_w[last_w_index]) && fabs(angle - current_theta) > 0.1) {
-      current_v = 0.0;
-      if (!(!IsInPlaceRotation(g_speed_v[last_v_index], g_speed_w[last_w_index]) &&
-            !IsStop(g_speed_v[last_v_index], g_speed_w[last_w_index]) &&
-            IsInPlaceRotation(g_speed_v[last_second_v_index], g_speed_w[last_second_w_index]))) {
-        g_angle = current_theta;
-      }
-    } else {
-      double ACC_V = 0.15;
-      if (fabs(angle - current_theta) > 10e-3) {
-        if (fabs(angle - current_theta) > M_PI / 3.0) {
-          current_v = 0.0;
-        } else {
-          ACC_V = fabs(last_v - current_v) * ACC_LIM_TH / fabs(angle - current_theta);
-          current_v = current_v + ACC_V * DT;
-        }
-      } else {
-        current_v = last_v;
-      }
-    }
-    g_spe = current_v / cos(g_angle);
-  }
-  current_theta = g_angle;
-}
 
 int WC_chassis_mcu::GetCopleySpeed(float v) {       // 将m/s转换成RPM
   // max speed
