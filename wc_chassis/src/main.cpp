@@ -34,22 +34,32 @@
 #include "parameter.h"
 #include "common_function.h"
 
+ros::Publisher ultrasonic_pub[15];
+ros::Publisher yaw_pub;
+ros::Publisher odom_pub;
+ros::Publisher gyro_pub;
+ros::Publisher remote_cmd_pub;
+ros::Publisher device_pub;
+ros::Publisher rotate_finished_pub;
+ros::Publisher protector_pub;
+ros::Publisher going_back_pub;
+
+
 int main(int argc, char **argv) {
 
     ROS_INFO("[wc_chassis] chassis version: 1.1.2.9");
     InitChassis(argc, argv,"wc_chassis");
     ROS_INFO("[wc_chassis] chassis init completed");
 
-    ros::Publisher ultrasonic_pub[15];
     /*********************************publish handle init ******************************/
-    ros::Publisher yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
-    ros::Publisher odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
-    ros::Publisher gyro_pub        = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
-    ros::Publisher remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
-    ros::Publisher device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
-    ros::Publisher rotate_finished_pub = p_device_nh->advertise<std_msgs::Int32>("rotate_finished", 5);
-    ros::Publisher protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
-    ros::Publisher going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
+    yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
+    odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
+    gyro_pub        = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
+    remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
+    device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
+    rotate_finished_pub = p_device_nh->advertise<std_msgs::Int32>("rotate_finished", 5);
+    protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
+    going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
 
     for(int i=0;i<15;i++){
         if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
@@ -80,8 +90,6 @@ int main(int argc, char **argv) {
     DoRemoteRet();
     if (++loop_count % 2) {
       g_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);
-      std::cout<<"remote_cmd_   "<<remote_cmd_<<std::endl;
-      std::cout<<"remote_index_   "<<remote_index_<<std::endl;
       PublishRemoteCmd(remote_cmd_pub,remote_cmd_, remote_index_);
       publishDeviceStatus(device_pub);
     }
@@ -98,6 +106,7 @@ int main(int argc, char **argv) {
     p_loop_rate->sleep();
   }
 
+  ROS_INFO("[wc_chassis] wc_chassis has closed, now free resource!");
   freeResource();
   return 0;
 }
