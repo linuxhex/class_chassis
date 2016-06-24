@@ -67,6 +67,7 @@ int main(int argc, char **argv) {
             ultrasonic_num ++;
         }
     }
+
     /*********************************  主循环  ******************************/
    while (ros::ok()) {
     g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
@@ -108,6 +109,7 @@ int main(int argc, char **argv) {
 
   ROS_INFO("[wc_chassis] wc_chassis has closed, now free resource!");
   freeResource();
+  exit(0);
   return 0;
 }
 
