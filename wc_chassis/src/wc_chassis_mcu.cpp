@@ -571,7 +571,7 @@ bool IsStop(float v, float w) {
 }
 
 void CalculateAngleAndSpeed(float* angle, float* speed, float v, float w) {
-  if (IsInPlaceRotation(v, w)) {	// v=Low & w=High -> Rotation Only
+  if (IsInPlaceRotation(v, w)) {
     if (w > 0) {
       *angle = M_PI_2;
     } else {
@@ -590,7 +590,6 @@ void CalculateAngleAndSpeed(float* angle, float* speed, float v, float w) {
 
 
 int WC_chassis_mcu::GetCopleySpeed(float v) {       // 将m/s转换成RPM
-  // max speed
   v = v > 0.8 ? 0.8 : v;
   return v * 60 / (M_PI * Dia_F_);
 }
@@ -673,13 +672,11 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
 
       std::string str = cComm::ByteToHexString(send, len);
       std::cout << "send speed: " << str << std::endl;
-      //  std::cout << "send speed: " << str.substr(42, 12) << std::endl;
      if (transfer_) {
         transfer_->Send_data(send, len);
         transfer_->Read_data(rec, rlen, 23, 500);
       }
      usleep(1000);
-
       last_speed_v_ = speed_v;
       last_speed_w_ = speed_w;
 }
