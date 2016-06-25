@@ -22,7 +22,7 @@ class Socket {
 
  private:
   unsigned char m_szReadTemp[1024];
-  ByteList m_lReadBuffer;
+  ByteList *m_lReadBuffer = NULL;
 
   unsigned char m_szWriteBuffer[1024];
   int m_nWriteBufferSize;

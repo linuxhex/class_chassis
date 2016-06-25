@@ -14,8 +14,8 @@
 Socket::Socket() {
   socket_ = NULL;
   thread_ = NULL;
-
-  m_lReadBuffer.Init(1024);
+  m_lReadBuffer = new ByteList();
+  m_lReadBuffer->Init(1025);
   memset(m_szWriteBuffer, 0, 1024);
   m_nWriteBufferSize = 0;
 
@@ -31,6 +31,10 @@ Socket::~Socket() {
   if(thread_ != NULL){
       delete thread_;
       thread_ = NULL;
+  }
+  if(m_lReadBuffer !=NULL){
+      delete m_lReadBuffer;
+      m_lReadBuffer = NULL;
   }
 }
 
@@ -57,11 +61,13 @@ bool Socket::open() {
 }
 
 void Socket::Send_data(unsigned char* s_data, unsigned short len) {
-  m_lReadBuffer.Clear();
-  memset(m_szWriteBuffer, 0, 1024);
-  m_nWriteBufferSize = len;
-  memcpy(m_szWriteBuffer, s_data, len);
-  write();
+  if(m_lReadBuffer!=NULL){
+      m_lReadBuffer->Clear();
+      memset(m_szWriteBuffer, 0, 1024);
+      m_nWriteBufferSize = len;
+      memcpy(m_szWriteBuffer, s_data, len);
+      write();
+  }
 }
 
 void Socket::read_callback(const boost::system::error_code& error, std::size_t bytes_transferred) {
@@ -69,7 +75,8 @@ void Socket::read_callback(const boost::system::error_code& error, std::size_t b
     ROS_ERROR("[SOCKET] read data error");
     return;
   }
-  m_lReadBuffer.Write(m_szReadTemp, bytes_transferred);
+  if(m_lReadBuffer!=NULL)
+  m_lReadBuffer->Write(m_szReadTemp, bytes_transferred);
   read();
 }
 
@@ -78,7 +85,7 @@ void Socket::Read_data(unsigned char* r_data, int &len, int need, int timeout) {
     int len_tmp = 0;
     while (1) {
       connection_status = 1;
-      len_tmp = m_lReadBuffer.Size();
+      len_tmp = m_lReadBuffer->Size();
       if (len_tmp >= need){
           break;
       }
@@ -91,7 +98,7 @@ void Socket::Read_data(unsigned char* r_data, int &len, int need, int timeout) {
         break;
       }
     }
-    m_lReadBuffer.Read(r_data, len);
+    m_lReadBuffer->Read(r_data, len);
 }
 
 int Socket::ThreadRun() {

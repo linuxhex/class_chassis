@@ -1,7 +1,6 @@
 #ifndef _BYTE_LIST_WANGHONGTAO_2014_08_30_
 #define _BYTE_LIST_WANGHONGTAO_2014_08_30_
 
-
 class ByteList{
 protected:
 	boost::mutex m_mutex;
