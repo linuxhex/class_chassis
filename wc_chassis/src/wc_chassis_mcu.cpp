@@ -59,6 +59,11 @@ WC_chassis_mcu::WC_chassis_mcu(){
     this->direction = 0;
     this->speed_v_ = 0;
     this->speed_w_ =0;
+    if (transfer_ != NULL) {
+        delete transfer_;
+        transfer_ = NULL;
+    }
+    transfer_ = new Socket();
     memset(send_, 0, 10);
     memset(rec_, 0, 20);
 }
@@ -72,10 +77,9 @@ WC_chassis_mcu::~WC_chassis_mcu() {
 }
 
 void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th) {
-  if (!transfer_) {
-    transfer_ = new Socket();
+
     transfer_->Init(host_name, port);
-  }
+
   if ((Dia_F > 0) && (Dia_F < 0.5)) {
     Dia_F_ = Dia_F;
   } else {

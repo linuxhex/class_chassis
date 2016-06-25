@@ -15,7 +15,7 @@ Socket::Socket() {
   socket_ = NULL;
   thread_ = NULL;
   m_lReadBuffer = new ByteList();
-  m_lReadBuffer->Init(1025);
+  m_lReadBuffer->Init(1024);
   memset(m_szWriteBuffer, 0, 1024);
   m_nWriteBufferSize = 0;
 

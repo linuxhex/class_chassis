@@ -75,4 +75,5 @@ void freeResource(void){
   delete p_nh;
   delete p_device_nh;
   delete p_loop_rate;
+  ros::shutdown();
 }

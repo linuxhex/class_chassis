@@ -5,11 +5,11 @@
 class ByteList{
 protected:
 	boost::mutex m_mutex;
-	unsigned char* m_pBuffer;
+    unsigned char* m_pBuffer=NULL;
 	int			   m_iOffset;
 	int			   m_iMax;
 public:
-	ByteList(): m_pBuffer(NULL),m_iMax(0),m_iOffset(0){};
+    ByteList(): m_pBuffer(NULL),m_iMax(1024),m_iOffset(0){};
 	~ByteList(){
 		if (m_pBuffer != NULL){
 			delete[] m_pBuffer;
@@ -29,7 +29,6 @@ public:
 		if (m_pBuffer == NULL){
 			return 0;
 		}
-		assert(m_pBuffer!=NULL);
 		memset(m_pBuffer + m_iOffset,0,len);
 		memcpy(m_pBuffer + m_iOffset,pWrite,len);
 

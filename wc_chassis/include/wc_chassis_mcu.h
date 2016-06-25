@@ -65,7 +65,7 @@ class WC_chassis_mcu{
   double full_speed_;
   int delta_counts_th_;
 
-  Socket* transfer_;
+  Socket* transfer_= NULL;
 
   bool   first_odo_;
   double odom_x_;
