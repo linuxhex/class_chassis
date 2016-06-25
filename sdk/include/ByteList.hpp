@@ -62,7 +62,7 @@ public:
     {
 
 		if (m_pBuffer != NULL){
-			delete m_pBuffer;
+            delete[] m_pBuffer;
 			m_pBuffer = NULL;
 		}
 
@@ -75,11 +75,9 @@ public:
 	}
 	void Clear(){
 		boost::mutex::scoped_lock lock(m_mutex);
-		if (m_pBuffer != NULL)
-		{
+		if (m_pBuffer != NULL){
 			memset(m_pBuffer,0,m_iMax);
 		}
-
 		m_iOffset = 0;
 	}
     bool IsPull()

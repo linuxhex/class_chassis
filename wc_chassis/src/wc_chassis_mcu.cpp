@@ -69,15 +69,6 @@ WC_chassis_mcu::~WC_chassis_mcu() {
         delete transfer_;
         transfer_ = NULL;
     }
-    if(pos_pub_left_ != NULL){
-        delete pos_pub_left_;
-        pos_pub_left_ = NULL;
-    }
-    if(pos_pub_right_ != NULL){
-        delete pos_pub_right_;
-        pos_pub_right_ = NULL;
-    }
-
 }
 
 void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th) {

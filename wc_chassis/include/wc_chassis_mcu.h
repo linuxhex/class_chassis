@@ -89,9 +89,6 @@ class WC_chassis_mcu{
   float last_speed_v_;
   float last_speed_w_;
 
-  ros::Publisher* pos_pub_left_;
-  ros::Publisher* pos_pub_right_;
-
   unsigned char send_[10];
   unsigned char rec_[20];
 

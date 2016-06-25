@@ -70,4 +70,9 @@ void freeResource(void){
   ROS_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
   delete checkConnectionThread;
   delete g_chassis_mcu;
+  delete p_odom_broadcaster;
+  delete p_n;
+  delete p_nh;
+  delete p_device_nh;
+  delete p_loop_rate;
 }

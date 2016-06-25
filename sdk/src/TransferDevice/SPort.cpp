@@ -19,7 +19,7 @@ Socket::Socket() {
   memset(m_szWriteBuffer, 0, 1024);
   m_nWriteBufferSize = 0;
 
-  host_name_ = "192.168.1.199";
+  host_name_ = "10.7.5.199";
   port_ = "5000";
 }
 
