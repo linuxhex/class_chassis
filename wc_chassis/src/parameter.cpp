@@ -61,6 +61,7 @@ int delta_counts_th; //满盘变化阀值（用于码盘防抖动）
 int remote_speed_level_ = 0; //遥控器控制速度等级
 int battery_level_ = 3;
 int remote_id = 1;
+int protector_num=8; //防撞条个数
 std::string hardware_id;
 std::string router_ip = std::string("10.7.5.1");
 std::string laser_ip = std::string("10.7.5.100");

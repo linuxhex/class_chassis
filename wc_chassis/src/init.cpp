@@ -90,7 +90,7 @@ void InitParameter(){
     p_nh->param("delta_counts_th",delta_counts_th,40);
     p_nh->param("remote_speed_level", remote_speed_level_, 1);
     p_nh->param("hardware_id", hardware_id, std::string("   "));
-
+    p_nh->param("protector_num",protector_num,8);
     p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));
     p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));
 

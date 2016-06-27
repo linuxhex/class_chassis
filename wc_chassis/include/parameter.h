@@ -101,7 +101,7 @@ extern std::string laser_connection_status;
 extern std::string router_connection_status;
 extern std::thread *checkConnectionThread;
 extern std::string *ultrasonic;
-
+extern int protector_num;
 
 
 #endif

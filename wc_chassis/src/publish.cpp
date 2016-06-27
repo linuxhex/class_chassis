@@ -124,7 +124,7 @@ void publish_protector_status(ros::Publisher &protector_pub) {
   status = g_ultrasonic[0];
   str = status.to_string();
   value.key = std::string("protector_data"); // 0:on 1:off
-  value.value = str.substr(24, 8);
+  value.value = str.substr(24, protector_num);
   protector_pub.publish(value);
 }
 void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub ) {
