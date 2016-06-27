@@ -25,6 +25,9 @@ float g_spe = 0.0;
 float g_angle = 0.0;
 unsigned int loop_count   = 0;
 int rotate_angle = 0;
+unsigned int protector_bits=0x00;
+unsigned int ultrasonic_bits=0x00;
+
 bool start_rotate_flag    = false;
 bool stop_rotate_flag     = true;
 bool is_rotate_finished   = false;

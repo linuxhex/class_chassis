@@ -27,13 +27,13 @@
 #include <vector>
 #define __PUBLISH__
 
-extern void PublishYaw(ros::Publisher &yaw_pub);
-extern void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub );
-extern void publishDeviceStatus(ros::Publisher &device_pub);
-extern void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index);
-extern void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int);
-extern void PublishUltrasonic(ros::Publisher ultrasonic_pub[]);
-extern void PublishGyro(ros::Publisher &gyro_pub);
-extern void publish_protector_status(ros::Publisher &protector_pub);
+ void PublishYaw(ros::Publisher &yaw_pub);
+ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub );
+ void publishDeviceStatus(ros::Publisher &device_pub);
+ void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index);
+ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int,unsigned int ultrasonic_offset);
+ void PublishUltrasonic(ros::Publisher ultrasonic_pub[]);
+ void PublishGyro(ros::Publisher &gyro_pub);
+ void publish_protector_status(ros::Publisher &protector_pub);
 
 #endif

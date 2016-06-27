@@ -19,7 +19,8 @@ ros::ServiceServer start_rotate_srv;
 ros::ServiceServer stop_rotate_srv;
 ros::ServiceServer check_rotate_srv;
 ros::ServiceServer check_hardware_srv;
-
+ros::ServiceServer close_protector_srv;
+ros::ServiceServer close_ultrasonic_srv;
 /***Subscriber***/
 ros::Subscriber    Navi_sub;
 ros::Subscriber    remote_ret_sub;
@@ -32,8 +33,9 @@ void InitService(){
     start_rotate_srv = p_device_nh->advertiseService("start_rotate", &StartRotate);
     stop_rotate_srv  = p_device_nh->advertiseService("stop_rotate", &StopRotate);
     check_rotate_srv = p_device_nh->advertiseService("check_rotate", &CheckRotate);
-    check_hardware_srv  = p_device_nh->advertiseService("check_hardware", &CheckHardware);
-
+    check_hardware_srv   = p_device_nh->advertiseService("check_hardware", &CheckHardware);
+    close_protector_srv  = p_device_nh->advertiseService("close_protector",&CloseProtector);
+    close_ultrasonic_srv  = p_device_nh->advertiseService("close_ultrasonic",&CloseUltrasonic);
 
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
     remote_ret_sub = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);

@@ -6,7 +6,7 @@
 #include "init.h"
 #include "parameter.h"
 
-void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int) {  // NOLINT
+void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int,unsigned int ultrasonic_offset) {  // NOLINT
   sensor_msgs::Range range;
   range.header.seq = 0;
   range.header.stamp = ros::Time::now();
@@ -25,6 +25,9 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
   } else {
     range.range = dis_meter;
   }
+  if((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00){ //屏蔽制定位置的超声的作用
+    range.range = 256 * 5.44 / 1000.0;
+  }
   publisher.publish(range);
 }
 
@@ -32,7 +35,7 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
 void PublishUltrasonic(ros::Publisher ultrasonic_pub[]) {
     for(int i=0;i<15;i++){
          if(ultrasonic_pub[i] != 0){  //==0表示不是文件里配置的超声
-             publish_ultrasonic(ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i]);
+             publish_ultrasonic(ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i],i);
          }
     }
 }
@@ -121,7 +124,7 @@ void publish_protector_status(ros::Publisher &protector_pub) {
   std::bitset<32> status;
   std::string str;
   diagnostic_msgs::KeyValue value;
-  status = g_ultrasonic[0];
+  status = g_ultrasonic[0]|(protector_bits<<24);
   str = status.to_string();
   value.key = std::string("protector_data"); // 0:on 1:off
   value.value = str.substr(24, protector_num);

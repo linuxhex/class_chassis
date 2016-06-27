@@ -5,6 +5,20 @@
 #include"init.h"
 #include "parameter.h"
 
+
+bool CloseProtector(autoscrubber_services::CloseProtector::Request& req,
+                    autoscrubber_services::CloseProtector::Response& res){
+    protector_bits = req.protectorBits.data;
+    return true;
+}
+
+bool CloseUltrasonic(autoscrubber_services::CloseUltrasonic::Request& req,
+                    autoscrubber_services::CloseUltrasonic::Response& res){
+    ultrasonic_bits = req.ultrasonicBits.data;
+    return true;
+}
+
+
 bool StartRotate(autoscrubber_services::StartRotate::Request& req,
                  autoscrubber_services::StartRotate::Response& res) {
   rotate_angle = req.rotateAngle.data;
