@@ -9,4 +9,7 @@ bool StartRotate(autoscrubber_services::StartRotate::Request& req, autoscrubber_
 bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrubber_services::CheckHardware::Response& res);
 bool CloseProtector(autoscrubber_services::CloseProtector::Request& req,autoscrubber_services::CloseProtector::Response& res);
 bool CloseUltrasonic(autoscrubber_services::CloseUltrasonic::Request& req,autoscrubber_services::CloseUltrasonic::Response& res);
+bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,autoscrubber_services::CheckProtectorStatus::Response& res);
+
+
 #endif

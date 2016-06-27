@@ -5,16 +5,38 @@
 #include"init.h"
 #include "parameter.h"
 
-
+/*
+ *  提供给上层应用，屏蔽特定的防撞条
+ */
 bool CloseProtector(autoscrubber_services::CloseProtector::Request& req,
                     autoscrubber_services::CloseProtector::Response& res){
     protector_bits = req.protectorBits.data;
     return true;
 }
 
+/*
+ *  提供给上层应用，屏蔽特定的超声
+ */
 bool CloseUltrasonic(autoscrubber_services::CloseUltrasonic::Request& req,
                     autoscrubber_services::CloseUltrasonic::Response& res){
     ultrasonic_bits = req.ultrasonicBits.data;
+    return true;
+}
+
+/*
+ *  提供给navigation模块，用于在判断遇到障碍物是是否是防撞条触发
+ */
+bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
+                        autoscrubber_services::CheckProtectorStatus::Response& res){
+
+    unsigned int status        = g_ultrasonic[0]|(protector_bits<<24);
+    unsigned int protect_value = (status^0xffff)>>(32-protector_num);
+    if(protect_value != 0){
+       res.protector_status.protect_status=true;
+    }else{
+       res.protector_status.protect_status=false;
+    }
+    res.protector_status.protect_value = protect_value;
     return true;
 }
 

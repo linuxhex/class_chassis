@@ -17,6 +17,7 @@
 #include <autoscrubber_services/StopRotate.h>
 #include <autoscrubber_services/CheckRotate.h>
 #include <autoscrubber_services/CloseProtector.h>
+#include <autoscrubber_services/CheckProtectorStatus.h>
 #include <autoscrubber_services/CloseUltrasonic.h>
 #include <stdio.h>
 #include <stdlib.h>
