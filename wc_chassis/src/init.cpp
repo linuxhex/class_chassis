@@ -19,8 +19,8 @@ ros::ServiceServer start_rotate_srv;
 ros::ServiceServer stop_rotate_srv;
 ros::ServiceServer check_rotate_srv;
 ros::ServiceServer check_hardware_srv;
-ros::ServiceServer close_protector_srv;
-ros::ServiceServer close_ultrasonic_srv;
+ros::ServiceServer protector_switch_srv;
+ros::ServiceServer ultrasonic_switch_srv;
 ros::ServiceServer check_protector_status_srv;
 
 /***Subscriber***/
@@ -36,8 +36,8 @@ void InitService(){
     stop_rotate_srv  = p_device_nh->advertiseService("stop_rotate", &StopRotate);
     check_rotate_srv = p_device_nh->advertiseService("check_rotate", &CheckRotate);
     check_hardware_srv   = p_device_nh->advertiseService("check_hardware", &CheckHardware);
-    close_protector_srv  = p_device_nh->advertiseService("protector_switch",&ProtectorSwitch);
-    close_ultrasonic_srv  = p_device_nh->advertiseService("ultrasonic_switch",&UltrasonicSwitch);
+    protector_switch_srv  = p_device_nh->advertiseService("protector_switch",&ProtectorSwitch);
+    ultrasonic_switch_srv  = p_device_nh->advertiseService("ultrasonic_switch",&UltrasonicSwitch);
     check_protector_status_srv  = p_device_nh->advertiseService("check_protector_status",&CheckProtectorStatus);
 
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
