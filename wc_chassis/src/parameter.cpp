@@ -3,7 +3,6 @@
 
 #include"parameter.h"
 
-double ACC_LIM_TH = 3.0 / 2.0 * M_PI;
 double ultral_effective_range = 0.4;
 double g_odom_x   = 0;
 double g_odom_y   = 0;

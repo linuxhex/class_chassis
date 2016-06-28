@@ -62,42 +62,39 @@ void InitParameter(){
     double timeWidth = 0;
     std::string host_name;
     int port;
-    std::string str_auto_topic;
-    std::string str_odom = "odom";
-    p_nh->param("odom", str_odom, str_odom);
-    p_nh->param("WC_Auto_topic", str_auto_topic, std::string("WC_AUTO"));
+
+
     p_nh->param("max_cmd_interval", max_cmd_interval, 1.0);
+    p_nh->param("TimeWidth", timeWidth, static_cast<double>(0.1));
+    p_nh->param("host_name", host_name, std::string("10.7.5.88"));
+    p_nh->param("port", port, 5000);
+
     p_nh->param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
     p_nh->param("B_DIA", b_dia, static_cast<double>(0.125));
     p_nh->param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
-    p_nh->param("COUNTS", counts, 12);
-    p_nh->param("REDUCTION_RATIO", reduction_ratio, 30);
+    p_nh->param("COUNTS", counts, 12);//霍尔数
+    p_nh->param("REDUCTION_RATIO", reduction_ratio, 30);//减速比
     p_nh->param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
-    p_nh->param("TimeWidth", timeWidth, static_cast<double>(0.1));
-    p_nh->param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));
-    p_nh->param("host_name", host_name, std::string("10.7.5.88"));
-    p_nh->param("port", port, 5000);
-    p_nh->param("acc_lim_th", ACC_LIM_TH, 3.0 / 2.0 * M_PI);
+    p_nh->param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));//超声有效检测距离
     p_nh->param("battery_full_level", battery_full_level, static_cast<double>(27.5));
     p_nh->param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
-    p_nh->param("ultrasonic",*ultrasonic,std::string(" "));
-    p_nh->param("ultrasonic_min_range",ultrasonic_min_range,static_cast<float>(0.04));
-    p_nh->param("ultrasonic_max_range",ultrasonic_max_range,static_cast<float>(1.0));
-
-    p_nh->param("max_speed_v", max_speed_v, static_cast<double>(0.6));
-    p_nh->param("max_speed_w", max_speed_w, static_cast<double>(0.6));
-    p_nh->param("speed_v_acc", speed_v_acc, static_cast<double>(0.025));
-    p_nh->param("speed_v_dec", speed_v_dec, static_cast<double>(-0.12));
+    p_nh->param("ultrasonic",*ultrasonic,std::string(" "));//配置的超声
+    p_nh->param("ultrasonic_min_range",ultrasonic_min_range,static_cast<float>(0.04));//超声最小距离
+    p_nh->param("ultrasonic_max_range",ultrasonic_max_range,static_cast<float>(1.0));//超声最大距离
+    p_nh->param("max_speed_v", max_speed_v, static_cast<double>(0.6));//最大速度
+    p_nh->param("max_speed_w", max_speed_w, static_cast<double>(0.6));//最大角速度
+    p_nh->param("speed_v_acc", speed_v_acc, static_cast<double>(0.025));//速度加速度
+    p_nh->param("speed_v_dec", speed_v_dec, static_cast<double>(-0.12));//速度减速度
     p_nh->param("speed_v_dec_to_zero", speed_v_dec_zero, static_cast<double>(-0.12));
-    p_nh->param("speed_w_acc", speed_w_acc, static_cast<double>(0.25));
-    p_nh->param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));
-    p_nh->param("full_speed",full_speed,static_cast<double>(3.0));
-    p_nh->param("delta_counts_th",delta_counts_th,40);
-    p_nh->param("remote_speed_level", remote_speed_level_, 1);
-    p_nh->param("hardware_id", hardware_id, std::string("   "));
-    p_nh->param("protector_num",protector_num,8);
-    p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));
-    p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));
+    p_nh->param("speed_w_acc", speed_w_acc, static_cast<double>(0.25));//角速度加速度
+    p_nh->param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));//角速度减速度
+    p_nh->param("full_speed",full_speed,static_cast<double>(3.0)); //电机满转速度
+    p_nh->param("delta_counts_th",delta_counts_th,800); //码盘防抖动阈值
+    p_nh->param("remote_speed_level", remote_speed_level_, 1);//遥控器控制速度
+    p_nh->param("hardware_id", hardware_id, std::string("   "));//硬件设备名称
+    p_nh->param("protector_num",protector_num,8);//防撞条使用数量
+    p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
+    p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
 
 
     pthread_mutex_init(&speed_mutex, NULL);

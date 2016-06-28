@@ -29,7 +29,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-extern  double ACC_LIM_TH ;
 extern  double ultral_effective_range ;
 extern  double g_odom_x   ;
 extern  double g_odom_y   ;
