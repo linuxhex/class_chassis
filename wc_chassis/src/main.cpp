@@ -47,7 +47,7 @@ ros::Publisher going_back_pub;
 
 int main(int argc, char **argv) {
 
-    ROS_INFO("[wc_chassis] chassis version: 1.1.2.5");
+    ROS_INFO("[wc_chassis] chassis version: 1.1.2.8");
     InitChassis(argc, argv,"wc_chassis");
     ROS_INFO("[wc_chassis] chassis init completed");
 

@@ -18,8 +18,8 @@
 #include <autoscrubber_services/StopRotate.h>
 #include <autoscrubber_services/CheckRotate.h>
 #include <autoscrubber_services/CheckHardware.h>
-#include <autoscrubber_services/CloseProtector.h>
-#include <autoscrubber_services/CloseUltrasonic.h>
+#include <autoscrubber_services/ProtectorSwitch.h>
+#include <autoscrubber_services/UltrasonicSwitch.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

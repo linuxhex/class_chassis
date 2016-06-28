@@ -36,8 +36,8 @@ void InitService(){
     stop_rotate_srv  = p_device_nh->advertiseService("stop_rotate", &StopRotate);
     check_rotate_srv = p_device_nh->advertiseService("check_rotate", &CheckRotate);
     check_hardware_srv   = p_device_nh->advertiseService("check_hardware", &CheckHardware);
-    close_protector_srv  = p_device_nh->advertiseService("close_protector",&CloseProtector);
-    close_ultrasonic_srv  = p_device_nh->advertiseService("close_ultrasonic",&CloseUltrasonic);
+    close_protector_srv  = p_device_nh->advertiseService("protector_switch",&ProtectorSwitch);
+    close_ultrasonic_srv  = p_device_nh->advertiseService("ultrasonic_switch",&UltrasonicSwitch);
     check_protector_status_srv  = p_device_nh->advertiseService("check_protector_status",&CheckProtectorStatus);
 
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);

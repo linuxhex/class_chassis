@@ -8,18 +8,32 @@
 /*
  *  提供给上层应用，屏蔽特定的防撞条
  */
-bool CloseProtector(autoscrubber_services::CloseProtector::Request& req,
-                    autoscrubber_services::CloseProtector::Response& res){
-    protector_bits = req.protectorBits.data;
+bool ProtectorSwitch(autoscrubber_services::ProtectorSwitch::Request& req,
+                    autoscrubber_services::ProtectorSwitch::Response& res)
+{
+    std::string protector_str =  req.protectorStr.data;
+    protector_bits = 0x00;  //bit位置　1:屏蔽  0:不屏蔽
+    for(unsigned int i = 0; i < protector_str.length(); ++i){
+        if(protector_str[i] == '0'){
+            protector_bits |= 0x01<<i;
+        }
+    }
     return true;
 }
 
 /*
  *  提供给上层应用，屏蔽特定的超声
  */
-bool CloseUltrasonic(autoscrubber_services::CloseUltrasonic::Request& req,
-                    autoscrubber_services::CloseUltrasonic::Response& res){
-    ultrasonic_bits = req.ultrasonicBits.data;
+bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
+                    autoscrubber_services::UltrasonicSwitch::Response& res)
+{
+    std::string ultrasonic_str = req.ultrasonicStr.data;
+    ultrasonic_bits = 0x00;  //bit位置　1:屏蔽  0：不屏蔽
+    for(unsigned int i = 0; i < ultrasonic_str.length(); ++i){
+        if(ultrasonic_str[i] == '0'){
+            ultrasonic_bits |= 0x01<<i;
+        }
+    }
     return true;
 }
 
