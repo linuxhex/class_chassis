@@ -29,14 +29,14 @@ bool CloseUltrasonic(autoscrubber_services::CloseUltrasonic::Request& req,
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
                         autoscrubber_services::CheckProtectorStatus::Response& res){
 
-    unsigned int status        = g_ultrasonic[0]|(protector_bits<<24);
-    unsigned int protect_value = (status^0xffff)>>(32-protector_num);
+    unsigned int status        = g_ultrasonic[0] | (protector_bits);
+    unsigned int protect_value = (status^0xffff) << (32-protector_num);
     if(protect_value != 0){
        res.protector_status.protect_status=true;
     }else{
        res.protector_status.protect_status=false;
     }
-    res.protector_status.protect_value = protect_value;
+    res.protector_status.protect_value = protect_value >> (32-protector_num);
     return true;
 }
 

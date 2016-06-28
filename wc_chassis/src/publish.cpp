@@ -137,10 +137,10 @@ void publish_protector_status(ros::Publisher &protector_pub) {
   std::bitset<32> status;
   std::string str;
   diagnostic_msgs::KeyValue value;
-  status = g_ultrasonic[0]|(protector_bits<<24);
+  status = g_ultrasonic[0] | protector_bits;
   str = status.to_string();
   value.key = std::string("protector_data"); // 0:on 1:off
-  value.value = str.substr(24, protector_num);
+  value.value = str.substr((32-protector_num), protector_num);
   protector_pub.publish(value);
 }
 
