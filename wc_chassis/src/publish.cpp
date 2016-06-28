@@ -6,6 +6,9 @@
 #include "init.h"
 #include "parameter.h"
 
+/*
+ * 发送超声
+ */
 void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int,unsigned int ultrasonic_offset) {  // NOLINT
   sensor_msgs::Range range;
   range.header.seq = 0;
@@ -39,7 +42,9 @@ void PublishUltrasonic(ros::Publisher ultrasonic_pub[]) {
          }
     }
 }
-
+/*
+ * 发送陀螺仪数据
+ */
 void PublishGyro(ros::Publisher &gyro_pub) {
   sensor_msgs::Imu imu_msg;
   imu_msg.header.stamp = ros::Time::now();
@@ -58,7 +63,9 @@ void PublishGyro(ros::Publisher &gyro_pub) {
   imu_msg.orientation.w = temp.getW();
   gyro_pub.publish(imu_msg);
 }
-
+/*
+ * 发送遥控器命令
+ */
 void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index) {
   std_msgs::UInt32 remote_cmd;
   if (cmd > 0 && cmd < 12) {
@@ -67,7 +74,9 @@ void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned
   remote_cmd.data = (index << 8) | cmd;
   remote_cmd_pub.publish(remote_cmd);
 }
-
+/*
+ * 发送设备状态
+ */
 void publishDeviceStatus(ros::Publisher &device_pub) {
 
     diagnostic_msgs::DiagnosticStatus device_status;
@@ -120,6 +129,10 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
 
     device_pub.publish(device_status);
 }
+
+/*
+ * 发送防撞条状态
+ */
 void publish_protector_status(ros::Publisher &protector_pub) {
   std::bitset<32> status;
   std::string str;
@@ -130,6 +143,10 @@ void publish_protector_status(ros::Publisher &protector_pub) {
   value.value = str.substr(24, protector_num);
   protector_pub.publish(value);
 }
+
+/*
+ * 发送里程值
+ */
 void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub ) {
   nav_msgs::Odometry odom;
   odom.header.stamp = ros::Time::now();;

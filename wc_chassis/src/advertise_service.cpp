@@ -40,22 +40,30 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
     return true;
 }
 
-
+/*
+ * 初始化　开始旋转
+ */
 bool StartRotate(autoscrubber_services::StartRotate::Request& req,
                  autoscrubber_services::StartRotate::Response& res) {
   rotate_angle = req.rotateAngle.data;
   start_rotate_flag = true;
   is_rotate_finished = false;
+  m_speed_v  = 0.0;
+  m_speed_w  = 0.0;
   g_chassis_mcu->acc_odom_theta_ = 0.0;
   return true;
 }
-
+/*
+ * 初始化　停止旋转
+ */
 bool StopRotate(autoscrubber_services::StopRotate::Request& req,
                 autoscrubber_services::StopRotate::Response& res) {
   start_rotate_flag = false;
   return true;
 }
-
+/*
+ * 初始化　旋转检测
+ */
 bool CheckRotate(autoscrubber_services::CheckRotate::Request& req,
                  autoscrubber_services::CheckRotate::Response& res) {
   res.isFinished.data = is_rotate_finished;

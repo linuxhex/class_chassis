@@ -4,7 +4,9 @@
 #include "init.h"
 #include "parameter.h"
 #include <std_msgs/Int32.h>
-
+/*
+ * 初始化　旋转操作
+ */
 bool DoRotate(ros::Publisher &rotate_finished_pub) {
   if (fabs(g_chassis_mcu->acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) ) {
     start_rotate_flag = false;
@@ -35,6 +37,9 @@ bool DoRotate(ros::Publisher &rotate_finished_pub) {
   return true;
 }
 
+/*
+ * IO口控制，手触等
+ */
 void DoDIO(ros::Publisher going_back_pub) {
     if ((++g_dio_count % 2) == 0) {
       unsigned int temp_di_data = g_chassis_mcu->doDIO(g_do_data_);
@@ -49,7 +54,9 @@ void DoDIO(ros::Publisher going_back_pub) {
       g_do_data_ = g_di_data_;
     }
 }
-
+/*
+ * 遥控器状态
+ */
 void DoRemoteRet(void) {
   if (++remote_ret_cnt_ > 8) {
     remote_ret_ &= 0xff00;
