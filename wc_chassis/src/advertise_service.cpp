@@ -14,7 +14,7 @@ bool ProtectorSwitch(autoscrubber_services::ProtectorSwitch::Request& req,
     std::string protector_str =  req.protectorStr.data;
     protector_bits = 0x00;  //bit位置　1:屏蔽  0:不屏蔽
     for(unsigned int i = 0; i < protector_str.length(); ++i){
-        if(protector_str[i] == '0'){
+        if(protector_str[protector_str.length()-1-i] == '0'){
             protector_bits |= 0x01<<i;
         }
     }
@@ -30,7 +30,7 @@ bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
     std::string ultrasonic_str = req.ultrasonicStr.data;
     ultrasonic_bits = 0x00;  //bit位置　1:屏蔽  0：不屏蔽
     for(unsigned int i = 0; i < ultrasonic_str.length(); ++i){
-        if(ultrasonic_str[i] == '0'){
+        if(ultrasonic_str[protector_str.length()-1-i] == '0'){
             ultrasonic_bits |= 0x01<<i;
         }
     }
