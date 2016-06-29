@@ -141,6 +141,12 @@ void publish_protector_status(ros::Publisher &protector_pub) {
   str = status.to_string();
   value.key = std::string("protector_data"); // 0:on 1:off
   value.value = str.substr((32-protector_num), protector_num);
+
+  for(unsigned int i = 0; i < value.value.length()/2; i++ ){
+      char c = value.value[i];
+      value.value[i] = value.value[value.value.length() -1 -i];
+      value.value[value.value.length() -1 -i] = c;
+  }
   protector_pub.publish(value);
 }
 
