@@ -7,7 +7,6 @@
 
 
 
-
 /*
  *  自动充电 状态查询
  */
@@ -34,9 +33,6 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
 
     return true;
 }
-
-
-
 
 
 /*

@@ -1,5 +1,0 @@
-<library path="lib/libsingle_laser_filter">
-    <class name="gaussian_laser_filters/SingleLaserFilter" type="gaussian_laser_filters::SingleLaserFilter" base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
-        <description>Filter for single laser laser specific use.</description>
-    </class>
-</library>
