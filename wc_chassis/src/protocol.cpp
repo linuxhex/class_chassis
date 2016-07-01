@@ -561,9 +561,6 @@ void CreateChargeStatus(unsigned char *ch,int *len)
 }
 
 
-
-
-
 int IRQ_CH(unsigned char c){
     unsigned char tmp[50];
     int len = 0;
