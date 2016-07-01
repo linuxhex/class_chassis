@@ -29,7 +29,7 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
     range.range = dis_meter;
   }
   if((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00){ //屏蔽制定位置的超声的作用
-    range.range = 256 * 5.44 / 1000.0;
+    range.range = ultrasonic_max_range;
   }
   publisher.publish(range);
 }

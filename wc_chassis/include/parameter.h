@@ -17,6 +17,8 @@
 #include <autoscrubber_services/StopRotate.h>
 #include <autoscrubber_services/CheckRotate.h>
 #include <autoscrubber_services/CheckProtectorStatus.h>
+#include <autoscrubber_services/CheckChargeStatus.h>
+#include <autoscrubber_services/SetChargeCmd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

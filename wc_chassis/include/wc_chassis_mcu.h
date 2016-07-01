@@ -36,6 +36,8 @@ class WC_chassis_mcu{
   void getYawAngle(short& yaw, short& pitch, short& roll);
   void comunication(void);
   unsigned int checkRemoteVerifyKey(unsigned int seed_key);
+  void setChargeCmd(unsigned int cmd);
+  void getChargeStatus(unsigned char &status,unsigned short &value);
 
 
   int V2RPM(float v);

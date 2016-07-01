@@ -212,8 +212,54 @@ void WC_chassis_mcu::setRemoteID(unsigned char id) {
   usleep(1000);
 }
 
+/*
+ * 自动充电   cmd  1:开始充电　　0:结束充电
+ */
+void WC_chassis_mcu::setChargeCmd(unsigned int cmd)
+{
+    unsigned char send[1024] = {0};
+    unsigned char rec[1024]  = {0};
+    int len = 0, rlen = 0;
 
-int WC_chassis_mcu::V2RPM(float v) {
+    CreateChargeCmd(send, &len, cmd);
+
+    if (transfer_) {
+      transfer_->Send_data(send, len);
+      transfer_->Read_data(rec, rlen, 12, 500);
+    }
+
+    usleep(1000);
+}
+
+/*
+ * 自动充电   cmd  1:开始充电　　0:结束充电
+ */
+void WC_chassis_mcu::getChargeStatus(unsigned char& status,unsigned short& value)
+{
+    unsigned char send[1024] = {0};
+    unsigned char rec[1024]  = {0};
+    int len = 0, rlen = 0;
+
+    CreateChargeStatus(send, &len);
+
+    if (transfer_) {
+      transfer_->Send_data(send, len);
+      transfer_->Read_data(rec, rlen, 15, 500);
+    }
+
+    if (rlen == 15) {
+      for (int i = 0; i < rlen; ++i) {
+        if (IRQ_CH(rec[i])) {
+            getChargeStatusValue(status, value);
+        }
+      }
+    }
+
+    usleep(1000);
+}
+
+int WC_chassis_mcu::V2RPM(float v)
+{
   int rpm = v * 60 / (M_PI*Dia_F_);
   return rpm;
 }
@@ -259,7 +305,6 @@ int getsign(int t) {
 bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     comunication();
 
-    // std::cout << "left: " << counts_left_ << " right: " << counts_right_ << " dleft: " << delta_counts_left_ << " dright: " << delta_counts_right_ << " angle: " << yaw_angle_  << std::endl;
       ROS_INFO("[WC CHASSIS] left: %d right: %d dleft: %d dright: %d ddleft: %d ddright: %d ngle: %f", counts_left_, counts_right_, delta_counts_left_, delta_counts_right_, delta_counts_left_ - last_odo_delta_counts_left_, delta_counts_right_ - last_odo_delta_counts_right_, yaw_angle_ / 10.0);
 
     if (first_odo_) {
@@ -307,11 +352,10 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
       ROS_ERROR("err delta_counts_left: %d", delta_counts_left);
       delta_counts_left = last_odo_delta_counts_left_;
     }
-
-    ROS_INFO("[WC CHASSIS] gotOdo:: delta_counts_left: %d delta_counts_right: %d last_odo_delta_counts_left_: %d last_odo_delta_counts_right_: %d", delta_counts_left, delta_counts_right, last_odo_delta_counts_left_, last_odo_delta_counts_right_);
-
     last_odo_delta_counts_right_ = delta_counts_right;
     last_odo_delta_counts_left_ = delta_counts_left;
+
+    ROS_INFO("[WC CHASSIS] gotOdo:: delta_counts_left: %d delta_counts_right: %d last_odo_delta_counts_left_: %d last_odo_delta_counts_right_: %d", delta_counts_left, delta_counts_right, last_odo_delta_counts_left_, last_odo_delta_counts_right_);
 
     double l_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_left * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
     double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920

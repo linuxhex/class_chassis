@@ -10,6 +10,6 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
 bool ProtectorSwitch(autoscrubber_services::ProtectorSwitch::Request& req,autoscrubber_services::ProtectorSwitch::Response& res);
 bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,autoscrubber_services::UltrasonicSwitch::Response& res);
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,autoscrubber_services::CheckProtectorStatus::Response& res);
-
-
+bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,autoscrubber_services::SetChargeCmd::Response& res);
+bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,autoscrubber_services::CheckChargeStatus::Response& res);
 #endif

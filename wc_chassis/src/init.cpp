@@ -22,6 +22,8 @@ ros::ServiceServer check_hardware_srv;
 ros::ServiceServer protector_switch_srv;
 ros::ServiceServer ultrasonic_switch_srv;
 ros::ServiceServer check_protector_status_srv;
+ros::ServiceServer auto_charge_cmd_srv;
+ros::ServiceServer check_auto_charge_status_srv;
 
 /***Subscriber***/
 ros::Subscriber    Navi_sub;
@@ -32,13 +34,16 @@ ros::Subscriber    gyro_update_state_sub;
  * 初始化所有的Service和订阅服务
  */
 void InitService(){
-    start_rotate_srv = p_device_nh->advertiseService("start_rotate", &StartRotate);
-    stop_rotate_srv  = p_device_nh->advertiseService("stop_rotate", &StopRotate);
-    check_rotate_srv = p_device_nh->advertiseService("check_rotate", &CheckRotate);
-    check_hardware_srv   = p_device_nh->advertiseService("check_hardware", &CheckHardware);
-    protector_switch_srv  = p_device_nh->advertiseService("protector_switch",&ProtectorSwitch);
-    ultrasonic_switch_srv  = p_device_nh->advertiseService("ultrasonic_switch",&UltrasonicSwitch);
-    check_protector_status_srv  = p_device_nh->advertiseService("check_protector_status",&CheckProtectorStatus);
+    start_rotate_srv              = p_device_nh->advertiseService("start_rotate", &StartRotate);
+    stop_rotate_srv               = p_device_nh->advertiseService("stop_rotate", &StopRotate);
+    check_rotate_srv              = p_device_nh->advertiseService("check_rotate", &CheckRotate);
+    check_hardware_srv            = p_device_nh->advertiseService("check_hardware", &CheckHardware);
+    protector_switch_srv          = p_device_nh->advertiseService("protector_switch",&ProtectorSwitch);
+    ultrasonic_switch_srv         = p_device_nh->advertiseService("ultrasonic_switch",&UltrasonicSwitch);
+    check_protector_status_srv    = p_device_nh->advertiseService("check_protector_status",&CheckProtectorStatus);
+    auto_charge_cmd_srv           = p_device_nh->advertiseService("auto_charge_cmd",&SetAutoChargeCmd);
+    check_auto_charge_status_srv  = p_device_nh->advertiseService("auto_charge_status",&CheckAutoChargeStatus);
+
 
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
     remote_ret_sub = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);

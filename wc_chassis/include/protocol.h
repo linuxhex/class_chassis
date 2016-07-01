@@ -53,6 +53,8 @@ typedef enum{
     REMOTE_ID = 0x41,
     RREMOTE_VERIFY_KEY = 0x42,
     REMOTE_VERIFY_KEY = 0x43,
+    CHARGE_CMD = 0x50,     //自动充电
+    CHARGE_STATUS = 0x51,     //自动充电
     TIME = 0x7e,
     RTIME = 0xfe,
     RCURRENT = 0x81,
@@ -224,6 +226,19 @@ typedef struct _RREMOTE_ID
   unsigned char id;
 }RRemoteIDProtocol;
 
+
+typedef struct _CHARGE_CMD
+{
+  unsigned char cmd;
+}RChargeCmdProtocol;
+
+typedef struct _CHARGE_STATUS
+{
+  unsigned char  status;
+  unsigned short value;
+}RChargeStatusProtocol;
+
+
 typedef struct _RREMOTE_VERIFY_KEY
 {
   unsigned int key;
@@ -274,6 +289,8 @@ typedef union _Data{
   RRemoteIDProtocol r_remote_id_;
   RRemoteVerifyKeyProtocol r_remote_verify_key_;
   RemoteVerifyKeyProtocol remote_verify_key_;
+  RChargeCmdProtocol chargeCmd;
+  RChargeStatusProtocol chargeStatus;
 }Data;
 
 typedef struct _AGVProtocol
@@ -335,6 +352,8 @@ void CreateRemoteID(unsigned char* ch,int* len,unsigned char remote_id);
 unsigned int getRemoteVerifyKey(void);
 unsigned char checksum(unsigned char* ch ,int len);
 int IRQ_CH(unsigned char c);
-
+void CreateChargeCmd(unsigned char* ch,int *len,unsigned char cmd);
+void getChargeStatusValue(unsigned char& status, unsigned short& value);
+void CreateChargeStatus(unsigned char *ch,int *len);
 
 #endif//_PROTOCOL_WANGHONGTAO_2015_01_16_

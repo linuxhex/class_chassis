@@ -5,6 +5,40 @@
 #include"init.h"
 #include "parameter.h"
 
+
+
+
+/*
+ *  自动充电 状态查询
+ */
+bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,
+                           autoscrubber_services::CheckChargeStatus::Response& res)
+{
+    unsigned char  status = 0;
+    unsigned short value  = 0;
+    g_chassis_mcu->getChargeStatus(status,value);
+    res.charge_status.status = status;
+    res.charge_status.value  = value;
+
+    return true;
+}
+
+/*
+ *  自动充电 控制命令  cmd  0:停止自动充电　　１:开始自动充电
+ */
+bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
+                      autoscrubber_services::SetChargeCmd::Response& res)
+{
+    unsigned char cmd = req.cmd.data;
+    g_chassis_mcu->setChargeCmd(cmd);
+
+    return true;
+}
+
+
+
+
+
 /*
  *  提供给上层应用，屏蔽特定的防撞条
  */
