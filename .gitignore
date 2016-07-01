@@ -1,0 +1,6 @@
+
+*.creator
+*.creator.user
+*.files
+*.includes
+*.*~
