@@ -50,6 +50,11 @@ int sum_battery_capacity = 0;
 std::string ultrasonic_str[] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
                                 "ultrasonic5","ultrasonic6","ultrasonic7","ultrasonic8","ultrasonic9",
                                 "ultrasonic10","ultrasonic11","ultrasonic12","ultrasonic13","ultrasonic14"};
+
+//特殊超声下标位置
+unsigned char special_ultrasonic_id[15] = {0xff};
+
+
 float ultrasonic_min_range = 0.04;  //超声检测的最小距离  默认值0.04
 float ultrasonic_max_range = 1.0;   //超声检测的最大距离  默认值1.0
 //超声接入的数量
@@ -64,6 +69,8 @@ int remote_speed_level_ = 0; //遥控器控制速度等级
 int battery_level_ = 3;
 int remote_id = 1;
 int protector_num = 8; //防撞条个数
+double inplace_rotating_theta = 0.2; //初始化时旋转角度
+
 std::string hardware_id;
 std::string router_ip = std::string("10.7.5.1");
 std::string laser_ip = std::string("10.7.5.100");
@@ -71,3 +78,6 @@ std::string laser_connection_status = std::string("true");
 std::string router_connection_status = std::string("true");
 std::thread *checkConnectionThread;
 std::string *ultrasonic;
+std::string *special_ultrasonic;
+float special_ultrasonic_offset_dismeter;
+

@@ -64,6 +64,7 @@ int main(int argc, char **argv) {
     for(int i=0;i<15;i++){
         if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
             ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
+            special_ultrasonic_id[i] = i;
             ultrasonic_num ++;
         }
     }

@@ -72,6 +72,8 @@ extern unsigned int remote_ret_cnt_;
 extern unsigned char remote_cmd_;
 extern unsigned short remote_index_;
 extern std::string ultrasonic_str[15];
+extern unsigned char special_ultrasonic_id[15];
+
 extern std::vector<int> g_ultrasonic;
 extern pthread_mutex_t speed_mutex;
 extern int battery_count;
@@ -83,7 +85,9 @@ extern unsigned int connection_status; // mcu ethernet connection status: 0>bad 
 extern int ultrasonic_num;
 extern float ultrasonic_min_range;  //超声检测的最小距离  默认值0.04
 extern float ultrasonic_max_range;   //超声检测的最大距离  默认值1.0
-
+extern float special_ultrasonic_offset_dismeter;
+extern std::string *ultrasonic;
+extern std::string *special_ultrasonic;
 extern double max_speed_v;
 extern double max_speed_w;
 extern double speed_v_acc;
@@ -102,9 +106,13 @@ extern std::string laser_ip;
 extern std::string laser_connection_status;
 extern std::string router_connection_status;
 extern std::thread *checkConnectionThread;
-extern std::string *ultrasonic;
+
+
+
 extern int protector_num;
 extern unsigned int protector_bits;
 extern unsigned int ultrasonic_bits;
+extern double inplace_rotating_theta;
+
 
 #endif

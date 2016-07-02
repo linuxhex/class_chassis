@@ -80,12 +80,17 @@ void InitParameter(){
     p_nh->param("COUNTS", counts, 12);//霍尔数
     p_nh->param("REDUCTION_RATIO", reduction_ratio, 30);//减速比
     p_nh->param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
-    p_nh->param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));//超声有效检测距离
     p_nh->param("battery_full_level", battery_full_level, static_cast<double>(27.5));
     p_nh->param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
+
     p_nh->param("ultrasonic",*ultrasonic,std::string(" "));//配置的超声
     p_nh->param("ultrasonic_min_range",ultrasonic_min_range,static_cast<float>(0.04));//超声最小距离
     p_nh->param("ultrasonic_max_range",ultrasonic_max_range,static_cast<float>(1.0));//超声最大距离
+    p_nh->param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));//超声有效检测距离
+    p_nh->param("special_ultrasonic",*special_ultrasonic,std::string(" "));//特殊配置的超声
+    p_nh->param("special_ultrasonic_offset_dismeter",special_ultrasonic_offset_dismeter,static_cast<float>(0.15)); //特殊超声偏置距离
+
+
     p_nh->param("max_speed_v", max_speed_v, static_cast<double>(0.6));//最大速度
     p_nh->param("max_speed_w", max_speed_w, static_cast<double>(0.6));//最大角速度
     p_nh->param("speed_v_acc", speed_v_acc, static_cast<double>(0.025));//速度加速度
@@ -100,6 +105,7 @@ void InitParameter(){
     p_nh->param("protector_num",protector_num,8);//防撞条使用数量
     p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
     p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
+    p_nh->param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));
 
 
     pthread_mutex_init(&speed_mutex, NULL);

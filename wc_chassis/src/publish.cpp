@@ -21,6 +21,11 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
   range.max_range = ultrasonic_max_range;
 
   float dis_meter = recv_int * 5.44 / 1000.0;
+
+  if(special_ultrasonic_id[ultrasonic_offset] = ultrasonic_offset){ //特殊位置超声处理
+    dis_meter = dis_meter - special_ultrasonic_offset_dismeter;
+  }
+
   if (dis_meter < range.min_range) {
     range.range = range.min_range;
   } else if (dis_meter > ultral_effective_range) {  // effective range
@@ -28,9 +33,11 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
   } else {
     range.range = dis_meter;
   }
-  if((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00){ //屏蔽制定位置的超声的作用
+
+  if((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00){ //应用层屏蔽超声的作用
     range.range = ultrasonic_max_range;
   }
+
   publisher.publish(range);
 }
 

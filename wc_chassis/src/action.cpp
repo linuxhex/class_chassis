@@ -22,9 +22,9 @@ bool DoRotate(ros::Publisher &rotate_finished_pub) {
   } else {
     is_rotate_finished = false;
     if (rotate_angle > 0) {
-      g_chassis_mcu->setTwoWheelSpeed(0.0, 0.2);
+      g_chassis_mcu->setTwoWheelSpeed(0.0, inplace_rotating_theta);
     } else if (rotate_angle < 0) {
-      g_chassis_mcu->setTwoWheelSpeed(0.0, -0.2);
+      g_chassis_mcu->setTwoWheelSpeed(0.0, - inplace_rotating_theta);
     } else {
       is_rotate_finished = true;
       start_rotate_flag = false;
