@@ -1,4 +1,4 @@
-/*publish.cpp 所有的topic的发布
+/* publish.cpp 所有的topic的发布
  */
 
 
@@ -34,7 +34,7 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
     range.range = dis_meter;
   }
 
-  if((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00){ //应用层屏蔽超声的作用
+  if(((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
     range.range = ultrasonic_max_range;
   }
 
@@ -141,6 +141,10 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
  * 发送防撞条状态
  */
 void publish_protector_status(ros::Publisher &protector_pub) {
+
+  if(protector_num <= 0){
+      return;
+  }
   std::bitset<32> status;
   std::string str;
   diagnostic_msgs::KeyValue value;

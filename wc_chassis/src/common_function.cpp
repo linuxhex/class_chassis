@@ -3,6 +3,15 @@
 #include"common_function.h"
 #include"init.h"
 
+std::string get_key_value(int status, int status_bit)
+{
+  if (status & (0x01 << status_bit)) {
+    return std::string("true");
+  } else {
+    return std::string("false");
+  }
+}
+
 #ifdef VERIFY_REMOTE_KEY
 unsigned int GenerateJSHash(unsigned int seed) {
   unsigned char ch[] = "NTM4N2I2YmFiOWIwNzgzYmViYWFjYjc2";

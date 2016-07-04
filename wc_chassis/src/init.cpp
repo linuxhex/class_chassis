@@ -106,7 +106,7 @@ void InitParameter(){
     p_nh->param("protector_num",protector_num,8);//防撞条使用数量
     p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
     p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
-    p_nh->param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));
+    p_nh->param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));//初始化旋转速度
 
 
     pthread_mutex_init(&speed_mutex, NULL);

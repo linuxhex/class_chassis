@@ -43,7 +43,19 @@ enum Device_ID{
   Mileage,
   Device_MAX
 };
-
+// Hardware ID
+enum Hardware_ID {
+  Main_board = 0,
+  Pannel_board,
+  Steering_board,
+  Power_board,
+  Ultrasonic_board,
+  Motor_driver,
+  Decoder,
+  Motor,
+  Ultrasonic,
+  Hardware_MAX
+};
 extern unsigned int g_dio_count ;
 extern unsigned int g_ret_count ;
 extern unsigned int g_pc_control;
@@ -115,6 +127,6 @@ extern int protector_num;
 extern unsigned int protector_bits;
 extern unsigned int ultrasonic_bits;
 extern double inplace_rotating_theta;
-
+extern bool ultrasonic_board_connection;
 
 #endif

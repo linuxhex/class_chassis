@@ -84,3 +84,4 @@ unsigned int protector_value = 0; //防撞条的值．0:表示防撞条没有被
 double protector_start_time = 0;  //防撞条触发开始时间
 unsigned char protector_down = 0; //0:表示防撞条没有触发　１:表示防撞条从触发到１ｓ钟时间之内
 unsigned char protector_service_call = 1;// 0:表示service没有被调，１：表示service被调
+bool ultrasonic_board_connection = true; //true:超声转接板连接正常

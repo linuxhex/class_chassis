@@ -341,8 +341,6 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
       delta_counts_right += 65536;
     }
 
-    // std::cout << "dleft: " << delta_counts_left << " dright: " << delta_counts_right << std::endl;
-
     //防止码盘抖动
     if (abs(delta_counts_right) > delta_counts_th_) {
       ROS_ERROR("err delta_counts_right: %d", delta_counts_right);
@@ -375,7 +373,6 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
       double gyro_dtheta =  (temp_dtheta / 10.0) / 180.0 * M_PI;
       odom_a_ += gyro_dtheta;
       acc_odom_theta_ += fabs(gyro_dtheta);
-  //    std::cout << "temp_theta: " << temp_dtheta << " ;odom_dtheta: " << gyro_dtheta << " acc_odom_theta_: " << acc_odom_theta_ << std::endl;
       odom_a_gyro_ = odom_a_;
     }
 
@@ -425,6 +422,9 @@ void WC_chassis_mcu::getUltra(void) {
   /*
    *防撞条预处理
    */
+  if(protector_num <= 0){
+      return;
+  }
   unsigned int status  = g_ultrasonic[0] | (protector_bits);
   status = (status^0xffff) << (32-protector_num);
 
@@ -590,7 +590,7 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
 
 void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
   if (ret == 0) { 
-    ROS_INFO("[wc_chassis] send remote ret == 0!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    ROS_INFO("[wc_chassis] send remote ret == 0!");
   }
   unsigned char send[1024] = {0};
   int len = 0;
@@ -682,7 +682,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
       ROS_INFO("[CHASSIS]  cc get max_speed_v_  = %.2f, max_speed_w_ = %.2f", max_speed_v_, max_speed_w_);
       float delta_speed_v = speed_v - last_speed_v_;
       float delta_speed_w = speed_w - last_speed_w_;
-      // speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;
+      //speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;
 
       if(delta_speed_v > 0.0) {
         float delta_speed_v_acc = fabs(speed_v) < 0.01 ? 0.25 : speed_v_acc_;
@@ -694,7 +694,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
       speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;
 
       ROS_INFO("[CHASSIS] set real speed v = %.2f, w = %.2f", speed_v, speed_w);
-      // calculate angle and speed
+        //calculate angle and speed
       if (IsInPlaceRotation(speed_v, speed_w))  {
         speed_right = Axle_ * tan(speed_w * TimeWidth_) / (2 * TimeWidth_);
         speed_left = -1.0 * speed_right;
@@ -703,11 +703,11 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
         speed_right = 0.0;
       } else {
         if (speed_w > 0.0) {  //Left
-    //     speed_left = speed_v - (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
+          //speed_left = speed_v - (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
           speed_left = speed_v - (Axle_ * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
           speed_right = 2 * speed_v - speed_left;
         } else { // right
-    //     speed_right = speed_v + (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
+          //speed_right = speed_v + (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
           speed_right = speed_v + (Axle_ * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
           speed_left = 2 * speed_v - speed_right;
         }

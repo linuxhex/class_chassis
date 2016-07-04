@@ -47,7 +47,7 @@ ros::Publisher going_back_pub;
 
 int main(int argc, char **argv) {
 
-    ROS_INFO("[wc_chassis] chassis version: 1.1.2.8");
+    ROS_INFO("[wc_chassis] chassis version: 1.1.3.2");
     InitChassis(argc, argv,"wc_chassis");
     ROS_INFO("[wc_chassis] chassis init completed");
 
@@ -76,7 +76,6 @@ int main(int argc, char **argv) {
     g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
     g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
     g_chassis_mcu->getUltra();
-    usleep(500);
     timeval tv;
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;

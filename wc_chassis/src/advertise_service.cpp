@@ -4,7 +4,7 @@
 #include"advertise_service.h"
 #include"init.h"
 #include "parameter.h"
-
+#include "common_function.h"
 
 
 /*
@@ -117,6 +117,8 @@ bool CheckRotate(autoscrubber_services::CheckRotate::Request& req,
  */
 bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrubber_services::CheckHardware::Response& res) {
 
+  int hardware_s = g_ultrasonic[19];
+
   diagnostic_msgs::DiagnosticStatus hardware_status;
   diagnostic_msgs::KeyValue value;
   hardware_status.name = std::string("hardware_status");
@@ -125,6 +127,11 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
 
   value.key = std::string("MCU_connection"); // 0:bad 1:good
   value.value = (connection_status == 1) ? std::string("true") : std::string("false");
+  hardware_status.values.push_back(value);
+
+  value.key = std::string("ultrasonic_board");
+  value.value = get_key_value(hardware_s, Ultrasonic_board);
+  std::istringstream(value.value) >> std::boolalpha >> ultrasonic_board_connection;
   hardware_status.values.push_back(value);
 
   value.key = std::string("laser_connection");
