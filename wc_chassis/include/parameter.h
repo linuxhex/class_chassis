@@ -107,8 +107,10 @@ extern std::string laser_connection_status;
 extern std::string router_connection_status;
 extern std::thread *checkConnectionThread;
 
-
-
+extern unsigned char protector_service_call;
+extern unsigned int protector_value;
+extern double protector_start_time;
+extern unsigned char protector_down;
 extern int protector_num;
 extern unsigned int protector_bits;
 extern unsigned int ultrasonic_bits;

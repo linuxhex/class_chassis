@@ -71,16 +71,14 @@ bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
  *  提供给navigation模块，用于在判断遇到障碍物是是否是防撞条触发
  */
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
-                        autoscrubber_services::CheckProtectorStatus::Response& res){
-
-    unsigned int status        = g_ultrasonic[0] | (protector_bits);
-    unsigned int protect_value = (status^0xffff) << (32-protector_num);
-    if(protect_value != 0){
+                          autoscrubber_services::CheckProtectorStatus::Response& res){
+    protector_service_call = 1;
+    if(protector_value != 0){
        res.protector_status.protect_status=true;
     }else{
        res.protector_status.protect_status=false;
     }
-    res.protector_status.protect_value = protect_value >> (32-protector_num);
+    res.protector_status.protect_value = protector_value >> (32-protector_num);
     return true;
 }
 

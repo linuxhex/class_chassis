@@ -62,6 +62,7 @@ void InitParameter(){
     double axle  = 0;
     int counts = 0;
     ultrasonic = new std::string();
+    special_ultrasonic = new std::string();
     int reduction_ratio = 0;
     double speed_ratio = 1.0;
     double timeWidth = 0;
@@ -71,7 +72,7 @@ void InitParameter(){
 
     p_nh->param("max_cmd_interval", max_cmd_interval, 1.0);
     p_nh->param("TimeWidth", timeWidth, static_cast<double>(0.1));
-    p_nh->param("host_name", host_name, std::string("10.7.5.88"));
+    p_nh->param("host_name", host_name, std::string("10.7.5.199"));
     p_nh->param("port", port, 5000);
 
     p_nh->param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
@@ -100,7 +101,7 @@ void InitParameter(){
     p_nh->param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));//角速度减速度
     p_nh->param("full_speed",full_speed,static_cast<double>(3.0)); //电机满转速度
     p_nh->param("delta_counts_th",delta_counts_th,800); //码盘防抖动阈值
-    p_nh->param("remote_speed_level", remote_speed_level_, 1);//遥控器控制速度
+    p_nh->param("remote_speed_level", remote_speed_level_, 0);//遥控器控制速度
     p_nh->param("hardware_id", hardware_id, std::string("   "));//硬件设备名称
     p_nh->param("protector_num",protector_num,8);//防撞条使用数量
     p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip

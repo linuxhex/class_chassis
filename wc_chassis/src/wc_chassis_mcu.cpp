@@ -402,7 +402,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     return true;
 }
 
-void WC_chassis_mcu::getUltra() {
+void WC_chassis_mcu::getUltra(void) {
   unsigned char send[1024] = {0};
   int len = 0;
 
@@ -418,9 +418,26 @@ void WC_chassis_mcu::getUltra() {
   if (rlen == 35) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
-        return ;
       }
     }
+  }
+
+  /*
+   *防撞条预处理
+   */
+  unsigned int status  = g_ultrasonic[0] | (protector_bits);
+  status = (status^0xffff) << (32-protector_num);
+
+  if(protector_service_call == 1){
+      protector_value = status;
+      protector_service_call = 0;
+  }
+
+  if(status != 0){
+      timeval tv;
+      gettimeofday(&tv, NULL);
+      protector_start_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+      protector_down = 1;
   }
 }
 
@@ -724,8 +741,6 @@ void WC_chassis_mcu::comunication(void) {
   delta_counts_left_ = getLPos();
   usleep(1000);
   delta_counts_right_ = getRPos();
-  usleep(1000);
-  getUltra();
   usleep(1000);
   getYawAngle(yaw_angle_, pitch_angle_, roll_angle_);
   yaw_angle_ = yaw_angle_ < 0 ? (3600 + yaw_angle_) : yaw_angle_;

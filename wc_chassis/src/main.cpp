@@ -64,7 +64,9 @@ int main(int argc, char **argv) {
     for(int i=0;i<15;i++){
         if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
             ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
-            special_ultrasonic_id[i] = i;
+            if(special_ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
+                special_ultrasonic_id[i] = i;
+            }
             ultrasonic_num ++;
         }
     }
@@ -73,7 +75,8 @@ int main(int argc, char **argv) {
    while (ros::ok()) {
     g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
     g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
-    usleep(1000);
+    g_chassis_mcu->getUltra();
+    usleep(500);
     timeval tv;
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
@@ -81,9 +84,10 @@ int main(int argc, char **argv) {
     if(start_rotate_flag) {
       DoRotate(rotate_finished_pub);
     } else {
-      if (time_now - last_cmd_vel_time >= max_cmd_interval) {
+      if ((time_now - last_cmd_vel_time >= max_cmd_interval) || (protector_down && (time_now - protector_start_time <= 1.0) && (m_speed_v >= 0))) {
         g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
       } else {
+        protector_down = 0;
         g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
       }
     }

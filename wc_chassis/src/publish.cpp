@@ -22,7 +22,7 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
 
   float dis_meter = recv_int * 5.44 / 1000.0;
 
-  if(special_ultrasonic_id[ultrasonic_offset] = ultrasonic_offset){ //特殊位置超声处理
+  if(special_ultrasonic_id[ultrasonic_offset] == ultrasonic_offset){ //特殊位置超声处理
     dis_meter = dis_meter - special_ultrasonic_offset_dismeter;
   }
 
