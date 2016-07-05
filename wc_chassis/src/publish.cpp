@@ -190,7 +190,6 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
   odom.twist.covariance.elems[35] = 1.0;
 
   geometry_msgs::Quaternion odom_quat;
-//  ROS_INFO("Odo Yaw = %lf", g_odom_tha * 57.3);
   odom_quat = tf::createQuaternionMsgFromYaw(g_odom_tha);
 #ifdef DEBUG_PRINT
   std::cout << "odo based" << std::endl;
@@ -205,7 +204,6 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
   odom.twist.twist.linear.x = g_odom_v;
   odom.twist.twist.linear.y = 0;
   odom.twist.twist.angular.z = g_odom_w;
-  // publish the message
   odom_pub.publish(odom);
 
   tf::Quaternion q;

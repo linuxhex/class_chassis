@@ -59,7 +59,7 @@ void checkConnectionHealthThread(void) {
             if(!ping(laser_ip.c_str())){
                 laser_connection_status = std::string("false");
             }
-            if(!ping(laser_ip.c_str())){
+            if(!ping(router_ip.c_str())){
                 router_connection_status = std::string("false");
             }
         }else{

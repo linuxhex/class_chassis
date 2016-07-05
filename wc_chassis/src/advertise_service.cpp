@@ -131,7 +131,6 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
 
   value.key = std::string("ultrasonic_board");
   value.value = get_key_value(hardware_s, Ultrasonic_board);
-  std::istringstream(value.value) >> std::boolalpha >> ultrasonic_board_connection;
   hardware_status.values.push_back(value);
 
   value.key = std::string("laser_connection");
@@ -144,7 +143,7 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
 
   //超声状态
   for (int i = 0; i < ultrasonic_num; ++i) {
-     if (g_ultrasonic[i + 1] == 0xff) {
+     if (g_ultrasonic[i + 1] == 0xff || !ultrasonic_board_connection) {
        value.key  = ultrasonic_str[i];
        value.value = std::string("false");
        hardware_status.values.push_back(value);

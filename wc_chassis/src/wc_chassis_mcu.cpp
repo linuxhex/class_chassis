@@ -12,6 +12,7 @@
 #include "SPort.h"
 #include "protocol.h"
 #include "wc_chassis_mcu.h"
+#include "common_function.h"
 
 #define REDUCTION_RATIO	        (25)
 #define SPEED_TH	            (1000)
@@ -419,6 +420,10 @@ void WC_chassis_mcu::getUltra(void) {
     }
   }
 
+  /*
+   *超声can连接状态预处理
+   */
+  std::istringstream(get_key_value(g_ultrasonic[19], Ultrasonic_board)) >> std::boolalpha >> ultrasonic_board_connection;
   /*
    *防撞条预处理
    */
