@@ -178,10 +178,10 @@ void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,
     full_speed_ = 3.0;
     std::cout << "full_speed err value:" <<full_speed<< std::endl;
   }
-  if ((delta_counts_th > 0) && (delta_counts_th < 200)) {
+  if ((delta_counts_th > 0) && (delta_counts_th < 10000)) {
     delta_counts_th_ = delta_counts_th;
   } else {
-    delta_counts_th_ = 40;
+    delta_counts_th_ = 800;
     std::cout << "delta_counts_th err value:" <<delta_counts_th<< std::endl;
   }
 
@@ -233,7 +233,7 @@ void WC_chassis_mcu::setChargeCmd(unsigned int cmd)
 }
 
 /*
- * 自动充电   cmd  1:开始充电　　0:结束充电
+ * 获取充电状态
  */
 void WC_chassis_mcu::getChargeStatus(unsigned char& status,unsigned short& value)
 {
@@ -279,7 +279,7 @@ bool WC_chassis_mcu::getCSpeed(double &v, double &w) {
     last_delta_counts_right_ = delta_counts_right_;
   }
 
-  const double t = 0.05; //stm32 update delta_counts_ in 20Hz
+  const double t = 0.1; //stm32 update delta_counts_ in 20Hz
   double l_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_left_ * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
   double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right_ * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
   mileage_left_ += fabs(l_wheel_pos);
