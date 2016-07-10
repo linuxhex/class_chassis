@@ -279,7 +279,7 @@ bool WC_chassis_mcu::getCSpeed(double &v, double &w) {
     last_delta_counts_right_ = delta_counts_right_;
   }
 
-  const double t = 0.1; //stm32 update delta_counts_ in 20Hz
+  const double t = 0.05; //stm32 update delta_counts_ in 20Hz
   double l_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_left_ * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
   double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right_ * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
   mileage_left_ += fabs(l_wheel_pos);
