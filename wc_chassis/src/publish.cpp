@@ -206,10 +206,11 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
   odom.twist.twist.angular.z = g_odom_w;
   odom_pub.publish(odom);
 
+  ros::Time odom_timestamped = ros::Time::now() + ros::Duration(0.1);
   tf::Quaternion q;
   tf::quaternionMsgToTF(odom.pose.pose.orientation, q);
   tf::Transform odom_meas(q, tf::Vector3(odom.pose.pose.position.x, odom.pose.pose.position.y, 0));
-  tf::StampedTransform odom_transform(odom_meas, ros::Time::now(), "base_odom", "base_link");
+  tf::StampedTransform odom_transform(odom_meas, odom_timestamped, "base_odom", "base_link");
   odom_broadcaster->sendTransform(odom_transform);
 }
 

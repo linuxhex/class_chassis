@@ -22,7 +22,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
+#ifdef SETTING_PRIORITY
 #include <sched.h>
+#endif
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -44,8 +46,27 @@ ros::Publisher rotate_finished_pub;
 ros::Publisher protector_pub;
 ros::Publisher going_back_pub;
 
+#define SETTING_PRIORITY
 
 int main(int argc, char **argv) {
+
+#ifdef SETTING_PRIORITY
+    struct sched_param param;
+    param.sched_priority = 99;
+    if (0 != sched_setscheduler(getpid(), SCHED_RR, &param)) {
+      std::cout << "set priority failed" << std::endl;
+    } else {
+      std::cout << "set priority succeed" << std::endl;
+    }
+    cpu_set_t mask;
+    CPU_ZERO(&mask);
+    CPU_SET(0, &mask);
+    if (sched_setaffinity(0, sizeof(mask), &mask) < 0) {
+      std::cout << "set affinity failed" << std::endl;
+    } else {
+      std::cout << "set affinity succeed" << std::endl;
+    }
+#endif
 
     ROS_INFO("[wc_chassis] chassis version: 1.1.3.2");
     InitChassis(argc, argv,"wc_chassis");
@@ -71,44 +92,83 @@ int main(int argc, char **argv) {
         }
     }
 
+   timeval tv;
     /*********************************  主循环  ******************************/
    while (ros::ok()) {
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  1.loop start: getOdo", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  2.getCSpeed", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  3.getUltra", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     g_chassis_mcu->getUltra();
-    timeval tv;
+
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
     if(start_rotate_flag) {
+      gettimeofday(&tv, NULL);
+      ROS_INFO("[CHASSIS-MAIN] t = %.5f;  4.0.DoRotate", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
       DoRotate(rotate_finished_pub);
     } else {
       if ((time_now - last_cmd_vel_time >= max_cmd_interval) || (protector_down && (time_now - protector_start_time <= 1.0) && (m_speed_v >= 0))) {
+        gettimeofday(&tv, NULL);
+        ROS_INFO("[CHASSIS-MAIN] t = %.5f;  4.1.setTwoWheelSpeed(0, 0)", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
         g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
       } else {
         protector_down = 0;
+        gettimeofday(&tv, NULL);
+        ROS_INFO("[CHASSIS-MAIN] t = %.5f;  4.2.setTwoWheelSpeed(%lf, %lf)", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec, m_speed_v, m_speed_w);
         g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
       }
     }
 
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  5.DoDIO", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     DoDIO(going_back_pub);
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  6.DoRemoteRet", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     DoRemoteRet();
     if (++loop_count % 2) {
+      gettimeofday(&tv, NULL);
+      ROS_INFO("[CHASSIS-MAIN] t = %.5f;  7.getRemoteCmd(5Hz)", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
       g_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);
+      gettimeofday(&tv, NULL);
+      ROS_INFO("[CHASSIS-MAIN] t = %.5f;  8.PublishRemoteCmd(5Hz)", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
       PublishRemoteCmd(remote_cmd_pub,remote_cmd_, remote_index_);
+      gettimeofday(&tv, NULL);
+      ROS_INFO("[CHASSIS-MAIN] t = %.5f;  9.publishDeviceStatus(5Hz)", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
       publishDeviceStatus(device_pub);
     }
     if (loop_count % 10) {//设置遥控器id
+      gettimeofday(&tv, NULL);
+      ROS_INFO("[CHASSIS-MAIN] t = %.5f;  10.setRemoteID(1Hz)", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
       g_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
       loop_count = 0;
     }
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  11.PublishOdom", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     PublishOdom(p_odom_broadcaster,odom_pub);
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  12.PublishYaw && PublishGyro", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     PublishYaw(yaw_pub);
     PublishGyro(gyro_pub);
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  13.PublishUltrasonic", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     PublishUltrasonic(ultrasonic_pub);
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  14.publish_protector_status", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     publish_protector_status(protector_pub);
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  15.0.spin start", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     ros::spinOnce();
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  15.1.spin end; loop_sleep start", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
     p_loop_rate->sleep();
+    gettimeofday(&tv, NULL);
+    ROS_INFO("[CHASSIS-MAIN] t = %.5f;  16. loop end!!!", static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec);
   }
 
   ROS_INFO("[wc_chassis] wc_chassis has closed, now free resource!");

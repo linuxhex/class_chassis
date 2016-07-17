@@ -22,6 +22,7 @@
 #define DELTA_SPEED_V_DEC_TH    (-0.12)
 #define DELTA_SPEED_W_TH	    (0.25)
 #define DT                      (0.1)
+#define DEBUG_ETHERNET
 
 const float  H = 0.92;
 float current_v = 0.0;
@@ -202,9 +203,21 @@ void WC_chassis_mcu::setRemoteID(unsigned char id) {
 
   CreateRemoteID(send, &len, id);
 
+  double start_time = GetTimeInSeconds();
+
   if (transfer_) {
     transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] setRemoteID: send time = %lf", send_time - start_time);
+#endif
     transfer_->Read_data(rec, rlen, 12, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] setRemoteID: recv time = %lf", recv_time - send_time);
+#endif
   }
 
   std::string str = cComm::ByteToHexString(send, len);
@@ -408,11 +421,29 @@ void WC_chassis_mcu::getUltra(void) {
   int rlen = 0;
 
   CreateRUltra(send, &len);
+  double start_time = GetTimeInSeconds();
   if (transfer_) {
     transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get_Ultra: send time = %lf", send_time - start_time);
+#endif
+
     transfer_->Read_data(rec, rlen, 23, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get_Ultra: recv time = %lf", recv_time - send_time);
+#endif
   }
 
+  // std::string str = cComm::ByteToHexString(send, len);
+  // std::cout << "send ultra: " << str << std::endl;
+
+   std::string str = cComm::ByteToHexString(rec, rlen);
+   std::cout << "recv ultra: " << str << std::endl;
+  // std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
   if (rlen == 35) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
@@ -455,15 +486,32 @@ unsigned int WC_chassis_mcu::checkRemoteVerifyKey(unsigned int seed_key) {
 
   CreateRemoteVerifyKey(send, &len, 0, seed_key);
 
+  double start_time = GetTimeInSeconds();
   if (transfer_) {
     transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time > 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] checkRemoteVerifyKey: send time = %lf", send_time - start_time);
+#endif
     transfer_->Read_data(rec, rlen, 15, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time > 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] checkRemoteVerifyKey: recv time = %lf", recv_time - send_time);
+#endif
   }
 
+//  std::string str_send = cComm::ByteToHexString(send, len);
+//  std::cout << "send Remote verify key: " << str_send << std::endl;
+
+//  std::string str_recv = cComm::ByteToHexString(rec, rlen);
+//  std::cout << "recv Remote verify key: " << str_recv << std::endl;
   if (rlen == 15) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
         return getRemoteVerifyKey();
+        // ROS_INFO("[wc_chassis] cmd = %d; index = %d", cmd, index);
       }
     }
   }
@@ -480,15 +528,32 @@ void WC_chassis_mcu::getRemoteCmd(unsigned char& cmd, unsigned short& index) {
 
   createRemoteCmd(send, &len);
 
+  double start_time = GetTimeInSeconds();
   if (transfer_) {
     transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get remote cmd: send time = %lf", send_time - start_time);
+#endif
     transfer_->Read_data(rec, rlen, 14, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get remote cmd: recv time = %lf", recv_time - send_time);
+#endif
   }
 
+  // std::string str = cComm::ByteToHexString(send, len);
+  // std::cout << "send Remote cmd: " << str << std::endl;
+
+  std::string str = cComm::ByteToHexString(rec, rlen);
+  std::cout << "recv Remote cmd: " << str << std::endl;
   if (rlen == 14) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
         getRemote(cmd, index);
+        // ROS_INFO("[wc_chassis] cmd = %d; index = %d", cmd, index);
       }
     }
   }
@@ -503,14 +568,32 @@ void WC_chassis_mcu::getYawAngle(short& yaw, short& pitch, short& roll) {
 
   createYawAngle(send, &len);
 
+  double start_time = GetTimeInSeconds();
   if (transfer_) {
     transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get Yaw Angle: send time = %lf", send_time - start_time);
+#endif
     transfer_->Read_data(rec, rlen, 17, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get Yaw Angle: recv time = %lf", recv_time - send_time);
+#endif
   }
+
+  // std::string str = cComm::ByteToHexString(send, len);
+  // std::cout << "send yaw: " << str << std::endl;
+
+  // std::string str = cComm::ByteToHexString(rec, rlen);
+  // std::cout << "recv Yaw angle: " << str << std::endl;
   if (rlen == 17) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
         getYaw(yaw, pitch, roll);
+        // std::cout << "Yaw = " << yaw / 10.0 << "; Pitch = " << pitch / 10.0 << "; Roll = " << roll / 10.0 << std::endl;
       }
     }
   }
@@ -525,10 +608,28 @@ int WC_chassis_mcu::getLPos() {
 
   CreateRPos(send, &len, 0);
 
+  double start_time = GetTimeInSeconds();
   if (transfer_) {
     transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time > 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get left pos: send time = %lf", send_time - start_time);
+#endif
     transfer_->Read_data(rec, rlen, 23, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time > 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get left pos: recv time = %lf", recv_time - send_time);
+#endif
   }
+
+  // std::string str = cComm::ByteToHexString(send, len);
+  // std::cout << "send left pos: " << str << std::endl;
+
+   // std::string str = cComm::ByteToHexString(rec, rlen);
+   // std::cout << "recv left pos:  " << str << std::endl;
+   // std::cout << "recv left pos:   " << str.substr(30, 12) << std::endl;
 
   if (rlen == 23) {
     for (int i = 0; i < rlen; ++i) {
@@ -549,11 +650,30 @@ int WC_chassis_mcu::getRPos() {
   int rlen = 0;
 
   CreateRPos(send, &len, 1);
+
+  double start_time = GetTimeInSeconds();
   if (transfer_) {
     transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get right pos: send time = %lf", send_time - start_time);
+#endif
+
     transfer_->Read_data(rec, rlen, 23, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get right pos: recv time = %lf", recv_time - send_time);
+#endif
   }
 
+  // std::string str = cComm::ByteToHexString(send, len);
+  // std::cout << "send right pos: " << str << std::endl;
+
+  // std::string str = cComm::ByteToHexString(rec, rlen);
+  // std::cout << "recv right pos: " << str << std::endl;
+  // std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
 
   if (rlen == 23) {
     for (int i = 0; i < rlen; ++i) {
@@ -575,10 +695,27 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
 
   CreateDO(send, &len, 0, usdo);
 
+  double start_time = GetTimeInSeconds();
   if (transfer_) {
     transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] set_DO: cost time = %lf", send_time - start_time);
+#endif
+
     transfer_->Read_data(rec, rlen, 15, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] get_DI: cost time = %lf", recv_time - send_time);
+#endif
   }
+  // std::string str_send = cComm::ByteToHexString(send, len);
+  // std::cout << "send do: " << str_send << std::endl;
+  // std::string str_recv = cComm::ByteToHexString(rec, len);
+  // std::cout << "get di: " << str_recv << std::endl;
+
   if (rlen == 15) {
     for (int i = 0 ; i < rlen ; ++i) {
       if (IRQ_CH(rec[i])) {
@@ -607,10 +744,26 @@ void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
 
   CreateRemoteRet(send, &len, 0, ret);
 
+  double start_time = GetTimeInSeconds();
   if (transfer_) {
     transfer_->Send_data(send, len);
-    transfer_->Read_data(rec, rlen, 14, 500);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] setRemoteRet: cost time = %lf", send_time - start_time);
+#endif
+
+    transfer_->Read_data(rec, rlen, 12, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time> 0.002)
+      ROS_INFO("[CHASSIS-ETHERNET] setRemoteRet: cost time = %lf", recv_time - send_time);
+#endif
   }
+
+  std::string str = cComm::ByteToHexString(send, len);
+  std::cout << "send remote ret: " << str << std::endl;
+
   usleep(1000);
 }
 
@@ -676,70 +829,80 @@ double sign(double t){
 }
 
 void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
+  ROS_INFO("[CHASSIS] get speed v = %.2f, w = %.2f", speed_v, speed_w);
+  float speed_left = 0.0;
+  float speed_right = 0.0;
+  short m_speed_left = 0;
+  short m_speed_right = 0;
+  speed_v = fabs(speed_v) > max_speed_v_ ?  sign(speed_v) * max_speed_v_ : speed_v;
+  speed_w = fabs(speed_w) > max_speed_w_ ?  sign(speed_w) * max_speed_w_ : speed_w;
+  ROS_INFO("[CHASSIS]  cc get max_speed_v_  = %.2f, max_speed_w_ = %.2f", max_speed_v_, max_speed_w_);
+  float delta_speed_v = speed_v - last_speed_v_;
+  float delta_speed_w = speed_w - last_speed_w_;
+  //speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;
 
-      ROS_INFO("[CHASSIS] get speed v = %.2f, w = %.2f", speed_v, speed_w);
-      float speed_left = 0.0;
-      float speed_right = 0.0;
-      short m_speed_left = 0;
-      short m_speed_right = 0;
-      speed_v = fabs(speed_v) > max_speed_v_ ?  sign(speed_v) * max_speed_v_ : speed_v;
-      speed_w = fabs(speed_w) > max_speed_w_ ?  sign(speed_w) * max_speed_w_ : speed_w;
-      ROS_INFO("[CHASSIS]  cc get max_speed_v_  = %.2f, max_speed_w_ = %.2f", max_speed_v_, max_speed_w_);
-      float delta_speed_v = speed_v - last_speed_v_;
-      float delta_speed_w = speed_w - last_speed_w_;
-      //speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;
+  if(delta_speed_v > 0.0) {
+    float delta_speed_v_acc = fabs(speed_v) < 0.01 ? 0.25 : speed_v_acc_;
+    speed_v = delta_speed_v > delta_speed_v_acc ? (last_speed_v_ + delta_speed_v_acc) : speed_v;
+  } else {
+    float delta_speed_v_dec = fabs(speed_v) < 0.01 ? speed_v_dec_zero_ : speed_v_dec_;
+    speed_v = delta_speed_v < delta_speed_v_dec ? (last_speed_v_ + delta_speed_v_dec) : speed_v;
+  }
+  speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;
 
-      if(delta_speed_v > 0.0) {
-        float delta_speed_v_acc = fabs(speed_v) < 0.01 ? 0.25 : speed_v_acc_;
-        speed_v = delta_speed_v > delta_speed_v_acc ? (last_speed_v_ + delta_speed_v_acc) : speed_v;
-     } else {
-        float delta_speed_v_dec = fabs(speed_v) < 0.01 ? speed_v_dec_zero_ : speed_v_dec_;
-        speed_v = delta_speed_v < delta_speed_v_dec ? (last_speed_v_ + delta_speed_v_dec) : speed_v;
-      }
-      speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;
+  ROS_INFO("[CHASSIS] set real speed v = %.2f, w = %.2f", speed_v, speed_w);
+    //calculate angle and speed
+  if (IsInPlaceRotation(speed_v, speed_w))  {
+    speed_right = Axle_ * tan(speed_w * TimeWidth_) / (2 * TimeWidth_);
+    speed_left = -1.0 * speed_right;
+  } else if (IsStop(speed_v, speed_w)) {
+    speed_left = 0.0;
+    speed_right = 0.0;
+  } else {
+    if (speed_w > 0.0) {  //Left
+      //speed_left = speed_v - (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
+      speed_left = speed_v - (Axle_ * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
+      speed_right = 2 * speed_v - speed_left;
+    } else { // right
+      //speed_right = speed_v + (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
+      speed_right = speed_v + (Axle_ * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
+      speed_left = 2 * speed_v - speed_right;
+    }
+  }
+  ROS_INFO("[CHASSIS] raw speed Left: %.2f, Right: %.2f", speed_left, speed_right);
+  m_speed_left = getMotorSpeed(speed_left);
+  m_speed_right= getMotorSpeed(speed_right);
 
-      ROS_INFO("[CHASSIS] set real speed v = %.2f, w = %.2f", speed_v, speed_w);
-        //calculate angle and speed
-      if (IsInPlaceRotation(speed_v, speed_w))  {
-        speed_right = Axle_ * tan(speed_w * TimeWidth_) / (2 * TimeWidth_);
-        speed_left = -1.0 * speed_right;
-      } else if (IsStop(speed_v, speed_w)) {
-        speed_left = 0.0;
-        speed_right = 0.0;
-      } else {
-        if (speed_w > 0.0) {  //Left
-          //speed_left = speed_v - (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
-          speed_left = speed_v - (Axle_ * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
-          speed_right = 2 * speed_v - speed_left;
-        } else { // right
-          //speed_right = speed_v + (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
-          speed_right = speed_v + (Axle_ * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
-          speed_left = 2 * speed_v - speed_right;
-        }
-      }
-      ROS_INFO("[CHASSIS] raw speed Left: %.2f, Right: %.2f", speed_left, speed_right);
-      m_speed_left = getMotorSpeed(speed_left);
-      m_speed_right= getMotorSpeed(speed_right);
+  ROS_INFO("[CHASSIS] cc set motor cmd Left: %d, Right: %d", m_speed_left, m_speed_right);
 
-      ROS_INFO("[CHASSIS] cc set motor cmd Left: %d, Right: %d", m_speed_left, m_speed_right);
+  unsigned char send[1024] = {0};
+  int len = 0;
 
-      unsigned char send[1024] = {0};
-      int len = 0;
+  unsigned char rec[1024] = {0};
+  int rlen = 0;
 
-      unsigned char rec[1024] = {0};
-      int rlen = 0;
+  CreateTwoWheelSpeed(send, &len, m_speed_left, m_speed_right);
 
-      CreateTwoWheelSpeed(send, &len, m_speed_left, m_speed_right);
-
-      std::string str = cComm::ByteToHexString(send, len);
-      std::cout << "send speed: " << str << std::endl;
-     if (transfer_) {
-        transfer_->Send_data(send, len);
-        transfer_->Read_data(rec, rlen, 23, 500);
-      }
-     usleep(1000);
-      last_speed_v_ = speed_v;
-      last_speed_w_ = speed_w;
+  std::string str = cComm::ByteToHexString(send, len);
+  std::cout << "send speed: " << str << std::endl;
+  double start_time = GetTimeInSeconds();
+  if (transfer_) {
+    transfer_->Send_data(send, len);
+#ifdef DEBUG_ETHERNET
+    double send_time = GetTimeInSeconds(); 
+    if (send_time - start_time> 0.002)
+      ROS_INFO("[CHASSIS] set speed: send time = %lf", send_time - start_time);
+#endif
+    transfer_->Read_data(rec, rlen, 23, 500);
+#ifdef DEBUG_ETHERNET
+    double recv_time = GetTimeInSeconds();
+    if (recv_time - send_time> 0.002)
+      ROS_INFO("[CHASSIS] set speed: recv time = %lf", recv_time - send_time);
+#endif
+  }
+  usleep(1000);
+  last_speed_v_ = speed_v;
+  last_speed_w_ = speed_w;
 }
 
 void WC_chassis_mcu::comunication(void) {
@@ -751,5 +914,4 @@ void WC_chassis_mcu::comunication(void) {
   yaw_angle_ = yaw_angle_ < 0 ? (3600 + yaw_angle_) : yaw_angle_;
   usleep(1000); 
   ROS_INFO("[CHASSIS] yaw_angle %d", yaw_angle_);
-
 }
