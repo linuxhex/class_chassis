@@ -7,6 +7,7 @@
 #include <sensor_msgs/Imu.h>
 #include <std_msgs/UInt32.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Int32.h>
 #include <tf/message_filter.h>
 #include <tf/transform_broadcaster.h>
 #include <diagnostic_msgs/DiagnosticStatus.h>
@@ -28,6 +29,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 #include "gs/file_util.h"
 #include <vector>
 #include "wc_chassis_mcu.h"
