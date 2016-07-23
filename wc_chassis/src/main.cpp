@@ -22,9 +22,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
-#ifdef SETTING_PRIORITY
-#include <sched.h>
-#endif
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -46,28 +43,11 @@ ros::Publisher rotate_finished_pub;
 ros::Publisher protector_pub;
 ros::Publisher going_back_pub;
 
-#define SETTING_PRIORITY
+
 
 int main(int argc, char **argv) {
 
-#ifdef SETTING_PRIORITY
-    struct sched_param param;
-    param.sched_priority = 99;
-    if (0 != sched_setscheduler(getpid(), SCHED_RR, &param)) {
-      std::cout << "set priority failed" << std::endl;
-    } else {
-      std::cout << "set priority succeed" << std::endl;
-    }
-    cpu_set_t mask;
-    CPU_ZERO(&mask);
-    CPU_SET(0, &mask);
-    if (sched_setaffinity(0, sizeof(mask), &mask) < 0) {
-      std::cout << "set affinity failed" << std::endl;
-    } else {
-      std::cout << "set affinity succeed" << std::endl;
-    }
-#endif
-
+    SetSchedPriority();   //设置chassis进程运行的优先级和占用的cpu核
     ROS_INFO("[wc_chassis] chassis version: 1.1.3.2");
     InitChassis(argc, argv,"wc_chassis");
     ROS_INFO("[wc_chassis] chassis init completed");

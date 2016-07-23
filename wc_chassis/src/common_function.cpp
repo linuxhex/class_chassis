@@ -12,6 +12,30 @@ std::string get_key_value(int status, int status_bit)
   }
 }
 
+
+
+void SetSchedPriority(void)
+{
+    #ifdef SETTING_PRIORITY
+        struct sched_param param;
+        param.sched_priority = 99;
+        if (0 != sched_setscheduler(getpid(), SCHED_RR, &param)) {
+          std::cout << "set priority failed" << std::endl;
+        } else {
+          std::cout << "set priority succeed" << std::endl;
+        }
+        cpu_set_t mask;
+        CPU_ZERO(&mask);
+        CPU_SET(0, &mask);
+        if (sched_setaffinity(0, sizeof(mask), &mask) < 0) {
+          std::cout << "set affinity failed" << std::endl;
+        } else {
+          std::cout << "set affinity succeed" << std::endl;
+        }
+    #endif
+}
+
+
 #ifdef VERIFY_REMOTE_KEY
 unsigned int GenerateJSHash(unsigned int seed) {
   unsigned char ch[] = "NTM4N2I2YmFiOWIwNzgzYmViYWFjYjc2";
