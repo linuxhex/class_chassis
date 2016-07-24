@@ -14,8 +14,7 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
                            autoscrubber_services::CheckChargeStatus::Response& res)
 {
     unsigned char  status = 0;
-    unsigned short value  = 0;
-    g_chassis_mcu->getChargeStatus(status,value);
+    g_chassis_mcu->getChargeStatus(status);
     res.charge_status.status = status;
     res.charge_status.value  = charge_voltage_;
 
