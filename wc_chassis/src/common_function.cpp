@@ -39,11 +39,11 @@ bool ping(const char* ip) {
         } else if (1 == ping_ret) {
             return false;
         } else {
-            ROS_ERROR("[chassis] unknown ping status:%d", ping_ret);
+            GAUSSIAN_ERROR("[chassis] unknown ping status:%d", ping_ret);
             return false;
         }
     } else {
-        ROS_ERROR("[chassis] ping program can not use");
+        GAUSSIAN_ERROR("[chassis] ping program can not use");
         return false;
     }
 }
@@ -76,7 +76,7 @@ void freeResource(void){
   std::string str;
   ss << checkConnectionThread->get_id();
   ss >> str;
-  ROS_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
+  GAUSSIAN_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
   delete checkConnectionThread;
   delete g_chassis_mcu;
   delete p_odom_broadcaster;

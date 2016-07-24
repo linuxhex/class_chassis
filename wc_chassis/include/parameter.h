@@ -19,6 +19,7 @@
 #include <autoscrubber_services/CheckProtectorStatus.h>
 #include <autoscrubber_services/CheckChargeStatus.h>
 #include <autoscrubber_services/SetChargeCmd.h>
+#include <gslib/gaussian_debug.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -89,9 +90,10 @@ extern unsigned char special_ultrasonic_id[15];
 extern std::vector<int> g_ultrasonic;
 extern pthread_mutex_t speed_mutex;
 extern int battery_count;
+extern int charge_count;
 extern int display_battery_capacity ;
 extern int sum_battery_capacity;
-
+extern int sum_charge_voltage;
 
 extern unsigned int connection_status; // mcu ethernet connection status: 0>bad 1>good
 extern int ultrasonic_num;
@@ -111,6 +113,7 @@ extern double full_speed;
 extern int    delta_counts_th;
 extern int remote_speed_level_;
 extern int battery_level_;
+extern short charge_voltage_;
 extern int remote_id ;
 extern std::string hardware_id;
 extern std::string router_ip;

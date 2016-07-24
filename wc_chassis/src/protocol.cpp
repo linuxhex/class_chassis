@@ -299,16 +299,16 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
         case RSPEED:
             break;
         case RPOS:
-    #ifdef MCU
-                if(protol->data.angle_.axis_id == 0){
-                    CreatePos(send,&len,0,m_left_pos);
-                    uart0SendStr(send,len);
-                }else if(protol->data.angle_.axis_id == 0){
-                    CreatePos(send,&len,1,m_right_pos);
-                    uart0SendStr(send,len);
-                }
-    #endif
-                break;
+#ifdef MCU
+            if(protol->data.angle_.axis_id == 0){
+                CreatePos(send,&len,0,m_left_pos);
+                uart0SendStr(send,len);
+            }else if(protol->data.angle_.axis_id == 0){
+                CreatePos(send,&len,1,m_right_pos);
+                uart0SendStr(send,len);
+            }
+#endif
+            break;
         case RTIME:
             break;
         case CHARGE_CMD:

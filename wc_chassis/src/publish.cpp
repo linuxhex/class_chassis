@@ -76,11 +76,37 @@ void PublishGyro(ros::Publisher &gyro_pub) {
 void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index) {
   std_msgs::UInt32 remote_cmd;
   if (cmd > 0 && cmd < 12) {
-    ROS_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
+    GAUSSIAN_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
   }
   remote_cmd.data = (index << 8) | cmd;
   remote_cmd_pub.publish(remote_cmd);
 }
+
+/*
+ * update status about device: charge voltage; protector status ... 
+ * TODO(cmn): add protector and other status those should be updated on 10Hz
+ */
+void UpdateDeviceStatus() {
+  unsigned int charge_ADC = (g_ultrasonic[22] << 8) | (g_ultrasonic[23] & 0xff);
+  double charge_value = 0.2298 * (charge_ADC - 516);
+  short current_charge_voltage = static_cast <short>(charge_value * 10.0);
+  current_charge_voltage = current_charge_voltage < 100 ? 0 : current_charge_voltage;
+  if (current_charge_voltage > 0 && ++charge_count == 0) {
+    charge_voltage_ = current_charge_voltage;
+  }
+  // do charge voltage filter every 30s
+  if (current_charge_voltage > 0 && charge_count > 0) {
+    sum_charge_voltage += current_charge_voltage;
+    if(charge_count == 300) {
+      charge_voltage_ = sum_charge_voltage / 300;
+      sum_charge_voltage = 0;
+      charge_count = 0;
+    }
+  }
+  GAUSSIAN_INFO("[wc_chassis] current_charge_value: %lf, current_charge_voltage: %d, charge_voltage: %d",
+                 charge_value, current_charge_voltage, charge_voltage_);
+}
+
 /*
  * 发送设备状态
  */
@@ -100,9 +126,10 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
     unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
     double battery_value = 0.2298 * (battery_ADC - 516);
     int current_battery_capacity;
-      current_battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
+    current_battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
     if(current_battery_capacity < 0) current_battery_capacity = 0;
     if(current_battery_capacity > 100) current_battery_capacity = 100;
+    // do battery voltage filter
     ++battery_count;
     if(battery_count == 0) {
       display_battery_capacity = current_battery_capacity;
@@ -114,6 +141,7 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
         sum_battery_capacity = 0;
       }
     }
+
     if (display_battery_capacity < 10) {
       battery_level_ = 0;
     } else if (display_battery_capacity < 40) {
@@ -124,7 +152,9 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
       battery_level_ = 3;
     }
 
-    std::cout << "battery_ADC " << battery_ADC << "; battery_balue " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << " battery_level_" << battery_level_ << std::endl;
+    GAUSSIAN_INFO("[wc_chassis] battery_ADC: %d; battery_value: %d;display_battery_capacity: %d; battery_level_: %d",
+                  battery_ADC, battery_value, display_battery_capacity, battery_level_);
+//    std::cout << "battery_ADC " << battery_ADC << "; battery_value " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << " battery_level_" << battery_level_ << std::endl;
     device_value.key = std::string("battery");
     device_value.value = std::to_string(display_battery_capacity);
     device_status.values.push_back(device_value);
@@ -210,7 +240,7 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
   tf::Quaternion q;
   tf::quaternionMsgToTF(odom.pose.pose.orientation, q);
   tf::Transform odom_meas(q, tf::Vector3(odom.pose.pose.position.x, odom.pose.pose.position.y, 0));
-  tf::StampedTransform odom_transform(odom_meas, odom_timestamped, "base_odom", "base_link");
+  tf::StampedTransform odom_transform(odom_meas, ros::Time::now(), "base_odom", "base_link");
   odom_broadcaster->sendTransform(odom_transform);
 }
 

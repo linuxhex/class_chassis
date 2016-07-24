@@ -5,7 +5,7 @@ COPTS = [
 ]
 LINK_OPTS = []
 
-# costmap_2d
+# wc_chassis
 cc_binary(
     name = "wc_chassis",
     srcs = glob([

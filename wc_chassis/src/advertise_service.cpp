@@ -1,8 +1,8 @@
 /* advertise_service.cpp 所有的 ros service的回调函数
 */
 
-#include"advertise_service.h"
-#include"init.h"
+#include "advertise_service.h"
+#include "init.h"
 #include "parameter.h"
 #include "common_function.h"
 
@@ -17,7 +17,7 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
     unsigned short value  = 0;
     g_chassis_mcu->getChargeStatus(status,value);
     res.charge_status.status = status;
-    res.charge_status.value  = value;
+    res.charge_status.value  = charge_voltage_;
 
     return true;
 }
@@ -29,6 +29,7 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
                       autoscrubber_services::SetChargeCmd::Response& res)
 {
     unsigned char cmd = req.cmd.data;
+    cmd += 2;
     g_chassis_mcu->setChargeCmd(cmd);
 
     return true;

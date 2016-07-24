@@ -45,7 +45,7 @@ void DoDIO(ros::Publisher going_back_pub) {
       unsigned int temp_di_data = g_chassis_mcu->doDIO(g_do_data_);
       cur_emergency_status = (temp_di_data >> (8 + Emergency_stop)) & 0x01;
       if (g_dio_count > 2 && ((g_di_data_ & 0x03) != 0x03) && ((temp_di_data & 0x03) == 0x03)) {
-        ROS_INFO("[wc_chassis] get_di data: 0x%x, and then publish going back!!!", temp_di_data);
+        GAUSSIAN_INFO("[wc_chassis] get_di data: 0x%x, and then publish going back!!!", temp_di_data);
         std_msgs::UInt32 msg;
         msg.data = 1;
         going_back_pub.publish(msg);

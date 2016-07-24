@@ -48,7 +48,7 @@ void InitService(){
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
     remote_ret_sub = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);
     gyro_update_state_sub = p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
-    ROS_INFO("[wc_chassis] init service & topic caller completed");
+    GAUSSIAN_INFO("[wc_chassis] init service & topic caller completed");
 
 }
 
@@ -118,7 +118,7 @@ void InitParameter(){
                         max_speed_v, max_speed_w, speed_v_acc, speed_v_dec,
                         speed_v_dec_zero, speed_w_acc, speed_w_dec,full_speed,delta_counts_th);
 
-    ROS_INFO("[wc_chassis] init param completed");
+    GAUSSIAN_INFO("[wc_chassis] init param completed");
 }
 
 /* 设备的初始化*/
@@ -146,14 +146,14 @@ void InitDevice(void){
   }
 #endif
   g_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
-  ROS_INFO("[wc_chassis] init device completed");
-
+  GAUSSIAN_INFO("[wc_chassis] init device completed");
+//  g_chassis_mcu->setChargeCmd(3);
 }
 
 /* chassis的初始化*/
 bool InitChassis(int argc, char **argv,const char *node_name){
 
-     ROS_INFO("[wc_chassis] init ros!");
+     GAUSSIAN_INFO("[wc_chassis] init ros!");
      ros::init(argc, argv, node_name);
 
      p_n = new ros::NodeHandle();

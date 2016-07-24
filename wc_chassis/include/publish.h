@@ -35,5 +35,5 @@
  void PublishUltrasonic(ros::Publisher ultrasonic_pub[]);
  void PublishGyro(ros::Publisher &gyro_pub);
  void publish_protector_status(ros::Publisher &protector_pub);
-
+ void UpdateDeviceStatus(void);
 #endif

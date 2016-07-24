@@ -43,8 +43,10 @@ pthread_mutex_t speed_mutex;
 std::vector<int> g_ultrasonic;
 unsigned int connection_status = 1; // mcu ethernet connection status: 0>bad 1>good
 int battery_count = -1;
+int charge_count = -1;
 int display_battery_capacity = 0;
 int sum_battery_capacity = 0;
+int sum_charge_voltage = 0;
 
 //超声可配的比较
 std::string ultrasonic_str[] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
@@ -67,6 +69,7 @@ double full_speed;  //满转速度
 int delta_counts_th; //满盘变化阀值（用于码盘防抖动）
 int remote_speed_level_ = 0; //遥控器控制速度等级
 int battery_level_ = 3;
+short charge_voltage_ = 0;
 int remote_id = 1;
 int protector_num = 8; //防撞条个数
 double inplace_rotating_theta = 0.2; //初始化时旋转角度
