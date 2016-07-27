@@ -251,7 +251,7 @@ void WC_chassis_mcu::setChargeCmd(unsigned int cmd)
 /*
  * 获取充电状态
  */
-void WC_chassis_mcu::getChargeStatus(unsigned char& status,unsigned short& value)
+void WC_chassis_mcu::getChargeStatus(unsigned char& status)
 {
     unsigned char send[1024] = {0};
     unsigned char rec[1024]  = {0};
@@ -267,7 +267,7 @@ void WC_chassis_mcu::getChargeStatus(unsigned char& status,unsigned short& value
     if (rlen == 15) {
       for (int i = 0; i < rlen; ++i) {
         if (IRQ_CH(rec[i])) {
-            getChargeStatusValue(status, value);
+            getChargeStatusValue(status);
         }
       }
     }

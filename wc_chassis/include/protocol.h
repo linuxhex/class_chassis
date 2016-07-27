@@ -235,7 +235,6 @@ typedef struct _CHARGE_CMD
 typedef struct _CHARGE_STATUS
 {
   unsigned char  status;
-  unsigned short value;
 }RChargeStatusProtocol;
 
 
@@ -353,7 +352,7 @@ unsigned int getRemoteVerifyKey(void);
 unsigned char checksum(unsigned char* ch ,int len);
 int IRQ_CH(unsigned char c);
 void CreateChargeCmd(unsigned char* ch,int *len,unsigned char cmd);
-void getChargeStatusValue(unsigned char& status, unsigned short& value);
+void getChargeStatusValue(unsigned char& status);
 void CreateChargeStatus(unsigned char *ch,int *len);
 
 #endif//_PROTOCOL_WANGHONGTAO_2015_01_16_

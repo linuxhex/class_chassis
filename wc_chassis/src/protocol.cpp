@@ -50,7 +50,6 @@ unsigned short volatile m_remote_index = 0;
 unsigned int volatile m_remote_check_key = 0;
 
 unsigned char  m_charge_status = 0;
-unsigned short m_charge_value = 0;
 
 unsigned int m_di = 0;
 
@@ -315,7 +314,6 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
             break;
         case CHARGE_STATUS:
             m_charge_status = protol->data.chargeStatus.status;
-            m_charge_value  = protol->data.chargeStatus.value;
             break;
         default:
             break;
@@ -514,10 +512,9 @@ void getRemote(unsigned char& cmd, unsigned short& index)
   index = m_remote_index;
 }
 
-void getChargeStatusValue(unsigned char& status, unsigned short& value){
+void getChargeStatusValue(unsigned char& status){
 
     status = m_charge_status;
-    value  = m_charge_value;
 }
 
 
