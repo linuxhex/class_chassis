@@ -9,7 +9,7 @@
 /*
  * 发送超声
  */
-void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int,unsigned int ultrasonic_offset) {  // NOLINT
+void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int,unsigned int ultrasonic_offset, double& ultra_range) {  // NOLINT
   sensor_msgs::Range range;
   range.header.seq = 0;
   range.header.stamp = ros::Time::now();
@@ -21,11 +21,11 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
   range.max_range = ultrasonic_max_range;
 
   float dis_meter = recv_int * 5.44 / 1000.0;
+  ultra_range = dis_meter;
 
   if(special_ultrasonic_id[ultrasonic_offset] == ultrasonic_offset){ //特殊位置超声处理
     dis_meter = dis_meter - special_ultrasonic_offset_dismeter;
   }
-
   if (dis_meter < range.min_range) {
     range.range = range.min_range;
   } else if (dis_meter > ultral_effective_range) {  // effective range
@@ -43,11 +43,13 @@ void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int rec
 
 
 void PublishUltrasonic(ros::Publisher ultrasonic_pub[]) {
-    for(int i=0;i<15;i++){
-         if(ultrasonic_pub[i] != 0){  //==0表示不是文件里配置的超声
-             publish_ultrasonic(ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i],i);
-         }
+  double raw_range;
+  for(int i=0;i<15;i++){
+    if(ultrasonic_pub[i] != 0){  //==0表示不是文件里配置的超声
+      publish_ultrasonic(ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i], i, raw_range);
+      GAUSSIAN_INFO("[wc chassis] get ultra[%d] raw range = %lf", i, raw_range);
     }
+  }
 }
 /*
  * 发送陀螺仪数据
