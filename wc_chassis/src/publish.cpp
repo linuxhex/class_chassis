@@ -88,7 +88,10 @@ void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned
  */
 void UpdateDeviceStatus() {
   unsigned int charge_ADC = (g_ultrasonic[22] << 8) | (g_ultrasonic[23] & 0xff);
-  double charge_value = 0.2298 * (charge_ADC - 516);
+//  double charge_value = 0.2298 * (charge_ADC - 516);
+//  double charge_value = 0.2352 * (charge_ADC - 507);
+  double charge_value = 0.2318 * (charge_ADC - 516);
+  charge_value = charge_value < 0.0 ? 0.0 : charge_value;
   short current_charge_voltage = static_cast <short>(charge_value * 10.0);
   current_charge_voltage = current_charge_voltage < 100 ? 0 : current_charge_voltage;
   if (current_charge_voltage > 0 && ++charge_count == 0) {
@@ -124,7 +127,9 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
     device_status.values.push_back(device_value);
 
     unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
-    double battery_value = 0.2298 * (battery_ADC - 516);
+//    double battery_value = 0.2298 * (battery_ADC - 516);
+//    double battery_value = 0.2352 * (battery_ADC - 507);
+    double battery_value = 0.2318 * (battery_ADC - 516);
     int current_battery_capacity;
     current_battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
     if(current_battery_capacity < 0) current_battery_capacity = 0;
@@ -152,7 +157,7 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
       battery_level_ = 3;
     }
 
-    GAUSSIAN_INFO("[wc_chassis] battery_ADC: %d; battery_value: %d;display_battery_capacity: %d; battery_level_: %d",
+    GAUSSIAN_INFO("[wc_chassis] battery_ADC: %d; battery_value: %lf;display_battery_capacity: %d; battery_level_: %d",
                   battery_ADC, battery_value, display_battery_capacity, battery_level_);
 //    std::cout << "battery_ADC " << battery_ADC << "; battery_value " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << " battery_level_" << battery_level_ << std::endl;
     device_value.key = std::string("battery");

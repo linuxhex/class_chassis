@@ -237,8 +237,8 @@ void WC_chassis_mcu::setChargeCmd(unsigned int cmd)
 
     CreateChargeCmd(send, &len, cmd);
 
-    std::string str = cComm::ByteToHexString(send, len);
-    std::cout << "send charge cmd: " << str << std::endl;
+    // std::string str = cComm::ByteToHexString(send, len);
+    // std::cout << "send charge cmd: " << str << std::endl;
 
     if (transfer_) {
       transfer_->Send_data(send, len);
@@ -445,8 +445,8 @@ void WC_chassis_mcu::getUltra(void) {
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send ultra: " << str << std::endl;
 
-  std::string str = cComm::ByteToHexString(rec, rlen);
-  std::cout << "recv ultra: " << str << std::endl;
+  // std::string str = cComm::ByteToHexString(rec, rlen);
+  // std::cout << "recv ultra: " << str << std::endl;
   // std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
   if (rlen == 35) {
     for (int i = 0; i < rlen; ++i) {
@@ -467,11 +467,15 @@ void WC_chassis_mcu::getUltra(void) {
   }
   unsigned int status  = g_ultrasonic[0] | (protector_bits);
   status = (status^0xffff) << (32-protector_num);
-
-  if(protector_service_call == 1){
-      protector_value = status;
-      protector_service_call = 0;
+  protector_value |= status;
+/*
+  if ((!status && protector_value) && !protector_service_call) {
+    protector_value = 1;
+  } else {
+    protector_value = status;
   }
+  protector_service_call = 0;
+*/
 
   if(status != 0){
       timeval tv;

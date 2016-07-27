@@ -73,13 +73,14 @@ bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
  */
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
                           autoscrubber_services::CheckProtectorStatus::Response& res){
-    protector_service_call = 1;
     if(protector_value != 0){
        res.protector_status.protect_status=true;
     }else{
        res.protector_status.protect_status=false;
     }
     res.protector_status.protect_value = protector_value >> (32-protector_num);
+    protector_value = 0;
+    protector_service_call = 1;
     return true;
 }
 

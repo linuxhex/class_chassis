@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
     device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
     rotate_finished_pub = p_device_nh->advertise<std_msgs::Int32>("rotate_finished", 5);
     protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
+//   protector_status_pub   = p_device_nh->advertise<autoscrubber_services::ProtectorStatus>("protector_status", 100);
     going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
 
     for(int i=0;i<15;i++){
