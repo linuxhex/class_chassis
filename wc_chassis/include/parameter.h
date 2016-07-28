@@ -30,6 +30,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+
 extern  double ultral_effective_range ;
 extern  double g_odom_x   ;
 extern  double g_odom_y   ;
@@ -57,6 +58,15 @@ enum Hardware_ID {
   Ultrasonic,
   Hardware_MAX
 };
+
+typedef enum Protector_Hit_ {
+  NONE_HIT = 0x00,
+  FRONT_HIT = 0x01,
+  REAR_HIT = 0x02,
+  BOTH_HIT = 0x03,
+} Protector_Hit;
+
+extern unsigned int protector_hit;
 extern unsigned int g_dio_count ;
 extern unsigned int g_ret_count ;
 extern unsigned int g_pc_control;
@@ -88,6 +98,8 @@ extern std::string ultrasonic_str[15];
 extern unsigned char special_ultrasonic_id[15];
 
 extern std::vector<int> g_ultrasonic;
+extern std::vector<unsigned int> front_protector_list;
+extern std::vector<unsigned int> rear_protector_list;
 extern pthread_mutex_t speed_mutex;
 extern int battery_count;
 extern int charge_count;
@@ -124,7 +136,7 @@ extern std::thread *checkConnectionThread;
 
 extern unsigned char protector_service_call;
 extern unsigned int protector_value;
-extern double protector_start_time;
+extern double protector_hit_time;
 extern unsigned char protector_down;
 extern int protector_num;
 extern unsigned int protector_bits;

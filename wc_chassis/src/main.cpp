@@ -7,6 +7,7 @@
 #include <std_msgs/Float32.h>
 #include "wc_chassis_mcu.h"
 #include "init.h"
+#include "parameter.h"
 #include "publish.h"
 #include "action.h"
 #include "parameter.h"
@@ -67,7 +68,9 @@ int main(int argc, char **argv) {
     if(start_rotate_flag) {
       DoRotate(rotate_finished_pub);
     } else {
-      if ((time_now - last_cmd_vel_time >= max_cmd_interval) || (protector_down && (time_now - protector_start_time <= 1.0) && (m_speed_v >= 0))) {
+      if ((time_now - last_cmd_vel_time >= max_cmd_interval) ||
+          ((protector_hit & FRONT_HIT) && m_speed_v > 0.001) || 
+          ((protector_hit & REAR_HIT)  && m_speed_v < -0.001)) {
         g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
       } else {
         protector_down = 0;

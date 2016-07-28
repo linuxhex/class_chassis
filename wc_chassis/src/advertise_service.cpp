@@ -13,22 +13,27 @@
 bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,
                            autoscrubber_services::CheckChargeStatus::Response& res)
 {
+    GAUSSIAN_INFO("calling CheckAutoChargeStatus start!!!");
     unsigned char  status = 0;
-    g_chassis_mcu->getChargeStatus(status);
+//    g_chassis_mcu->getChargeStatus(status);
     res.charge_status.status = status;
     res.charge_status.value  = charge_voltage_;
-
+    GAUSSIAN_INFO("calling CheckAutoChargeStatus end!!!");
     return true;
 }
 
 /*
- *  自动充电 控制命令  cmd  0:停止自动充电　　１:开始自动充电
+ *  自动充电 控制命令  cmd  4:停止自动充电　　3:开始自动充电
  */
 bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
                       autoscrubber_services::SetChargeCmd::Response& res)
 {
     unsigned char cmd = req.cmd.data;
-    cmd += 2;
+    if (cmd == 1) {
+      cmd = 3;
+    } else {
+      cmd = 4;
+    }
     g_chassis_mcu->setChargeCmd(cmd);
 
     return true;
@@ -72,13 +77,13 @@ bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
  */
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
                           autoscrubber_services::CheckProtectorStatus::Response& res){
-    if(protector_value != 0){
+    if(protector_value != NONE_HIT){
        res.protector_status.protect_status=true;
     }else{
        res.protector_status.protect_status=false;
     }
-    res.protector_status.protect_value = protector_value >> (32-protector_num);
-    protector_value = 0;
+    res.protector_status.protect_value = protector_value;
+    protector_value = NONE_HIT;
     protector_service_call = 1;
     return true;
 }
