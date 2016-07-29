@@ -36,6 +36,7 @@ unsigned int cur_emergency_status = 1;
 double battery_full_level;
 double battery_empty_level;
 unsigned int remote_ret_     = 0x0a00;
+unsigned int charger_monitor_cmd_ = 0;
 unsigned int remote_ret_cnt_ = 0;
 unsigned char remote_cmd_    = 0;
 unsigned short remote_index_ = 0;
@@ -74,6 +75,7 @@ int delta_counts_th; //满盘变化阀值（用于码盘防抖动）
 int remote_speed_level_ = 0; //遥控器控制速度等级
 int battery_level_ = 3;
 short charge_voltage_ = 0;
+double charger_low_voltage_;
 int remote_id = 1;
 int protector_num = 8; //防撞条个数
 double inplace_rotating_theta = 0.2; //初始化时旋转角度
@@ -89,6 +91,7 @@ std::string *special_ultrasonic;
 float special_ultrasonic_offset_dismeter;
 unsigned int protector_value = 0; //防撞条的值．0:表示防撞条没有被触发　!0:表示防撞条被触发
 double protector_hit_time = 0;  //防撞条触发开始时间
+double charger_on_time; //检测到充电条电压正常的时间
 unsigned char protector_down = 0; //0:表示防撞条没有触发　１:表示防撞条从触发到１ｓ钟时间之内
 unsigned char protector_service_call = 1;// 0:表示service没有被调，１：表示service被调
 bool ultrasonic_board_connection = true; //true:超声转接板连接正常

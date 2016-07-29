@@ -22,6 +22,7 @@ ros::Publisher device_pub;
 ros::Publisher rotate_finished_pub;
 ros::Publisher protector_pub;
 ros::Publisher going_back_pub;
+ros::Publisher dio_pub;
 
 
 
@@ -42,15 +43,16 @@ int main(int argc, char **argv) {
     protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
 //   protector_status_pub   = p_device_nh->advertise<autoscrubber_services::ProtectorStatus>("protector_status", 100);
     going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
+    dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
 
     for(int i=0;i<15;i++){
-        if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
-            ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
-            if(special_ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
-                special_ultrasonic_id[i] = i;
-            }
-            ultrasonic_num ++;
+      if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
+        ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
+        if(special_ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
+          special_ultrasonic_id[i] = i;
         }
+        ultrasonic_num ++;
+      }
     }
 
    timeval tv;
@@ -70,7 +72,12 @@ int main(int argc, char **argv) {
     } else {
       if ((time_now - last_cmd_vel_time >= max_cmd_interval) ||
           ((protector_hit & FRONT_HIT) && m_speed_v > 0.001) || 
-          ((protector_hit & REAR_HIT)  && m_speed_v < -0.001)) {
+          ((protector_hit & REAR_HIT)  && m_speed_v < -0.001) || 
+//          (time_now - charger_on_time < 1.0 && charge_voltage_ > charger_low_voltage_)) {
+          (charge_voltage_ > charger_low_voltage_)) {
+        if (charge_voltage_ > charger_low_voltage_) {
+          GAUSSIAN_INFO("WC CHASSIS: charge_voltage = %lf > charger_low_voltage = %lf", charge_voltage_, charger_low_voltage_); 
+        }
         g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
       } else {
         protector_down = 0;
@@ -89,6 +96,7 @@ int main(int argc, char **argv) {
       g_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
       loop_count = 0;
     }
+    PublishDIO(dio_pub);
     PublishOdom(p_odom_broadcaster,odom_pub);
     PublishYaw(yaw_pub);
     PublishGyro(gyro_pub);

@@ -26,6 +26,15 @@ void DoNavigationCallback(const geometry_msgs::Twist& Navigation_msg) {
   current_w_index = temp_w_index;
   pthread_mutex_unlock(&speed_mutex);
 }
+
+/*
+ * 是否需要监控充电桩, 若检测到充电桩，则立即停机1s
+ */
+void ChargerMonitorCallback(const std_msgs::UInt32& ret) {
+  charger_monitor_cmd_ = ret.data;
+  GAUSSIAN_INFO("[wc_chassis] get charger_monitor_cmd_ = %d", charger_monitor_cmd_);
+}
+
 /*
  * 更新遥控器状态
  */
