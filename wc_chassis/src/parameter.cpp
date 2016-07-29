@@ -75,7 +75,8 @@ int delta_counts_th; //满盘变化阀值（用于码盘防抖动）
 int remote_speed_level_ = 0; //遥控器控制速度等级
 int battery_level_ = 3;
 short charge_voltage_ = 0;
-double charger_low_voltage_;
+double current_charge_value_ = 0.0;
+double charger_low_voltage_ = 0.0;
 int remote_id = 1;
 int protector_num = 8; //防撞条个数
 double inplace_rotating_theta = 0.2; //初始化时旋转角度

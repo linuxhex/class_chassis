@@ -128,6 +128,7 @@ extern int    delta_counts_th;
 extern int remote_speed_level_;
 extern int battery_level_;
 extern short charge_voltage_;
+extern double current_charge_value_;
 extern int remote_id ;
 extern std::string hardware_id;
 extern std::string router_ip;

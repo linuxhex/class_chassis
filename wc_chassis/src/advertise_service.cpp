@@ -14,6 +14,7 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
                            autoscrubber_services::CheckChargeStatus::Response& res)
 {
     GAUSSIAN_INFO("calling CheckAutoChargeStatus start!!!");
+    if (charger_monitor_cmd_ && charge_voltage_ > charger_low_voltage_) {
     unsigned char  status = 0;
 //    g_chassis_mcu->getChargeStatus(status);
     res.charge_status.status = status;
