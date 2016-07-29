@@ -52,40 +52,6 @@ void InitService(){
 
 }
 
-void ReadConfigFromXMLRPC(XmlRpc::XmlRpcValue& config_xmlrpc, const std::string& full_param_name, std::vector<unsigned int>* config_list) {
-  unsigned int config;
-  for (int i = 0; i < config_xmlrpc.size(); ++i) {
-    // Make sure each element of the list is an array of size 2. (x and y coordinates)
-    XmlRpc::XmlRpcValue value = config_xmlrpc[ i ];
-    if (value.getType() != XmlRpc::XmlRpcValue::TypeInt) {
-      ROS_FATAL("The config (parameter %s) must be specified as list of parameter server eg: [1, 2, ..., n], but this spec is not of that form.", full_param_name.c_str());
-      throw std::runtime_error( "The config must be specified as list of parameter server eg: [1, 2, ..., n],, but this spec is not of that form");
-    }
-    config = static_cast<int>(value);
-    GAUSSIAN_INFO("[SERVICEROBOT] get config[%d] px = %d", i, config);
-    config_list->push_back(config);
-  }
-}
-
-bool ReadConfigFromParams(std::string param_name, ros::NodeHandle* nh, std::vector<unsigned int>* config_list) {
-  std::string full_param_name;
-
-  if (nh->searchParam(param_name, full_param_name)) {
-    XmlRpc::XmlRpcValue config_xmlrpc;
-    nh->getParam(full_param_name, config_xmlrpc);
-    GAUSSIAN_INFO("[CHASSIS] %s: config_list size = %zu",param_name.c_str(), config_xmlrpc.size());
-    if (config_xmlrpc.getType() == XmlRpc::XmlRpcValue::TypeArray && config_xmlrpc.size() > 0) {
-      ReadConfigFromXMLRPC(config_xmlrpc, full_param_name, config_list);
-      for (int i = 0; i < config_list->size(); ++i) {
-        GAUSSIAN_INFO("[CHASSIS] %s: config_list[%d/%zu] = %d",param_name.c_str() ,i, config_list->size(), config_list->at(i));
-      }
-      return true;
-    } else {
-      GAUSSIAN_ERROR("[CHASSIS] %s: config_list param's type is not Array!", param_name.c_str());
-      return false;
-    }
-  }
-}
 /*  ros参数服务器参数的初始化*/
 void InitParameter(){
 
