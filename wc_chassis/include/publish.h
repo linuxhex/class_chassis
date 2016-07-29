@@ -28,6 +28,7 @@
 #define __PUBLISH__
 
  void PublishYaw(ros::Publisher &yaw_pub);
+ void PublishDIO(ros::Publisher &dio_pub);
  void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub );
  void publishDeviceStatus(ros::Publisher &device_pub);
  void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index);

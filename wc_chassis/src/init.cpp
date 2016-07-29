@@ -29,6 +29,7 @@ ros::ServiceServer check_auto_charge_status_srv;
 ros::Subscriber    Navi_sub;
 ros::Subscriber    remote_ret_sub;
 ros::Subscriber    gyro_update_state_sub;
+ros::Subscriber    charger_monitor_sub;
 
 /***
  * 初始化所有的Service和订阅服务
@@ -46,6 +47,7 @@ void InitService(){
 
 
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
+    charger_monitor_sub = p_n->subscribe("/charger_monitor", 10, ChargerMonitorCallback);
     remote_ret_sub = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);
     gyro_update_state_sub = p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
     GAUSSIAN_INFO("[wc_chassis] init service & topic caller completed");
@@ -106,6 +108,7 @@ void InitParameter(){
     p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
     p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
     p_nh->param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));//初始化旋转速度
+    p_nh->param("charger_low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化旋转速度
 
     // 前面防撞条配置
     if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {
