@@ -21,6 +21,8 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
     res.charge_status.value  = charge_voltage_;
     GAUSSIAN_INFO("calling CheckAutoChargeStatus end!!!");
     return true;
+    }
+    return false;
 }
 
 /*
@@ -77,7 +79,8 @@ bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
  *  提供给navigation模块，用于在判断遇到障碍物是是否是防撞条触发
  */
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
-                          autoscrubber_services::CheckProtectorStatus::Response& res){
+                          autoscrubber_services::CheckProtectorStatus::Response& res)
+{
     if(protector_value != NONE_HIT){
        res.protector_status.protect_status=true;
     }else{
@@ -93,7 +96,8 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
  * 初始化　开始旋转
  */
 bool StartRotate(autoscrubber_services::StartRotate::Request& req,
-                 autoscrubber_services::StartRotate::Response& res) {
+                 autoscrubber_services::StartRotate::Response& res)
+{
   rotate_angle = req.rotateAngle.data;
   start_rotate_flag = true;
   is_rotate_finished = false;
