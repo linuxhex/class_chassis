@@ -126,6 +126,9 @@ void UpdateDeviceStatus() {
   GAUSSIAN_INFO("[wc_chassis] adc_charge = %d, current_charge_value: %lf, current_charge_voltage: %d, charge_voltage: %d",
                  charge_ADC, charge_value, current_charge_voltage, charge_voltage_);
 
+  if(protector_num <= 0){
+      return;
+  }
   // check protector hit
   unsigned int status = g_ultrasonic[0] | protector_bits;
 //  status ^= (0xffff >> (32 - protector_num));

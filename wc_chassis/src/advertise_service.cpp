@@ -89,7 +89,8 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
  * 初始化　开始旋转
  */
 bool StartRotate(autoscrubber_services::StartRotate::Request& req,
-                 autoscrubber_services::StartRotate::Response& res) {
+                 autoscrubber_services::StartRotate::Response& res)
+{
   rotate_angle = req.rotateAngle.data;
   start_rotate_flag = true;
   is_rotate_finished = false;
