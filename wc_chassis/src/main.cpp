@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
           ((protector_hit & FRONT_HIT) && m_speed_v > 0.001) || 
           ((protector_hit & REAR_HIT)  && m_speed_v < -0.001) || 
 //          (time_now - charger_on_time < 1.0 && current_charge_value_ > charger_low_voltage_)) {
-          (current_charge_value_ > charger_low_voltage_)) {
+          (charger_monitor_cmd_ && current_charge_value_ > charger_low_voltage_)) {
         if (current_charge_value_ > charger_low_voltage_) {
           GAUSSIAN_INFO("WC CHASSIS: charge_voltage = %lf > charger_low_voltage = %lf", current_charge_value_, charger_low_voltage_); 
         }

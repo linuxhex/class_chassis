@@ -44,7 +44,7 @@ void RemoteRetCallback(const std_msgs::UInt32& ret) {
     GAUSSIAN_INFO("[wc_chassis] get remote ret cmd = %d, state = %d", (remote_ret_ & 0xff), (remote_ret_ >> 8) & 0xff);
 }
 /*
- * 停车时关闭陀螺仪
+ * 停车时关闭陀螺仪 仅扫地图使能
  */
 void GyroUpdateCallback(const std_msgs::UInt32& state) {
   if (state.data == 0) {
