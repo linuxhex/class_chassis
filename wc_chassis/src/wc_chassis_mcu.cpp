@@ -237,8 +237,8 @@ void WC_chassis_mcu::setChargeCmd(unsigned int cmd)
 
     CreateChargeCmd(send, &len, cmd);
 
-    std::string str = cComm::ByteToHexString(send, len);
-    std::cout << "send charge cmd: " << str << std::endl;
+//    std::string str = cComm::ByteToHexString(send, len);
+//    std::cout << "send charge cmd: " << str << std::endl;
 
     if (transfer_) {
       transfer_->Send_data(send, len);

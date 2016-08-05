@@ -23,6 +23,7 @@ cc_binary(
         "wc_chassis/src/publish.cpp",
         "wc_chassis/src/subscribe.cpp",
         "wc_chassis/src/common_function.cpp",
+        "wc_chassis/src/schedule.cpp",
         "sdk/include/*.h",
         "sdk/include/*.hpp",
         "wc_chassis/include/*.h",

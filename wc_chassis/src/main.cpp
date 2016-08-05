@@ -41,7 +41,6 @@ int main(int argc, char **argv) {
     device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
     rotate_finished_pub = p_device_nh->advertise<std_msgs::Int32>("rotate_finished", 5);
     protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
-//   protector_status_pub   = p_device_nh->advertise<autoscrubber_services::ProtectorStatus>("protector_status", 100);
     going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
     dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
 
@@ -62,8 +61,6 @@ int main(int argc, char **argv) {
     g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
     g_chassis_mcu->getUltra();
 
-    UpdateDeviceStatus();
-
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
@@ -73,7 +70,6 @@ int main(int argc, char **argv) {
       if ((time_now - last_cmd_vel_time >= max_cmd_interval) ||
           ((protector_hit & FRONT_HIT) && m_speed_v > 0.001) || 
           ((protector_hit & REAR_HIT)  && m_speed_v < -0.001) || 
-//          (time_now - charger_on_time < 1.0 && current_charge_value_ > charger_low_voltage_)) {
           (current_charge_value_ > charger_low_voltage_)) {
         if (current_charge_value_ > charger_low_voltage_) {
           GAUSSIAN_INFO("WC CHASSIS: charge_voltage = %lf > charger_low_voltage = %lf", current_charge_value_, charger_low_voltage_); 

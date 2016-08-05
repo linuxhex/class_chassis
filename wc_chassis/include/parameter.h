@@ -27,6 +27,9 @@
 #include <thread>
 #include <sched.h>
 #include <iostream>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -137,15 +140,17 @@ extern std::string laser_connection_status;
 extern std::string router_connection_status;
 extern std::thread *checkConnectionThread;
 
-extern unsigned char protector_service_call;
 extern unsigned int protector_value;
 extern double protector_hit_time;
-extern double charger_on_time;
 extern unsigned char protector_down;
 extern int protector_num;
 extern unsigned int protector_bits;
 extern unsigned int ultrasonic_bits;
 extern double inplace_rotating_theta;
 extern bool ultrasonic_board_connection;
+extern bool on_charge; //在充电true 停止充电false
+
+extern boost::asio::io_service *p_io;
+extern boost::asio::deadline_timer *p_update_device_timer;
 
 #endif

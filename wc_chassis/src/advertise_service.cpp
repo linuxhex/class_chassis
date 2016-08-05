@@ -15,12 +15,12 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
 {
     GAUSSIAN_INFO("calling CheckAutoChargeStatus start!!!");
     if (charger_monitor_cmd_ && charge_voltage_ > charger_low_voltage_) {
-    unsigned char  status = 0;
-//    g_chassis_mcu->getChargeStatus(status);
-    res.charge_status.status = status;
-    res.charge_status.value  = charge_voltage_;
-    GAUSSIAN_INFO("calling CheckAutoChargeStatus end!!!");
-    return true;
+        unsigned char  status = 0;
+        g_chassis_mcu->getChargeStatus(status);
+        res.charge_status.status = status;
+        res.charge_status.value  = charge_voltage_;
+        GAUSSIAN_INFO("calling CheckAutoChargeStatus end!!!");
+        return true;
     }
     return false;
 }
@@ -32,10 +32,12 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
                       autoscrubber_services::SetChargeCmd::Response& res)
 {
     unsigned char cmd = req.cmd.data;
-    if (cmd == 1) {
+    if (1 == cmd) {
       cmd = 3;
+      on_charge = true;
     } else {
       cmd = 4;
+      on_charge = false;
     }
     g_chassis_mcu->setChargeCmd(cmd);
 
@@ -88,7 +90,6 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
     }
     res.protector_status.protect_value = protector_value;
     protector_value = NONE_HIT;
-    protector_service_call = 1;
     return true;
 }
 

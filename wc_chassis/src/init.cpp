@@ -5,7 +5,7 @@
 #include "subscribe.h"
 #include "parameter.h"
 #include "common_function.h"
-
+#include "schedule.h"
 /***ros 相关****/
 tf::TransformBroadcaster *p_odom_broadcaster;
 WC_chassis_mcu *g_chassis_mcu;
@@ -34,7 +34,8 @@ ros::Subscriber    charger_monitor_sub;
 /***
  * 初始化所有的Service和订阅服务
  */
-void InitService(){
+void InitService()
+{
     start_rotate_srv              = p_device_nh->advertiseService("start_rotate", &StartRotate);
     stop_rotate_srv               = p_device_nh->advertiseService("stop_rotate", &StopRotate);
     check_rotate_srv              = p_device_nh->advertiseService("check_rotate", &CheckRotate);
@@ -45,7 +46,6 @@ void InitService(){
     auto_charge_cmd_srv           = p_device_nh->advertiseService("auto_charge_cmd",&SetAutoChargeCmd);
     check_auto_charge_status_srv  = p_device_nh->advertiseService("auto_charge_status",&CheckAutoChargeStatus);
 
-
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
     charger_monitor_sub = p_n->subscribe("/charger_monitor", 10, ChargerMonitorCallback);
     remote_ret_sub = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);
@@ -55,7 +55,8 @@ void InitService(){
 }
 
 /*  ros参数服务器参数的初始化*/
-void InitParameter(){
+void InitParameter()
+{
 
     g_chassis_mcu = new WC_chassis_mcu();
     p_odom_broadcaster = new tf::TransformBroadcaster();
@@ -132,7 +133,8 @@ void InitParameter(){
 }
 
 /* 设备的初始化*/
-void InitDevice(void){
+void InitDevice(void)
+{
 
 #ifdef VERIFY_REMOTE_KEY
   srand((unsigned int)time(NULL));
@@ -157,11 +159,22 @@ void InitDevice(void){
 #endif
   g_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
   GAUSSIAN_INFO("[wc_chassis] init device completed");
-//  g_chassis_mcu->setChargeCmd(3);
+}
+
+/* schedule任务初始化 */
+void InitSchedule(void)
+{
+    p_io = new boost::asio::io_service();
+
+    p_update_device_timer = new boost::asio::deadline_timer(*p_io,boost::posix_time::seconds(0.1));
+    p_update_device_timer->async_wait(&updateDeviceStatus);
+
+    p_io->run();
 }
 
 /* chassis的初始化*/
-bool InitChassis(int argc, char **argv,const char *node_name){
+bool InitChassis(int argc, char **argv,const char *node_name)
+{
 
      GAUSSIAN_INFO("[wc_chassis] init ros!");
      ros::init(argc, argv, node_name);
@@ -174,5 +187,6 @@ bool InitChassis(int argc, char **argv,const char *node_name){
      InitService();
      InitParameter();
      InitDevice();
+     InitSchedule();
      return true;
 }

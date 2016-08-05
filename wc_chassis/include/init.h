@@ -46,7 +46,7 @@ bool InitChassis(int argc, char **argv,const char *node_name);
 void InitDevice(void);
 void InitParameter(void);
 void InitService(void);
-
+void InitSchedule(void);
 #endif
 
 

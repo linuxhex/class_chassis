@@ -4,7 +4,6 @@
 #include"init.h"
 #include"parameter.h"
 
-
 void ReadConfigFromXMLRPC(XmlRpc::XmlRpcValue& config_xmlrpc, const std::string& full_param_name, std::vector<unsigned int>* config_list) {
   unsigned int config;
   for (int i = 0; i < config_xmlrpc.size(); ++i) {
@@ -41,7 +40,6 @@ bool ReadConfigFromParams(std::string param_name, ros::NodeHandle* nh, std::vect
   return false;
 }
 
-
 std::string get_key_value(int status, int status_bit)
 {
   if (status & (0x01 << status_bit)) {
@@ -51,7 +49,7 @@ std::string get_key_value(int status, int status_bit)
   }
 }
 
-
+/* 　设置chassis调度优先级，cpu*/
 void SetSchedPriority(void)
 {
     #ifdef SETTING_PRIORITY
@@ -72,7 +70,6 @@ void SetSchedPriority(void)
         }
     #endif
 }
-
 
 #ifdef VERIFY_REMOTE_KEY
 unsigned int GenerateJSHash(unsigned int seed) {
@@ -146,5 +143,7 @@ void freeResource(void){
   delete p_nh;
   delete p_device_nh;
   delete p_loop_rate;
+  delete p_io;
+  delete p_update_device_timer;
   ros::shutdown();
 }
