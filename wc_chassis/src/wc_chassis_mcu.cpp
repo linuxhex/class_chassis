@@ -78,7 +78,7 @@ WC_chassis_mcu::~WC_chassis_mcu() {
     }
 }
 
-void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, int Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th) {
+void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, double Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th) {
 
     transfer_->Init(host_name, port);
 
@@ -106,9 +106,10 @@ void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,
     std::cout << "Counts err value:" <<Counts<< std::endl;
   }
 
-  if ((Reduction_ratio > 0) && (Reduction_ratio < 100)) {
+  if ((Reduction_ratio > 0.0) && (Reduction_ratio < 100.0)) {
     Reduction_ratio_ = Reduction_ratio;
   } else {
+    Reduction_ratio_ = 30.0;
     std::cout << "Reduction_ratio err value:" << Reduction_ratio<< std::endl;
   }
 
@@ -445,8 +446,8 @@ void WC_chassis_mcu::getUltra(void) {
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send ultra: " << str << std::endl;
 
-  std::string str = cComm::ByteToHexString(rec, rlen);
-  std::cout << "recv ultra: " << str << std::endl;
+  // std::string str = cComm::ByteToHexString(rec, rlen);
+  // std::cout << "recv ultra: " << str << std::endl;
   // std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
   if (rlen == 35) {
     for (int i = 0; i < rlen; ++i) {

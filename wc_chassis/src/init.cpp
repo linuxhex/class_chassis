@@ -65,7 +65,7 @@ void InitParameter(){
     int counts = 0;
     ultrasonic = new std::string();
     special_ultrasonic = new std::string();
-    int reduction_ratio = 0;
+    double reduction_ratio = 30.0;
     double speed_ratio = 1.0;
     double timeWidth = 0;
     std::string host_name;
@@ -81,7 +81,7 @@ void InitParameter(){
     p_nh->param("B_DIA", b_dia, static_cast<double>(0.125));
     p_nh->param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
     p_nh->param("COUNTS", counts, 12);//霍尔数
-    p_nh->param("REDUCTION_RATIO", reduction_ratio, 30);//减速比
+    p_nh->param("REDUCTION_RATIO", reduction_ratio, static_cast<double>(30.0));//减速比
     p_nh->param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
     p_nh->param("battery_full_level", battery_full_level, static_cast<double>(27.5));
     p_nh->param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
