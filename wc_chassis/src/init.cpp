@@ -109,6 +109,7 @@ void InitParameter(){
     p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
     p_nh->param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));//初始化旋转速度
     p_nh->param("charger_low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化旋转速度
+    p_nh->param("new_hardware_version", new_hardware_version_, false);//新板子手触开关和防撞条共用一个接口
 
     // 前面防撞条配置
     if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {

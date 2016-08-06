@@ -122,7 +122,7 @@ void UpdateDeviceStatus() {
     sum_charge_voltage = 0;
     charge_count = -1;
   }
-  */
+*/
   GAUSSIAN_INFO("[wc_chassis] adc_charge = %d, current_charge_value: %lf, current_charge_voltage: %d, charge_voltage: %d",
                  charge_ADC, charge_value, current_charge_voltage, charge_voltage_);
 
