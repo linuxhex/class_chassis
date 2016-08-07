@@ -88,6 +88,7 @@ extern  int rotate_angle;
 extern bool start_rotate_flag;
 extern bool stop_rotate_flag;
 extern bool is_rotate_finished;
+extern bool new_hardware_version_;
 extern unsigned int g_di_data_;
 extern unsigned int g_do_data_;
 extern unsigned int cur_emergency_status;

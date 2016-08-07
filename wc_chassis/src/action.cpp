@@ -41,19 +41,21 @@ bool DoRotate(ros::Publisher &rotate_finished_pub) {
  * IO口控制，手触等
  */
 void DoDIO(ros::Publisher going_back_pub) {
-    if ((++g_dio_count % 2) == 0) {
-      unsigned int temp_di_data = g_chassis_mcu->doDIO(g_do_data_);
-      GAUSSIAN_INFO("[wc_chassis] get_di data: 0x%x", temp_di_data);
-      cur_emergency_status = (temp_di_data >> (8 + Emergency_stop)) & 0x01;
-      if (g_dio_count > 2 && ((g_di_data_ & 0x03) != 0x03) && ((temp_di_data & 0x03) == 0x03)) {
-        GAUSSIAN_INFO("[wc_chassis] get_di data: 0x%x, and then publish going back!!!", temp_di_data);
-        std_msgs::UInt32 msg;
-        msg.data = 1;
-        going_back_pub.publish(msg);
-      }
-      g_di_data_ = temp_di_data & 0xff;
-      g_do_data_ = g_di_data_;
-    }
+  unsigned int temp_di_data = g_chassis_mcu->doDIO(g_do_data_);
+  GAUSSIAN_INFO("[wc_chassis] get_di data: 0x%x", temp_di_data);
+  cur_emergency_status = (temp_di_data >> (8 + Emergency_stop)) & 0x01;
+  // new version hardware hand touch
+  if (new_hardware_version_) {
+    temp_di_data = g_ultrasonic[0];
+  }
+  if (++g_dio_count > 2 && ((g_di_data_ & 0x03) != 0x03) && ((temp_di_data & 0x03) == 0x03)) {
+    GAUSSIAN_INFO("[wc_chassis] get_di data: 0x%x, and then publish going back!!!", temp_di_data);
+    std_msgs::UInt32 msg;
+    msg.data = 1;
+    going_back_pub.publish(msg);
+  }
+  g_di_data_ = temp_di_data & 0xff;
+  g_do_data_ = g_di_data_;  // just for testing
 }
 /*
  * 遥控器状态

@@ -66,7 +66,7 @@ void InitParameter()
     int counts = 0;
     ultrasonic = new std::string();
     special_ultrasonic = new std::string();
-    int reduction_ratio = 0;
+    double reduction_ratio = 30.0;
     double speed_ratio = 1.0;
     double timeWidth = 0;
     std::string host_name;
@@ -82,7 +82,7 @@ void InitParameter()
     p_nh->param("B_DIA", b_dia, static_cast<double>(0.125));
     p_nh->param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
     p_nh->param("COUNTS", counts, 12);//霍尔数
-    p_nh->param("REDUCTION_RATIO", reduction_ratio, 30);//减速比
+    p_nh->param("REDUCTION_RATIO", reduction_ratio, static_cast<double>(30.0));//减速比
     p_nh->param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
     p_nh->param("battery_full_level", battery_full_level, static_cast<double>(27.5));
     p_nh->param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
@@ -110,6 +110,7 @@ void InitParameter()
     p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
     p_nh->param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));//初始化旋转速度
     p_nh->param("charger_low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化旋转速度
+    p_nh->param("new_hardware_version", new_hardware_version_, false);//新板子手触开关和防撞条共用一个接口
 
     // 前面防撞条配置
     if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {

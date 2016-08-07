@@ -30,6 +30,7 @@ unsigned int ultrasonic_bits=0x00;
 bool start_rotate_flag    = false;
 bool stop_rotate_flag     = true;
 bool is_rotate_finished   = false;
+bool new_hardware_version_= false;
 unsigned int g_di_data_   = 0;
 unsigned int g_do_data_   = 0;
 unsigned int cur_emergency_status = 1;

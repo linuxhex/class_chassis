@@ -11,6 +11,7 @@
  *  自动充电 状态查询
  */
 bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,
+<<<<<<< HEAD
                            autoscrubber_services::CheckChargeStatus::Response& res)
 {
     GAUSSIAN_INFO("calling CheckAutoChargeStatus start!!!");
@@ -23,12 +24,24 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
         return true;
     }
     return false;
+=======
+                           autoscrubber_services::CheckChargeStatus::Response& res) {
+  GAUSSIAN_INFO("calling CheckAutoChargeStatus start!!!");
+  unsigned char  status = 0;
+  if (charger_monitor_cmd_ && charge_voltage_ > charger_low_voltage_) {
+  }
+  res.charge_status.status = status;
+  res.charge_status.value  = charge_voltage_;
+  GAUSSIAN_INFO("calling CheckAutoChargeStatus end!!!");
+  return true;
+>>>>>>> 5f88541c7068869379ecc941e29853eba6d93456
 }
 
 /*
  *  自动充电 控制命令  cmd  4:停止自动充电　　3:开始自动充电
  */
 bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
+<<<<<<< HEAD
                       autoscrubber_services::SetChargeCmd::Response& res)
 {
     unsigned char cmd = req.cmd.data;
@@ -40,8 +53,18 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
       on_charge = false;
     }
     g_chassis_mcu->setChargeCmd(cmd);
+=======
+                      autoscrubber_services::SetChargeCmd::Response& res) {
+  unsigned char cmd = req.cmd.data;
+  if (cmd == 1) {
+    cmd = 3;
+  } else {
+    cmd = 4;
+  }
+  g_chassis_mcu->setChargeCmd(cmd);
+>>>>>>> 5f88541c7068869379ecc941e29853eba6d93456
 
-    return true;
+  return true;
 }
 
 
@@ -49,38 +72,37 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
  *  提供给上层应用，屏蔽特定的防撞条
  */
 bool ProtectorSwitch(autoscrubber_services::ProtectorSwitch::Request& req,
-                    autoscrubber_services::ProtectorSwitch::Response& res)
-{
-    std::string protector_str =  req.protectorStr.data;
-    protector_bits = 0x00;  //bit位置　1:屏蔽  0:不屏蔽
-    for(unsigned int i = 0; i < protector_str.length(); ++i){
-        if(protector_str[i] == '0'){
-            protector_bits |= 0x01<<i;
-        }
+    autoscrubber_services::ProtectorSwitch::Response& res) {
+  std::string protector_str =  req.protectorStr.data;
+  protector_bits = 0x00;  //bit位置　1:屏蔽  0:不屏蔽
+  for(unsigned int i = 0; i < protector_str.length(); ++i){
+    if(protector_str[i] == '0'){
+      protector_bits |= 0x01<<i;
     }
-    return true;
+  }
+  return true;
 }
 
 /*
  *  提供给上层应用，屏蔽特定的超声
  */
 bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
-                    autoscrubber_services::UltrasonicSwitch::Response& res)
-{
-    std::string ultrasonic_str = req.ultrasonicStr.data;
-    ultrasonic_bits = 0x00;  //bit位置　1:屏蔽  0：不屏蔽
-    for(unsigned int i = 0; i < ultrasonic_str.length(); ++i){
-        if(ultrasonic_str[i] == '0'){
-            ultrasonic_bits |= 0x01<<i;
-        }
+    autoscrubber_services::UltrasonicSwitch::Response& res) {
+  std::string ultrasonic_str = req.ultrasonicStr.data;
+  ultrasonic_bits = 0x00;  //bit位置　1:屏蔽  0：不屏蔽
+  for(unsigned int i = 0; i < ultrasonic_str.length(); ++i){
+    if(ultrasonic_str[i] == '0'){
+      ultrasonic_bits |= 0x01<<i;
     }
-    return true;
+  }
+  return true;
 }
 
 /*
  *  提供给navigation模块，用于在判断遇到障碍物是是否是防撞条触发
  */
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
+<<<<<<< HEAD
                           autoscrubber_services::CheckProtectorStatus::Response& res)
 {
     if(protector_value != NONE_HIT){
@@ -91,6 +113,18 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
     res.protector_status.protect_value = protector_value;
     protector_value = NONE_HIT;
     return true;
+=======
+                          autoscrubber_services::CheckProtectorStatus::Response& res){
+  if(protector_value != NONE_HIT){
+    res.protector_status.protect_status=true;
+  }else{
+    res.protector_status.protect_status=false;
+  }
+  res.protector_status.protect_value = protector_value;
+  protector_value = NONE_HIT;
+  protector_service_call = 1;
+  return true;
+>>>>>>> 5f88541c7068869379ecc941e29853eba6d93456
 }
 
 /*
@@ -155,15 +189,15 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
 
   //超声状态
   for (int i = 0; i < ultrasonic_num; ++i) {
-     if (g_ultrasonic[i + 1] == 0xff || !ultrasonic_board_connection) {
-       value.key  = ultrasonic_str[i];
-       value.value = std::string("false");
-       hardware_status.values.push_back(value);
-     } else{
-       value.key   = ultrasonic_str[i];
-       value.value = std::string("true");
-       hardware_status.values.push_back(value);
-     }
+    if (g_ultrasonic[i + 1] == 0xff || !ultrasonic_board_connection) {
+      value.key  = ultrasonic_str[i];
+      value.value = std::string("false");
+      hardware_status.values.push_back(value);
+    } else{
+      value.key   = ultrasonic_str[i];
+      value.value = std::string("true");
+      hardware_status.values.push_back(value);
+    }
   }
   res.hardwareStatus = hardware_status;
   return true;
