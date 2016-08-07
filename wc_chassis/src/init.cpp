@@ -1,11 +1,13 @@
 /* init.cpp文件包含了所有wc_chassis工程的初始化
 */
+
 #include "init.h"
 #include "advertise_service.h"
 #include "subscribe.h"
 #include "parameter.h"
 #include "common_function.h"
 #include "schedule.h"
+
 /***ros 相关****/
 tf::TransformBroadcaster *p_odom_broadcaster;
 WC_chassis_mcu *g_chassis_mcu;
@@ -171,6 +173,8 @@ void InitSchedule(void)
     p_update_device_timer->async_wait(&updateDeviceStatus);
 
     p_io->run();
+    GAUSSIAN_INFO("[wc_chassis] init schedule completed");
+
 }
 
 /* chassis的初始化*/

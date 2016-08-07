@@ -93,7 +93,6 @@ std::string *special_ultrasonic;
 float special_ultrasonic_offset_dismeter;
 unsigned int protector_value = 0; //防撞条的值．0:表示防撞条没有被触发　!0:表示防撞条被触发
 double protector_hit_time = 0;  //防撞条触发开始时间
-unsigned char protector_down = 0; //0:表示防撞条没有触发　１:表示防撞条从触发到１ｓ钟时间之内
 bool ultrasonic_board_connection = true; //true:超声转接板连接正常
 bool on_charge = false; //在充电true 停止充电false
 //定时调度任务

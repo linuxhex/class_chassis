@@ -1,7 +1,6 @@
 /* publish.cpp 所有的topic的发布
  */
 
-
 #include "publish.h"
 #include "init.h"
 #include "parameter.h"
@@ -51,6 +50,7 @@ void PublishUltrasonic(ros::Publisher ultrasonic_pub[]) {
     }
   }
 }
+
 /*
  * 发送陀螺仪数据
  */
@@ -72,6 +72,7 @@ void PublishGyro(ros::Publisher &gyro_pub) {
   imu_msg.orientation.w = temp.getW();
   gyro_pub.publish(imu_msg);
 }
+
 /*
  * 发送遥控器命令
  */
@@ -85,88 +86,6 @@ void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned
 }
 
 /*
-<<<<<<< HEAD
-=======
- * update status about device: charge voltage; protector status ... 
- * TODO(cmn): add protector and other status those should be updated on 10Hz
- */
-void UpdateDeviceStatus() {
-  unsigned int charge_ADC = (g_ultrasonic[22] << 8) | (g_ultrasonic[23] & 0xff);
-//  double charge_value = 0.2298 * (charge_ADC - 516);
-//  double charge_value = 0.2352 * (charge_ADC - 507);
-  double charge_value = 0.2330 * (charge_ADC - 509);
-  charge_value = charge_value < 0.0 ? 0.0 : charge_value;
-  current_charge_value_= charge_value;
-  short current_charge_voltage = static_cast <short>(charge_value * 10.0);
-  current_charge_voltage = current_charge_voltage < 100 ? 0 : current_charge_voltage;
-  current_charge_voltage = current_charge_voltage > 500 ? 0 : current_charge_voltage;
-  charge_voltage_ = current_charge_voltage;
-  if (charger_monitor_cmd_ && charge_value > charger_low_voltage_) {
-//    charger_monitor_cmd_ = 0;
-    timeval tv;
-    gettimeofday(&tv, NULL);
-    charger_on_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
-  }
-/*
-  if (current_charge_voltage > 0 && ++charge_count == 0) {
-    charge_voltage_ = current_charge_voltage;
-  }
-  // do charge voltage filter every 30s
-  if (current_charge_voltage > 0 && charge_count > 0) {
-    sum_charge_voltage += current_charge_voltage;
-    if(charge_count == 300) {
-      charge_voltage_ = sum_charge_voltage / 300;
-      sum_charge_voltage = 0;
-      charge_count = 0;
-    }
-  } else if (current_charge_voltage == 0) {
-    charge_voltage_ = 0;
-    sum_charge_voltage = 0;
-    charge_count = -1;
-  }
-*/
-  GAUSSIAN_INFO("[wc_chassis] adc_charge = %d, current_charge_value: %lf, current_charge_voltage: %d, charge_voltage: %d",
-                 charge_ADC, charge_value, current_charge_voltage, charge_voltage_);
-
-  if(protector_num <= 0){
-      return;
-  }
-  // check protector hit
-  unsigned int status = g_ultrasonic[0] | protector_bits;
-//  status ^= (0xffff >> (32 - protector_num));
-//  GAUSSIAN_INFO("[WC_CHASSIS] enablel protector [%x]!!!", (0xffff >> (32 - protector_num)));
-  
-  unsigned int temp_hit = NONE_HIT;
-  for (int i = 0; i < front_protector_list.size(); ++i) {
-    if (!(status & (1 << front_protector_list.at(i)))) {
-      temp_hit |= FRONT_HIT;
-      GAUSSIAN_ERROR("[WC_CHASSIS] front protector bit[%d] hit!!!", front_protector_list.at(i));
-      break;
-    }
-  }
-  for (int i = 0; i < rear_protector_list.size(); ++i) {
-    if (!(status & (1 << rear_protector_list.at(i)))) {
-      temp_hit |= REAR_HIT;
-      GAUSSIAN_ERROR("[WC_CHASSIS] rear protector bit[%d] hit!!!", rear_protector_list.at(i));
-      break;
-    }
-  }
-  if (temp_hit != NONE_HIT) {
-    timeval tv;
-    protector_value |= temp_hit;
-    gettimeofday(&tv, NULL);
-    protector_hit_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
-  }
- /*
-  if (protector_service_call) 
-    protector_value = NONE_HIT;
-  protector_service_call = 0;
-  */
-  protector_hit = temp_hit;
-}
-
-/*
->>>>>>> 5f88541c7068869379ecc941e29853eba6d93456
  * 发送设备状态
  */
 void publishDeviceStatus(ros::Publisher &device_pub) {

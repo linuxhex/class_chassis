@@ -70,18 +70,12 @@ int main(int argc, char **argv) {
       if ((time_now - last_cmd_vel_time >= max_cmd_interval) ||
           ((protector_hit & FRONT_HIT) && m_speed_v > 0.001) || 
           ((protector_hit & REAR_HIT)  && m_speed_v < -0.001) || 
-<<<<<<< HEAD
-          (current_charge_value_ > charger_low_voltage_)) {
-=======
-//          (time_now - charger_on_time < 1.0 && current_charge_value_ > charger_low_voltage_)) {
           (charger_monitor_cmd_ && current_charge_value_ > charger_low_voltage_)) {
->>>>>>> 5f88541c7068869379ecc941e29853eba6d93456
         if (current_charge_value_ > charger_low_voltage_) {
           GAUSSIAN_INFO("WC CHASSIS: charge_voltage = %lf > charger_low_voltage = %lf", current_charge_value_, charger_low_voltage_); 
         }
         g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
       } else {
-        protector_down = 0;
         g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
       }
     }

@@ -11,10 +11,8 @@
  *  自动充电 状态查询
  */
 bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,
-<<<<<<< HEAD
                            autoscrubber_services::CheckChargeStatus::Response& res)
 {
-    GAUSSIAN_INFO("calling CheckAutoChargeStatus start!!!");
     if (charger_monitor_cmd_ && charge_voltage_ > charger_low_voltage_) {
         unsigned char  status = 0;
         g_chassis_mcu->getChargeStatus(status);
@@ -24,24 +22,12 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
         return true;
     }
     return false;
-=======
-                           autoscrubber_services::CheckChargeStatus::Response& res) {
-  GAUSSIAN_INFO("calling CheckAutoChargeStatus start!!!");
-  unsigned char  status = 0;
-  if (charger_monitor_cmd_ && charge_voltage_ > charger_low_voltage_) {
-  }
-  res.charge_status.status = status;
-  res.charge_status.value  = charge_voltage_;
-  GAUSSIAN_INFO("calling CheckAutoChargeStatus end!!!");
-  return true;
->>>>>>> 5f88541c7068869379ecc941e29853eba6d93456
 }
 
 /*
  *  自动充电 控制命令  cmd  4:停止自动充电　　3:开始自动充电
  */
 bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
-<<<<<<< HEAD
                       autoscrubber_services::SetChargeCmd::Response& res)
 {
     unsigned char cmd = req.cmd.data;
@@ -53,20 +39,9 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
       on_charge = false;
     }
     g_chassis_mcu->setChargeCmd(cmd);
-=======
-                      autoscrubber_services::SetChargeCmd::Response& res) {
-  unsigned char cmd = req.cmd.data;
-  if (cmd == 1) {
-    cmd = 3;
-  } else {
-    cmd = 4;
-  }
-  g_chassis_mcu->setChargeCmd(cmd);
->>>>>>> 5f88541c7068869379ecc941e29853eba6d93456
 
   return true;
 }
-
 
 /*
  *  提供给上层应用，屏蔽特定的防撞条
@@ -102,7 +77,6 @@ bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
  *  提供给navigation模块，用于在判断遇到障碍物是是否是防撞条触发
  */
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
-<<<<<<< HEAD
                           autoscrubber_services::CheckProtectorStatus::Response& res)
 {
     if(protector_value != NONE_HIT){
@@ -113,18 +87,6 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
     res.protector_status.protect_value = protector_value;
     protector_value = NONE_HIT;
     return true;
-=======
-                          autoscrubber_services::CheckProtectorStatus::Response& res){
-  if(protector_value != NONE_HIT){
-    res.protector_status.protect_status=true;
-  }else{
-    res.protector_status.protect_status=false;
-  }
-  res.protector_status.protect_value = protector_value;
-  protector_value = NONE_HIT;
-  protector_service_call = 1;
-  return true;
->>>>>>> 5f88541c7068869379ecc941e29853eba6d93456
 }
 
 /*
@@ -141,6 +103,7 @@ bool StartRotate(autoscrubber_services::StartRotate::Request& req,
   g_chassis_mcu->acc_odom_theta_ = 0.0;
   return true;
 }
+
 /*
  * 初始化　停止旋转
  */
@@ -149,6 +112,7 @@ bool StopRotate(autoscrubber_services::StopRotate::Request& req,
   start_rotate_flag = false;
   return true;
 }
+
 /*
  * 初始化　旋转检测
  */

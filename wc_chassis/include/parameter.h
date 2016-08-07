@@ -143,7 +143,6 @@ extern std::thread *checkConnectionThread;
 
 extern unsigned int protector_value;
 extern double protector_hit_time;
-extern unsigned char protector_down;
 extern int protector_num;
 extern unsigned int protector_bits;
 extern unsigned int ultrasonic_bits;
