@@ -459,7 +459,9 @@ void WC_chassis_mcu::getUltra(void) {
   /*
    *超声can连接状态预处理
    */
-  std::istringstream(get_key_value(g_ultrasonic[19], Ultrasonic_board)) >> std::boolalpha >> ultrasonic_board_connection;
+  if (!old_ultrasonic_) {
+    std::istringstream(get_key_value(g_ultrasonic[19], Ultrasonic_board)) >> std::boolalpha >> ultrasonic_board_connection;
+  }
   /*
    *防撞条预处理
    */
