@@ -153,7 +153,7 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
 
   //超声状态
   for (int i = 0; i < ultrasonic_num; ++i) {
-    if (g_ultrasonic[i + 1] == 0xff || !ultrasonic_board_connection) {
+    if (g_ultrasonic[i + 1] == 0xff || g_ultrasonic[i + 1] == 0x00 || !ultrasonic_board_connection) {
       value.key  = ultrasonic_str[i];
       value.value = std::string("false");
       hardware_status.values.push_back(value);
