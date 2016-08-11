@@ -99,13 +99,14 @@ void UpdateDeviceStatus() {
   current_charge_voltage = current_charge_voltage < 100 ? 0 : current_charge_voltage;
   current_charge_voltage = current_charge_voltage > 500 ? 0 : current_charge_voltage;
   charge_voltage_ = current_charge_voltage;
+
+/*
   if (charger_monitor_cmd_ && charge_value > charger_low_voltage_) {
 //    charger_monitor_cmd_ = 0;
     timeval tv;
     gettimeofday(&tv, NULL);
     charger_on_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
   }
-/*
   if (current_charge_voltage > 0 && ++charge_count == 0) {
     charge_voltage_ = current_charge_voltage;
   }

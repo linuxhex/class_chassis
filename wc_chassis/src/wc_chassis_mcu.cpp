@@ -228,25 +228,39 @@ void WC_chassis_mcu::setRemoteID(unsigned char id) {
 }
 
 /*
- * 自动充电   cmd  03:开始充电　　04:结束充电
+ * 自动充电   cmd  01:开始充电　　02:结束充电
+ *            sta  01:正在充电　　02:不在充电
+ *    bit 对应关系：   01        23            45         67
+ *                    充电   内部(12V)   外部(电机24V)   客户 
  */
-void WC_chassis_mcu::setChargeCmd(unsigned int cmd)
-{
-    unsigned char send[1024] = {0};
-    unsigned char rec[1024]  = {0};
-    int len = 0, rlen = 0;
+unsigned char WC_chassis_mcu::setChargeCmd(unsigned char cmd) {
+  unsigned char send[1024] = {0};
+  unsigned char rec[1024]  = {0};
+  int len = 0, rlen = 0;
+  unsigned char status;
 
-    CreateChargeCmd(send, &len, cmd);
+  CreateChargeCmd(send, &len, cmd);
 
-    std::string str = cComm::ByteToHexString(send, len);
-    std::cout << "send charge cmd: " << str << std::endl;
+  std::string str_send = cComm::ByteToHexString(send, len);
+  std::cout << "send charge cmd: " << str_send << std::endl;
 
-    if (transfer_) {
-      transfer_->Send_data(send, len);
-      transfer_->Read_data(rec, rlen, 12, 500);
+  if (transfer_) {
+    transfer_->Send_data(send, len);
+    transfer_->Read_data(rec, rlen, 12, 500);
+  }
+
+  std::string str_rec = cComm::ByteToHexString(rec, len);
+  std::cout << "recv charge status: " << str_rec << std::endl;
+
+  if (rlen == 12) {
+    for (int i = 0; i < rlen; ++i) {
+      if (IRQ_CH(rec[i])) {
+        getChargeStatusValue(status);
+      }
     }
-
-    usleep(1000);
+  }
+  usleep(1000);
+  return status;
 }
 
 /*
