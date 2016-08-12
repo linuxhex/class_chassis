@@ -11,6 +11,7 @@
  *  自动充电 状态查询
  */
 bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,
+<<<<<<< HEAD
                            autoscrubber_services::CheckChargeStatus::Response& res)
 {
     if (charger_monitor_cmd_ && charge_voltage_ > charger_low_voltage_) {
@@ -22,12 +23,29 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
         return true;
     }
     return false;
+=======
+                           autoscrubber_services::CheckChargeStatus::Response& res) {
+  unsigned char  status = g_chassis_mcu->setChargeCmd(0);
+  GAUSSIAN_INFO("[CHASSIS] get raw charge status = 0x%.2x", status);
+  if ((status & 0x03) == STA_CHARGER_ON) {
+    status = STA_CHARGER_ON;
+  } if (charge_voltage_ >= charger_low_voltage_) {
+    status = STA_CHARGER_TOUCHED;
+  } else {
+    status = STA_CHARGER_OFF;
+  }
+  res.charge_status.status = status;
+  res.charge_status.value  = charge_voltage_ >= charger_low_voltage_ * 10 ? charge_voltage_ : 0;
+  GAUSSIAN_INFO("[CHASSIS] get real charge status = %d, voltage = %d!!!", res.charge_status.status, res.charge_status.value);
+  return true;
+>>>>>>> ca9b6bcb3c9464c1debc518290abf33a832861c4
 }
 
 /*
- *  自动充电 控制命令  cmd  4:停止自动充电　　3:开始自动充电
+ *  自动充电 控制命令  cmd 　01:开始自动充电  02:停止自动充电
  */
 bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
+<<<<<<< HEAD
                       autoscrubber_services::SetChargeCmd::Response& res)
 {
     unsigned char cmd = req.cmd.data;
@@ -40,6 +58,45 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
     }
     g_chassis_mcu->setChargeCmd(cmd);
 
+=======
+                      autoscrubber_services::SetChargeCmd::Response& res) {
+  unsigned char cmd = req.cmd.data;
+  unsigned char status;
+  if (cmd == CMD_CHARGER_ON) {
+    charger_cmd_ = CMD_CHARGER_ON;
+    // start a thread to handle auto charger
+    std::thread([&](){
+      GAUSSIAN_INFO("[CHASSIS] start to check charger volatage = %d", charge_voltage_);
+      sleep(3);
+      unsigned int sleep_cnt = 0;
+      unsigned int check_charger_cnt = 0;
+      while(++sleep_cnt  < 100 && charger_cmd_ == CMD_CHARGER_ON) {
+       GAUSSIAN_INFO("[CHASSIS] checking charger volatage = %d", charge_voltage_);
+       if (charge_voltage_ >= charger_low_voltage_) {
+         ++check_charger_cnt;
+       } else {
+         check_charger_cnt = 0;
+       }
+       if (check_charger_cnt > 30 && charger_cmd_ == CMD_CHARGER_ON) {
+         GAUSSIAN_INFO("[CHASSIS] check charger voltage normal > 30s, set charger relay on!!!");
+         g_chassis_mcu->setChargeCmd(CMD_CHARGER_ON);
+         break;
+       }
+        sleep(1);
+      }
+    }).detach();
+
+  } else if (cmd == CMD_CHARGER_OFF) {
+    GAUSSIAN_INFO("[CHASSIS] set charger off!!!");
+    charger_cmd_ = CMD_CHARGER_OFF;
+    g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+  } else if (cmd == CMD_CHARGER_MONITOR) {
+    GAUSSIAN_INFO("[CHASSIS] set charger moniter on!!!");
+    charger_cmd_ = CMD_CHARGER_MONITOR;
+  } else {
+    charger_cmd_ = CMD_CHARGER_NONE;
+  }
+>>>>>>> ca9b6bcb3c9464c1debc518290abf33a832861c4
   return true;
 }
 
@@ -77,6 +134,7 @@ bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
  *  提供给navigation模块，用于在判断遇到障碍物是是否是防撞条触发
  */
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
+<<<<<<< HEAD
                           autoscrubber_services::CheckProtectorStatus::Response& res)
 {
     if(protector_value != NONE_HIT){
@@ -87,6 +145,19 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
     res.protector_status.protect_value = protector_value;
     protector_value = NONE_HIT;
     return true;
+=======
+                          autoscrubber_services::CheckProtectorStatus::Response& res){
+  if(protector_value != NONE_HIT){
+    res.protector_status.protect_status=true;
+    res.protector_status.protect_value = protector_value;
+    protector_value = NONE_HIT;
+  }else{
+    res.protector_status.protect_status=false;
+    res.protector_status.protect_value = NONE_HIT;
+  }
+  protector_service_call = 1;
+  return true;
+>>>>>>> ca9b6bcb3c9464c1debc518290abf33a832861c4
 }
 
 /*

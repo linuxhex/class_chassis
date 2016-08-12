@@ -228,52 +228,71 @@ void WC_chassis_mcu::setRemoteID(unsigned char id) {
 }
 
 /*
- * 自动充电   cmd  03:开始充电　　04:结束充电
+ * 自动充电   cmd  01:开始充电　　02:结束充电
+ *            sta  01:正在充电　　02:不在充电
+ *    bit 对应关系：   01        23            45         67
+ *                    充电   内部(12V)   外部(电机24V)   客户 
  */
-void WC_chassis_mcu::setChargeCmd(unsigned int cmd)
-{
-    unsigned char send[1024] = {0};
-    unsigned char rec[1024]  = {0};
-    int len = 0, rlen = 0;
+unsigned char WC_chassis_mcu::setChargeCmd(unsigned char cmd) {
+  unsigned char send[1024] = {0};
+  unsigned char rec[1024]  = {0};
+  int len = 0, rlen = 0;
+  unsigned char status = 0;
 
-    CreateChargeCmd(send, &len, cmd);
+  CreateChargeCmd(send, &len, cmd);
 
+<<<<<<< HEAD
 //    std::string str = cComm::ByteToHexString(send, len);
 //    std::cout << "send charge cmd: " << str << std::endl;
+=======
+#ifdef DEBUG_ETHERNET
+  std::string str_send = cComm::ByteToHexString(send, len);
+  std::cout << "send charge cmd: " << str_send << std::endl;
+#endif
+>>>>>>> ca9b6bcb3c9464c1debc518290abf33a832861c4
 
-    if (transfer_) {
-      transfer_->Send_data(send, len);
-      transfer_->Read_data(rec, rlen, 12, 500);
+  if (transfer_) {
+    transfer_->Send_data(send, len);
+    transfer_->Read_data(rec, rlen, 12, 500);
+  }
+
+#ifdef DEBUG_ETHERNET
+  std::string str_rec = cComm::ByteToHexString(rec, len);
+  std::cout << "recv charge status: " << str_rec << std::endl;
+#endif
+
+  if (rlen == 12) {
+    for (int i = 0; i < rlen; ++i) {
+      if (IRQ_CH(rec[i])) {
+        status = getChargeStatusValue();
+      }
     }
-
-    usleep(1000);
+  }
+  usleep(1000);
+  return status;
 }
 
 /*
- * 获取充电状态
+ * 自动充电关机   cmd  01:关机
  */
-void WC_chassis_mcu::getChargeStatus(unsigned char& status)
-{
-    unsigned char send[1024] = {0};
-    unsigned char rec[1024]  = {0};
-    int len = 0, rlen = 0;
+void WC_chassis_mcu::setShutdownCmd(unsigned char cmd) {
+  unsigned char send[1024] = {0};
+  unsigned char rec[1024]  = {0};
+  int len = 0, rlen = 0;
 
-    CreateChargeStatus(send, &len);
+  CreateShutdownCmd(send, &len, cmd);
 
-    if (transfer_) {
-      transfer_->Send_data(send, len);
-      transfer_->Read_data(rec, rlen, 15, 500);
-    }
+#ifdef DEBUG_ETHERNET
+  std::string str_send = cComm::ByteToHexString(send, len);
+  std::cout << "send shutdown cmd: " << str_send << std::endl;
+#endif
 
-    if (rlen == 15) {
-      for (int i = 0; i < rlen; ++i) {
-        if (IRQ_CH(rec[i])) {
-            getChargeStatusValue(status);
-        }
-      }
-    }
+  if (transfer_) {
+    transfer_->Send_data(send, len);
+    transfer_->Read_data(rec, rlen, 12, 500);
+  }
 
-    usleep(1000);
+  usleep(1000);
 }
 
 int WC_chassis_mcu::V2RPM(float v)
@@ -443,6 +462,17 @@ void WC_chassis_mcu::getUltra(void) {
 #endif
   }
 
+<<<<<<< HEAD
+=======
+  // std::string str = cComm::ByteToHexString(send, len);
+  // std::cout << "send ultra: " << str << std::endl;
+
+#ifdef DEBUG_ETHERNET
+  std::string str = cComm::ByteToHexString(rec, rlen);
+  std::cout << "recv ultra: " << str << std::endl;
+#endif
+  // std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
+>>>>>>> ca9b6bcb3c9464c1debc518290abf33a832861c4
   if (rlen == 35) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {

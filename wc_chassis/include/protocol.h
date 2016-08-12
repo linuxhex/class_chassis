@@ -54,7 +54,7 @@ typedef enum{
   RREMOTE_VERIFY_KEY = 0x42,
   REMOTE_VERIFY_KEY = 0x43,
   CHARGE_CMD = 0x90,     //自动充电
-  CHARGE_STATUS = 0x92,     //自动充电
+  CHARGE_STATUS = 0x91,     //自动充电
   TIME = 0x7e,
   RTIME = 0xfe,
   RCURRENT = 0x81,
@@ -63,14 +63,15 @@ typedef enum{
   RANGLE = 0x84,
   RSPEED2 = 0x85,
   RULTRASONIC = 0x86,
-  RDI = 0x87,
   ULTRASONIC = 0x88,
+  RDI = 0x87,
   RAD = 0x89,
   RYAW_ANGLE = 0x8a, 	//Request for Yaw
   YAW_ANGLE = 0x8b,
   RREMOTE_CMD = 0x8c, 	//Request for remote cmd
   REMOTE_CMD = 0x8d,
-  REMOTE_RET = 0x8e   //send remote ret
+  REMOTE_RET = 0x8e,   //send remote ret
+  SHUTDOWN_CMD = 0x94, //send shutdown cmd on charging
 }CMDTypes;
 
 typedef struct _MsgState
@@ -237,6 +238,11 @@ typedef struct _CHARGE_STATUS
   unsigned char  status;
 }RChargeStatusProtocol;
 
+typedef struct _SHUTDOWN_CM
+{
+  unsigned char cmd;
+}ShutDownProtocol;
+
 
 typedef struct _RREMOTE_VERIFY_KEY
 {
@@ -290,6 +296,7 @@ typedef union _Data{
   RemoteVerifyKeyProtocol remote_verify_key_;
   RChargeCmdProtocol chargeCmd;
   RChargeStatusProtocol chargeStatus;
+  ShutDownProtocol shutdownCmd;
 }Data;
 
 typedef struct _AGVProtocol
@@ -352,7 +359,7 @@ unsigned int getRemoteVerifyKey(void);
 unsigned char checksum(unsigned char* ch ,int len);
 int IRQ_CH(unsigned char c);
 void CreateChargeCmd(unsigned char* ch,int *len,unsigned char cmd);
-void getChargeStatusValue(unsigned char& status);
-void CreateChargeStatus(unsigned char *ch,int *len);
+unsigned char getChargeStatusValue(void);
+void CreateShutdownCmd(unsigned char* ch,int *len,unsigned char cmd);
 
 #endif//_PROTOCOL_WANGHONGTAO_2015_01_16_

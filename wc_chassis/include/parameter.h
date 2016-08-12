@@ -69,6 +69,32 @@ typedef enum Protector_Hit_ {
   BOTH_HIT = 0x03,
 } Protector_Hit;
 
+typedef enum Relay_Cmd_ {
+  CMD_CHARGER_NONE    = 0x00,
+  CMD_CHARGER_ON      = 0x01,
+  CMD_CHARGER_OFF     = 0x02,
+  CMD_CHARGER_POWEROFF = 0x03,
+  CMD_CHARGER_MONITOR = 0x04,
+  CMD_CTRL_PWR_ON     = 0x01 << 2,
+  CMD_CTRL_PWR_OFF    = 0x02 << 2,
+  CMD_MOTOR_PWR_ON    = 0x01 << 4,
+  CMD_MOTOR_PWR_OFF   = 0x02 << 4,
+  CMD_CUSTERM_PWR_ON  = 0x01 << 6,
+  CMD_CUSTERM_PWR_OFF = 0x02 << 6,
+} Relay_Cmd;
+
+typedef enum Relay_Status_ {
+  STA_CHARGER_ON      = 0x01,
+  STA_CHARGER_OFF     = 0x02,
+  STA_CHARGER_TOUCHED = 0x03,
+  STA_CTRL_PWR_ON     = 0x01 << 2,
+  STA_CTRL_PWR_OFF    = 0x02 << 2,
+  STA_MOTOR_PWR_ON    = 0x01 << 4,
+  STA_MOTOR_PWR_OFF   = 0x02 << 4,
+  STA_CUSTERM_PWR_ON  = 0x01 << 6,
+  STA_CUSTERM_PWR_OFF = 0x02 << 6,
+} Relay_Status;
+
 extern unsigned int protector_hit;
 extern unsigned int g_dio_count ;
 extern unsigned int g_ret_count ;
@@ -96,7 +122,7 @@ extern unsigned int cur_emergency_status;
 extern double battery_full_level;
 extern double battery_empty_level;
 extern unsigned int remote_ret_;
-extern unsigned int charger_monitor_cmd_;
+extern unsigned int charger_cmd_;
 extern double charger_low_voltage_;
 extern unsigned int remote_ret_cnt_;
 extern unsigned char remote_cmd_;

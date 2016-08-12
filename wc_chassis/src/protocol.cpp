@@ -227,8 +227,9 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
             protol->data.chargeCmd.cmd = data->chargeCmd.cmd;
             protol->len = sizeof(RChargeCmdProtocol);
             break;
-        case CHARGE_STATUS:
-            break;
+        case SHUTDOWN_CMD:
+            protol->data.shutdownCmd.cmd = data->shutdownCmd.cmd;
+            protol->len = sizeof(ShutDownProtocol);
         default:
             break;
     }
@@ -309,8 +310,6 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
 #endif
             break;
         case RTIME:
-            break;
-        case CHARGE_CMD:
             break;
         case CHARGE_STATUS:
             m_charge_status = protol->data.chargeStatus.status;
@@ -512,9 +511,8 @@ void getRemote(unsigned char& cmd, unsigned short& index)
   index = m_remote_index;
 }
 
-void getChargeStatusValue(unsigned char& status){
-
-    status = m_charge_status;
+unsigned char getChargeStatusValue(){
+  return m_charge_status;
 }
 
 
@@ -543,18 +541,19 @@ void CreateChargeCmd(unsigned char* ch,int *len,unsigned char cmd){
 
   Data data;
   data.chargeCmd.cmd = cmd;
-  SInit_Proto(&sendProtocol,CHARGE_CMD);
-  Coder(ch,len,&sendProtocol,&data);
+  SInit_Proto(&sendProtocol, CHARGE_CMD);
+  Coder(ch, len, &sendProtocol, &data);
 }
 
 /*
- * 自动充电 充电状态查询
+ * 自动充电关机
  */
-void CreateChargeStatus(unsigned char *ch,int *len)
-{
-    Data data;
-    SInit_Proto(&sendProtocol,CHARGE_STATUS);
-    Coder(ch,len,&sendProtocol,&data);
+void CreateShutdownCmd(unsigned char* ch,int *len,unsigned char cmd){
+
+  Data data;
+  data.shutdownCmd.cmd = cmd;
+  SInit_Proto(&sendProtocol, SHUTDOWN_CMD);
+  Coder(ch, len, &sendProtocol, &data);
 }
 
 

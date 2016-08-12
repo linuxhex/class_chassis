@@ -31,8 +31,7 @@ ros::ServiceServer check_auto_charge_status_srv;
 ros::Subscriber    Navi_sub;
 ros::Subscriber    remote_ret_sub;
 ros::Subscriber    gyro_update_state_sub;
-ros::Subscriber    charger_monitor_sub;
-
+ros::Subscriber    shutdown_sub;
 /***
  * 初始化所有的Service和订阅服务
  */
@@ -49,9 +48,9 @@ void InitService()
     check_auto_charge_status_srv  = p_device_nh->advertiseService("auto_charge_status",&CheckAutoChargeStatus);
 
     Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
-    charger_monitor_sub = p_n->subscribe("/charger_monitor", 10, ChargerMonitorCallback);
     remote_ret_sub = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);
     gyro_update_state_sub = p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
+    shutdown_sub = p_n->subscribe("/device/shutdown", 10, ShutdownCallback);
     GAUSSIAN_INFO("[wc_chassis] init service & topic caller completed");
 
 }
