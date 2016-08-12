@@ -5,7 +5,7 @@ COPTS = [
 ]
 LINK_OPTS = []
 
-# costmap_2d
+# wc_chassis
 cc_binary(
     name = "wc_chassis",
     srcs = glob([
@@ -16,6 +16,14 @@ cc_binary(
         "wc_chassis/src/protocol.cpp",
         "wc_chassis/src/wc_chassis_mcu.cpp",
         "wc_chassis/src/main.cpp",
+        "wc_chassis/src/action.cpp",
+        "wc_chassis/src/advertise_service.cpp",
+        "wc_chassis/src/init.cpp",
+        "wc_chassis/src/parameter.cpp",
+        "wc_chassis/src/publish.cpp",
+        "wc_chassis/src/subscribe.cpp",
+        "wc_chassis/src/common_function.cpp",
+        "wc_chassis/src/schedule.cpp",
         "sdk/include/*.h",
         "sdk/include/*.hpp",
         "wc_chassis/include/*.h",

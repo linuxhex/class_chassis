@@ -175,6 +175,7 @@ extern unsigned int protector_bits;
 extern unsigned int ultrasonic_bits;
 extern double inplace_rotating_theta;
 extern bool ultrasonic_board_connection;
+extern bool on_charge; //在充电true 停止充电false
 
 extern boost::asio::io_service *p_io;
 extern boost::asio::deadline_timer *p_update_device_timer;

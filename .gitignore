@@ -1,0 +1,11 @@
+
+*.creator
+*.creator.user
+*.files
+*.includes
+*.*~
+*.config
+*.swp
+*.swo
+core
+*.autosave

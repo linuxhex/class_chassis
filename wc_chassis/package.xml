@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+  <name>wc_chassis</name>
+  <version>1.0.0</version>
+  <description>chassis node</description>
+  <maintainer email="chenkan@gs-robot.com">Cameron</maintainer>
+  <license>NO LICENSE</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>autoscrubber_services</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>autoscrubber_services</run_depend>
+</package>
+
