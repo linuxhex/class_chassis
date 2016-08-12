@@ -450,41 +450,6 @@ void WC_chassis_mcu::getUltra(void) {
     }
   }
 
-<<<<<<< HEAD
-=======
-  /*
-   *超声can连接状态预处理
-   */
-  if (!old_ultrasonic_) {
-    std::istringstream(get_key_value(g_ultrasonic[19], Ultrasonic_board)) >> std::boolalpha >> ultrasonic_board_connection;
-  }
-  /*
-   *防撞条预处理
-   */
-  if(protector_num <= 0){
-      return;
-  }
-/*
-  unsigned int status  = g_ultrasonic[0] | (protector_bits);
-  status = (status^0xffff) << (32-protector_num);
-  protector_value |= status;
-  if ((!status && protector_value) && !protector_service_call) {
-    protector_value = 1;
-  } else {
-    protector_value = status;
-  }
-  protector_service_call = 0;
-*/
-
- /*
-  if(status != 0){
-      timeval tv;
-      gettimeofday(&tv, NULL);
-      protector_start_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
-      protector_down = 1;
-  }
-  */
->>>>>>> 9bd8366dc17e6b14f71205a4597f24c95a7b4c4f
 }
 
 unsigned int WC_chassis_mcu::checkRemoteVerifyKey(unsigned int seed_key) {

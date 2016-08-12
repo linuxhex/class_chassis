@@ -25,7 +25,6 @@ ros::Publisher going_back_pub;
 ros::Publisher dio_pub;
 
 
-
 int main(int argc, char **argv) {
 
     SetSchedPriority();   //设置chassis进程运行的优先级和占用的cpu核

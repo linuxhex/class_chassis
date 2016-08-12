@@ -7,8 +7,9 @@
 void updateDeviceStatus(const boost::system::error_code& ) {
 
   /*超声can连接状处理*/
-  std::istringstream(get_key_value(g_ultrasonic[19], Ultrasonic_board)) >> std::boolalpha >> ultrasonic_board_connection;
-
+  if (!old_ultrasonic_) {
+     std::istringstream(get_key_value(g_ultrasonic[19], Ultrasonic_board)) >> std::boolalpha >> ultrasonic_board_connection;
+  }
   if(on_charge){
       unsigned int charge_ADC = (g_ultrasonic[22] << 8) | (g_ultrasonic[23] & 0xff);
     //  double charge_value = 0.2298 * (charge_ADC - 516);
