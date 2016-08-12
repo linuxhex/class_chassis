@@ -48,7 +48,7 @@ void GyroUpdateCallback(const std_msgs::UInt32& state) {
 }
 
 /*
- * 更新遥控器状态
+ *
  */
 void ShutdownCallback(const std_msgs::UInt32& cmd) {
     unsigned char shutdown = (unsigned char)cmd.data;

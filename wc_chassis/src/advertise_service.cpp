@@ -11,19 +11,6 @@
  *  自动充电 状态查询
  */
 bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,
-<<<<<<< HEAD
-                           autoscrubber_services::CheckChargeStatus::Response& res)
-{
-    if (charger_monitor_cmd_ && charge_voltage_ > charger_low_voltage_) {
-        unsigned char  status = 0;
-        g_chassis_mcu->getChargeStatus(status);
-        res.charge_status.status = status;
-        res.charge_status.value  = charge_voltage_;
-        GAUSSIAN_INFO("calling CheckAutoChargeStatus end!!!");
-        return true;
-    }
-    return false;
-=======
                            autoscrubber_services::CheckChargeStatus::Response& res) {
   unsigned char  status = g_chassis_mcu->setChargeCmd(0);
   GAUSSIAN_INFO("[CHASSIS] get raw charge status = 0x%.2x", status);
@@ -38,30 +25,14 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
   res.charge_status.value  = charge_voltage_ >= charger_low_voltage_ * 10 ? charge_voltage_ : 0;
   GAUSSIAN_INFO("[CHASSIS] get real charge status = %d, voltage = %d!!!", res.charge_status.status, res.charge_status.value);
   return true;
->>>>>>> ca9b6bcb3c9464c1debc518290abf33a832861c4
 }
 
 /*
  *  自动充电 控制命令  cmd 　01:开始自动充电  02:停止自动充电
  */
 bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
-<<<<<<< HEAD
-                      autoscrubber_services::SetChargeCmd::Response& res)
-{
-    unsigned char cmd = req.cmd.data;
-    if (1 == cmd) {
-      cmd = 3;
-      on_charge = true;
-    } else {
-      cmd = 4;
-      on_charge = false;
-    }
-    g_chassis_mcu->setChargeCmd(cmd);
-
-=======
                       autoscrubber_services::SetChargeCmd::Response& res) {
   unsigned char cmd = req.cmd.data;
-  unsigned char status;
   if (cmd == CMD_CHARGER_ON) {
     charger_cmd_ = CMD_CHARGER_ON;
     // start a thread to handle auto charger
@@ -96,7 +67,6 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
   } else {
     charger_cmd_ = CMD_CHARGER_NONE;
   }
->>>>>>> ca9b6bcb3c9464c1debc518290abf33a832861c4
   return true;
 }
 
@@ -134,18 +104,6 @@ bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
  *  提供给navigation模块，用于在判断遇到障碍物是是否是防撞条触发
  */
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
-<<<<<<< HEAD
-                          autoscrubber_services::CheckProtectorStatus::Response& res)
-{
-    if(protector_value != NONE_HIT){
-       res.protector_status.protect_status=true;
-    }else{
-       res.protector_status.protect_status=false;
-    }
-    res.protector_status.protect_value = protector_value;
-    protector_value = NONE_HIT;
-    return true;
-=======
                           autoscrubber_services::CheckProtectorStatus::Response& res){
   if(protector_value != NONE_HIT){
     res.protector_status.protect_status=true;
@@ -155,9 +113,7 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
     res.protector_status.protect_status=false;
     res.protector_status.protect_value = NONE_HIT;
   }
-  protector_service_call = 1;
   return true;
->>>>>>> ca9b6bcb3c9464c1debc518290abf33a832861c4
 }
 
 /*

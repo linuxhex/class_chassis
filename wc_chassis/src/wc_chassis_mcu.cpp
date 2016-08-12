@@ -241,16 +241,6 @@ unsigned char WC_chassis_mcu::setChargeCmd(unsigned char cmd) {
 
   CreateChargeCmd(send, &len, cmd);
 
-<<<<<<< HEAD
-//    std::string str = cComm::ByteToHexString(send, len);
-//    std::cout << "send charge cmd: " << str << std::endl;
-=======
-#ifdef DEBUG_ETHERNET
-  std::string str_send = cComm::ByteToHexString(send, len);
-  std::cout << "send charge cmd: " << str_send << std::endl;
-#endif
->>>>>>> ca9b6bcb3c9464c1debc518290abf33a832861c4
-
   if (transfer_) {
     transfer_->Send_data(send, len);
     transfer_->Read_data(rec, rlen, 12, 500);
@@ -462,17 +452,11 @@ void WC_chassis_mcu::getUltra(void) {
 #endif
   }
 
-<<<<<<< HEAD
-=======
-  // std::string str = cComm::ByteToHexString(send, len);
-  // std::cout << "send ultra: " << str << std::endl;
-
 #ifdef DEBUG_ETHERNET
   std::string str = cComm::ByteToHexString(rec, rlen);
   std::cout << "recv ultra: " << str << std::endl;
 #endif
   // std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
->>>>>>> ca9b6bcb3c9464c1debc518290abf33a832861c4
   if (rlen == 35) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
