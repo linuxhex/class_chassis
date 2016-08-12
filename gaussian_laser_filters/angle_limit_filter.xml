@@ -1,5 +1,0 @@
-<library path="lib/libangle_limit_filter">
-    <class name="gaussian_laser_filters/AngleLimitFilter" type="gaussian_laser_filters::AngleLimitFilter" base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
-        <description>Limit laser angle, and return range_max + 1 for beams that out range.</description>
-    </class>
-</library>

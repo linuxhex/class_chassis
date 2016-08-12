@@ -1,5 +1,0 @@
-<library path="lib/liblms1xx_filter">
-    <class name="gaussian_laser_filters/LMS1xxFilter" type="gaussian_laser_filters::LMS1xxFilter" base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
-        <description>Filter for lms1xx laser specific use.</description>
-    </class>
-</library>
