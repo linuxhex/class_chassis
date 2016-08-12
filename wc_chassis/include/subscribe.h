@@ -30,7 +30,7 @@
 
 extern void DoNavigationCallback(const geometry_msgs::Twist& Navigation_msg);
 extern void RemoteRetCallback(const std_msgs::UInt32& ret);
-extern void ChargerMonitorCallback(const std_msgs::UInt32& ret);
 extern void GyroUpdateCallback(const std_msgs::UInt32& state);
+extern void ShutdownCallback(const std_msgs::UInt32& cmd);
 
 #endif

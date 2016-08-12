@@ -237,25 +237,29 @@ unsigned char WC_chassis_mcu::setChargeCmd(unsigned char cmd) {
   unsigned char send[1024] = {0};
   unsigned char rec[1024]  = {0};
   int len = 0, rlen = 0;
-  unsigned char status;
+  unsigned char status = 0;
 
   CreateChargeCmd(send, &len, cmd);
 
+#ifdef DEBUG_ETHERNET
   std::string str_send = cComm::ByteToHexString(send, len);
   std::cout << "send charge cmd: " << str_send << std::endl;
+#endif
 
   if (transfer_) {
     transfer_->Send_data(send, len);
     transfer_->Read_data(rec, rlen, 12, 500);
   }
 
+#ifdef DEBUG_ETHERNET
   std::string str_rec = cComm::ByteToHexString(rec, len);
   std::cout << "recv charge status: " << str_rec << std::endl;
+#endif
 
   if (rlen == 12) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
-        getChargeStatusValue(status);
+        status = getChargeStatusValue();
       }
     }
   }
@@ -264,30 +268,26 @@ unsigned char WC_chassis_mcu::setChargeCmd(unsigned char cmd) {
 }
 
 /*
- * 获取充电状态
+ * 自动充电关机   cmd  01:关机
  */
-void WC_chassis_mcu::getChargeStatus(unsigned char& status)
-{
-    unsigned char send[1024] = {0};
-    unsigned char rec[1024]  = {0};
-    int len = 0, rlen = 0;
+void WC_chassis_mcu::setShutdownCmd(unsigned char cmd) {
+  unsigned char send[1024] = {0};
+  unsigned char rec[1024]  = {0};
+  int len = 0, rlen = 0;
 
-    CreateChargeStatus(send, &len);
+  CreateShutdownCmd(send, &len, cmd);
 
-    if (transfer_) {
-      transfer_->Send_data(send, len);
-      transfer_->Read_data(rec, rlen, 15, 500);
-    }
+#ifdef DEBUG_ETHERNET
+  std::string str_send = cComm::ByteToHexString(send, len);
+  std::cout << "send shutdown cmd: " << str_send << std::endl;
+#endif
 
-    if (rlen == 15) {
-      for (int i = 0; i < rlen; ++i) {
-        if (IRQ_CH(rec[i])) {
-            getChargeStatusValue(status);
-        }
-      }
-    }
+  if (transfer_) {
+    transfer_->Send_data(send, len);
+    transfer_->Read_data(rec, rlen, 12, 500);
+  }
 
-    usleep(1000);
+  usleep(1000);
 }
 
 int WC_chassis_mcu::V2RPM(float v)
@@ -460,8 +460,10 @@ void WC_chassis_mcu::getUltra(void) {
   // std::string str = cComm::ByteToHexString(send, len);
   // std::cout << "send ultra: " << str << std::endl;
 
-  // std::string str = cComm::ByteToHexString(rec, rlen);
-  // std::cout << "recv ultra: " << str << std::endl;
+#ifdef DEBUG_ETHERNET
+  std::string str = cComm::ByteToHexString(rec, rlen);
+  std::cout << "recv ultra: " << str << std::endl;
+#endif
   // std::cout << "recv right pos:  " << str.substr(30, 12) << std::endl;
   if (rlen == 35) {
     for (int i = 0; i < rlen; ++i) {

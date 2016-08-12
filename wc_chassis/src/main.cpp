@@ -73,7 +73,8 @@ int main(int argc, char **argv) {
       if ((time_now - last_cmd_vel_time >= max_cmd_interval) ||
           ((protector_hit & FRONT_HIT) && m_speed_v > 0.001) || 
           ((protector_hit & REAR_HIT)  && m_speed_v < -0.001) || 
-          (charger_cmd_ == CMD_CHARGER_MONITOR && current_charge_value_ > charger_low_voltage_) || charger_cmd_ == CMD_CHARGER_ON) {
+          (charger_cmd_ == CMD_CHARGER_MONITOR && current_charge_value_ > charger_low_voltage_) ||
+          charger_cmd_ == CMD_CHARGER_ON) {
         if (charger_cmd_ == CMD_CHARGER_ON || charger_cmd_ == CMD_CHARGER_MONITOR) {
           GAUSSIAN_INFO("WC CHASSIS: charge_voltage = %lf > charger_low_voltage = %lf", current_charge_value_, charger_low_voltage_); 
         }

@@ -47,3 +47,11 @@ void GyroUpdateCallback(const std_msgs::UInt32& state) {
   GAUSSIAN_INFO("[wc_chassis] set gyro state = %d", g_chassis_mcu->gyro_state_);
 }
 
+/*
+ * 更新遥控器状态
+ */
+void ShutdownCallback(const std_msgs::UInt32& cmd) {
+    unsigned char shutdown = (unsigned char)cmd.data;
+    g_chassis_mcu->setShutdownCmd(shutdown);
+    GAUSSIAN_ERROR("[wc_chassis] set shutdown cmd = %d", shutdown);
+}

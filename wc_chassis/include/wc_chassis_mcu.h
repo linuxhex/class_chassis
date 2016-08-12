@@ -37,8 +37,7 @@ class WC_chassis_mcu{
   void comunication(void);
   unsigned int checkRemoteVerifyKey(unsigned int seed_key);
   unsigned char setChargeCmd(unsigned char cmd);
-  void getChargeStatus(unsigned char &status);
-
+  void setShutdownCmd(unsigned char cmd);
 
   int V2RPM(float v);
   int GetCopleySpeed(float v);
