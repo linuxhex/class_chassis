@@ -23,9 +23,8 @@ ros::Publisher rotate_finished_pub;
 ros::Publisher protector_pub;
 ros::Publisher going_back_pub;
 ros::Publisher dio_pub;
-ros::Publisher gyro_roll_pub;
-ros::Publisher gyro_pitch_pub;
-ros::Publisher gyro_yaw_pub;
+ros::Publisher gyro_value_pub;
+
 
 
 int main(int argc, char **argv) {
@@ -45,9 +44,7 @@ int main(int argc, char **argv) {
     protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
     going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
     dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
-    gyro_roll_pub   = p_device_nh->advertise<std_msgs::Float32>("roll_value", 50);
-    gyro_pitch_pub  = p_device_nh->advertise<std_msgs::Float32>("pitch_value", 50);
-    gyro_yaw_pub    = p_device_nh->advertise<std_msgs::Float32>("yaw_value", 50);
+    gyro_value_pub   = p_device_nh->advertise<autoscrubber_services::gyroValue>("gyro_value", 50);
 
     for(int i=0;i<15;i++){
       if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
@@ -101,9 +98,7 @@ int main(int argc, char **argv) {
     PublishOdom(p_odom_broadcaster,odom_pub);
     PublishYaw(yaw_pub);
     PublishGyro(gyro_pub);
-    PublishGyroPitch(gyro_pitch_pub);
-    PublishGyroRoll(gyro_roll_pub);
-    PublishGyroYaw(gyro_yaw_pub);
+    PublishGyroValue(gyro_value_pub);
     PublishUltrasonic(ultrasonic_pub);
     publish_protector_status(protector_pub);
     ros::spinOnce();
