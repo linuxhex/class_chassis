@@ -62,8 +62,8 @@ void chargealueManage(void)
 */
 void updateDeviceStatusThread(void)
 {
+  g_chassis_mcu->getUltra();
   while(1){
-      g_chassis_mcu->getUltra();
       /*超声can连接状处理*/
       if (!old_ultrasonic_) {
          std::istringstream(get_key_value(g_ultrasonic[19], Ultrasonic_board)) >> std::boolalpha >> ultrasonic_board_connection;
