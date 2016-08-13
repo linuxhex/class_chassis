@@ -43,7 +43,7 @@ unsigned int remote_ret_cnt_ = 0;
 unsigned char remote_cmd_    = 0;
 unsigned short remote_index_ = 0;
 pthread_mutex_t speed_mutex;
-std::vector<int> g_ultrasonic;
+std::vector<int> g_ultrasonic(24);
 std::vector<unsigned int> front_protector_list;
 std::vector<unsigned int> rear_protector_list;
 unsigned int connection_status = 1; // mcu ethernet connection status: 0>bad 1>good
@@ -88,7 +88,11 @@ std::string router_ip = std::string("10.7.5.1");
 std::string laser_ip = std::string("10.7.5.100");
 std::string laser_connection_status = std::string("true");
 std::string router_connection_status = std::string("true");
-std::thread *checkConnectionThread;
+
+std::thread *p_checkConnectionThread;
+std::thread *p_updateDeviceStatusThread;
+
+
 std::string *ultrasonic;
 std::string *special_ultrasonic;
 float special_ultrasonic_offset_dismeter;
@@ -96,6 +100,4 @@ unsigned int protector_value = NONE_HIT; //防撞条的值．0:表示防撞条�
 double protector_hit_time = 0;  //防撞条触发开始时间
 bool ultrasonic_board_connection = true; //true:超声转接板连接正常
 bool on_charge = false; //在充电true 停止充电false
-//定时调度任务
-boost::asio::io_service *p_io;
-boost::asio::deadline_timer *p_update_device_timer;
+

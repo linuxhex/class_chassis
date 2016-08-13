@@ -124,9 +124,7 @@ void InitParameter()
     }
 
     pthread_mutex_init(&speed_mutex, NULL);
-    checkConnectionThread  = new std::thread(checkConnectionHealthThread);
-    checkConnectionThread->detach();
-    sleep(2);
+
     g_chassis_mcu->Init(host_name, std::to_string(port),f_dia, b_dia, axle,
                         timeWidth, counts, reduction_ratio, speed_ratio,
                         max_speed_v, max_speed_w, speed_v_acc, speed_v_dec,
@@ -164,15 +162,15 @@ void InitDevice(void)
   GAUSSIAN_INFO("[wc_chassis] init device completed");
 }
 
-/* schedule任务初始化 */
+/* 多线程任务初始化 */
 void InitSchedule(void)
 {
-    p_io = new boost::asio::io_service();
+    p_checkConnectionThread    = new std::thread(checkConnectionHealthThread);
+    p_checkConnectionThread->detach();
 
-    p_update_device_timer = new boost::asio::deadline_timer(*p_io,boost::posix_time::seconds(0.1));
-    p_update_device_timer->async_wait(&updateDeviceStatus);
+    p_updateDeviceStatusThread = new std::thread(updateDeviceStatusThread);
+    p_updateDeviceStatusThread->detach();
 
-    p_io->run();
     GAUSSIAN_INFO("[wc_chassis] init schedule completed");
 
 }

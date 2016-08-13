@@ -85,65 +85,27 @@ unsigned int GenerateJSHash(unsigned int seed) {
 }
 #endif
 
-/*
- * ping ip
-*/
-bool ping(const char* ip) {
-    int status, ping_ret;
-    status = system((std::string("ping -w 1 ") + std::string(ip)).c_str());
-    if (-1 != status) {
-        ping_ret = WEXITSTATUS(status);
-        if (0 == ping_ret) {
-            return true;
-        } else if (1 == ping_ret) {
-            return false;
-        } else {
-            GAUSSIAN_ERROR("[chassis] unknown ping status:%d", ping_ret);
-            return false;
-        }
-    } else {
-        GAUSSIAN_ERROR("[chassis] ping program can not use");
-        return false;
-    }
-}
-
-/*
- * 检测激光＋路由器网关口连接状态
-*/
-void checkConnectionHealthThread(void) {
-
-    while(1){
-        if(!ping(laser_ip.c_str()) || !ping(router_ip.c_str())){
-            sleep(3);
-            if(!ping(laser_ip.c_str())){
-                laser_connection_status = std::string("false");
-            }
-            if(!ping(router_ip.c_str())){
-                router_connection_status = std::string("false");
-            }
-        }else{
-          laser_connection_status = std::string("true");
-          router_connection_status = std::string("true");
-        }
-        sleep(20);
-    }
-}
 
 void freeResource(void){
 
   std::stringstream ss;
   std::string str;
-  ss << checkConnectionThread->get_id();
+  ss << p_checkConnectionThread->get_id();
   ss >> str;
   GAUSSIAN_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
-  delete checkConnectionThread;
+
+  ss << p_updateDeviceStatusThread->get_id();
+  ss >> str;
+  GAUSSIAN_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
+
+  delete p_checkConnectionThread;
+  delete p_updateDeviceStatusThread;
   delete g_chassis_mcu;
   delete p_odom_broadcaster;
   delete p_n;
   delete p_nh;
   delete p_device_nh;
   delete p_loop_rate;
-  delete p_io;
-  delete p_update_device_timer;
+
   ros::shutdown();
 }
