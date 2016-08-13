@@ -4,5 +4,6 @@
 #include "parameter.h"
 void updateDeviceStatusThread(void);
 bool ping(const char*);
+void protectorManage(void);
 void checkConnectionHealthThread(void);
 #endif // SCHEDULE_H

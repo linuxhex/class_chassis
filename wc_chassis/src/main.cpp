@@ -58,7 +58,6 @@ int main(int argc, char **argv) {
    while (ros::ok()) {
     g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
     g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
-    g_chassis_mcu->getUltra();
 
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
@@ -71,8 +70,8 @@ int main(int argc, char **argv) {
           ((protector_hit & REAR_HIT)  && m_speed_v < -0.001) || 
           (charger_cmd_ == CMD_CHARGER_MONITOR && current_charge_value_ > charger_low_voltage_) ||
            charger_cmd_ == CMD_CHARGER_ON) {
-        if (charger_cmd_ == CMD_CHARGER_ON || charger_cmd_ == CMD_CHARGER_MONITOR) {
-          GAUSSIAN_INFO("WC CHASSIS: charge_voltage = %lf > charger_low_voltage = %lf", current_charge_value_, charger_low_voltage_); 
+            if (charger_cmd_ == CMD_CHARGER_ON || charger_cmd_ == CMD_CHARGER_MONITOR) {
+              GAUSSIAN_INFO("WC CHASSIS: charge_voltage = %lf > charger_low_voltage = %lf", current_charge_value_, charger_low_voltage_);
         }
         g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
       } else {
