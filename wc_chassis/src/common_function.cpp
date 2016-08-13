@@ -36,7 +36,6 @@ bool ReadConfigFromParams(std::string param_name, ros::NodeHandle* nh, std::vect
       GAUSSIAN_ERROR("[CHASSIS] %s: config_list param's type is not Array!", param_name.c_str());
     }
   }
-
   return false;
 }
 

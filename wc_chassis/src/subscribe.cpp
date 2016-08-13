@@ -15,16 +15,7 @@ void DoNavigationCallback(const geometry_msgs::Twist& Navigation_msg) {
 
   m_speed_v = Navigation_msg.linear.x;
   m_speed_w = Navigation_msg.angular.z;
-  pthread_mutex_lock(&speed_mutex);
-  double temp_v = Navigation_msg.linear.x;
-  double temp_w = -1 * Navigation_msg.angular.z;
-  int temp_v_index = (current_v_index + 1) % 3;
-  int temp_w_index = (current_w_index + 1) % 3;
-  g_speed_v[temp_v_index] = static_cast<float>(temp_v);
-  g_speed_w[temp_w_index] = static_cast<float>(temp_w);
-  current_v_index = temp_v_index;
-  current_w_index = temp_w_index;
-  pthread_mutex_unlock(&speed_mutex);
+
 }
 
 /*
