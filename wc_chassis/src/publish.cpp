@@ -236,3 +236,21 @@ void PublishYaw(ros::Publisher &yaw_pub){
   yaw_pub.publish(msg);
 }
 
+void PublishGyroPitch(ros::Publisher &gyro_pitch_pub)
+{
+  std_msgs::Float32 msg;
+  msg.data = g_chassis_mcu->pitch_angle_;
+  gyro_pitch_pub.publish(msg);
+}
+void PublishGyroRoll(ros::Publisher &gyro_roll_pub)
+{
+  std_msgs::Float32 msg;
+  msg.data = g_chassis_mcu->roll_angle_;
+  gyro_roll_pub.publish(msg);
+}
+void PublishGyroYaw(ros::Publisher &gyro_yaw_pub)
+{
+  std_msgs::Float32 msg;
+  msg.data = g_chassis_mcu->yaw_angle_;
+  gyro_yaw_pub.publish(msg);
+}

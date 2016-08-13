@@ -37,4 +37,9 @@
  void PublishGyro(ros::Publisher &gyro_pub);
  void publish_protector_status(ros::Publisher &protector_pub);
  void UpdateDeviceStatus(void);
+
+ void PublishGyroPitch(ros::Publisher &gyro_pitch_pub);
+ void PublishGyroRoll(ros::Publisher &gyro_roll_pub);
+ void PublishGyroYaw(ros::Publisher &gyro_yaw_pub);
+
 #endif
