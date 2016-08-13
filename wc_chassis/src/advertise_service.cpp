@@ -12,19 +12,11 @@
  */
 bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,
                            autoscrubber_services::CheckChargeStatus::Response& res) {
-  unsigned char  status = g_chassis_mcu->setChargeCmd(0);
-  GAUSSIAN_INFO("[CHASSIS] get raw charge status = 0x%.2x", status);
-  if ((status & 0x03) == STA_CHARGER_ON) {
-    status = STA_CHARGER_ON;
-  } if (charge_voltage_ >= charger_low_voltage_) {
-    status = STA_CHARGER_TOUCHED;
-  } else {
-    status = STA_CHARGER_OFF;
-  }
-  res.charge_status.status = status;
-  res.charge_status.value  = charge_voltage_ >= charger_low_voltage_ * 10 ? charge_voltage_ : 0;
-  GAUSSIAN_INFO("[CHASSIS] get real charge status = %d, voltage = %d!!!", res.charge_status.status, res.charge_status.value);
-  return true;
+    res.charge_status.status = charger_status_;
+    res.charge_status.value  = charger_voltage_ >= charger_low_voltage_ ? (short)(charger_voltage_ * 10) : 0;
+    GAUSSIAN_INFO("[CHASSIS] get real charge status = %d, value = %d, raw_voltage = %lf!!!",
+                   res.charge_status.status, res.charge_status.value, charger_voltage_);
+    return true;
 }
 
 /*
@@ -37,13 +29,13 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
     charger_cmd_ = CMD_CHARGER_ON;
     // start a thread to handle auto charger
     std::thread([&](){
-      GAUSSIAN_INFO("[CHASSIS] start to check charger volatage = %d", charge_voltage_);
+      GAUSSIAN_INFO("[CHASSIS] start to check charger volatage = %d", charger_voltage_);
       sleep(3);
       unsigned int sleep_cnt = 0;
       unsigned int check_charger_cnt = 0;
       while(++sleep_cnt  < 100 && charger_cmd_ == CMD_CHARGER_ON) {
-       GAUSSIAN_INFO("[CHASSIS] checking charger volatage = %d", charge_voltage_);
-       if (charge_voltage_ >= charger_low_voltage_) {
+       GAUSSIAN_INFO("[CHASSIS] checking charger volatage = %d", charger_voltage_);
+       if (charger_voltage_ >= charger_low_voltage_) {
          ++check_charger_cnt;
        } else {
          check_charger_cnt = 0;

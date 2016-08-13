@@ -168,8 +168,8 @@ void InitSchedule(void)
     p_checkConnectionThread    = new std::thread(checkConnectionHealthThread);
     p_checkConnectionThread->detach();
 
-    p_updateDeviceStatusThread = new std::thread(updateDeviceStatusThread);
-    p_updateDeviceStatusThread->detach();
+//    p_updateDeviceStatusThread = new std::thread(updateDeviceStatusThread);
+//    p_updateDeviceStatusThread->detach();
 
     GAUSSIAN_INFO("[wc_chassis] init schedule completed");
 

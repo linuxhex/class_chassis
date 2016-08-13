@@ -15,7 +15,6 @@ void DoNavigationCallback(const geometry_msgs::Twist& Navigation_msg) {
 
   m_speed_v = Navigation_msg.linear.x;
   m_speed_w = Navigation_msg.angular.z;
-
 }
 
 /*
@@ -39,9 +38,10 @@ void GyroUpdateCallback(const std_msgs::UInt32& state) {
 }
 
 /*
- *
+ * 通知下位机，关闭除了充电外的所有继电器
  */
-void ShutdownCallback(const std_msgs::UInt32& cmd) {
+void ShutdownCallback(const std_msgs::UInt32& cmd)
+{
     unsigned char shutdown = (unsigned char)cmd.data;
     g_chassis_mcu->setShutdownCmd(shutdown);
     GAUSSIAN_ERROR("[wc_chassis] set shutdown cmd = %d", shutdown);

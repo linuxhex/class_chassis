@@ -41,6 +41,8 @@ unsigned int remote_ret_     = 0x0a00;
 unsigned int charger_cmd_    = CMD_CHARGER_NONE;
 unsigned int remote_ret_cnt_ = 0;
 unsigned char remote_cmd_    = 0;
+unsigned int charger_status_ = STA_CHARGER_OFF;
+unsigned int relay_status_ = 0;
 unsigned short remote_index_ = 0;
 pthread_mutex_t speed_mutex;
 std::vector<int> g_ultrasonic(24);
@@ -51,9 +53,10 @@ int battery_count = -1;
 int charge_count = -1;
 int display_battery_capacity = 0;
 int sum_battery_capacity = 0;
-int sum_charge_voltage = 0;
 
 unsigned int protector_hit;
+double battery_value_ = 0.0;
+double sum_battery_value_ = 0.0;
 
 //超声可配的比较
 std::string ultrasonic_str[] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
@@ -76,8 +79,8 @@ double full_speed;  //满转速度
 int delta_counts_th; //满盘变化阀值（用于码盘防抖动）
 int remote_speed_level_ = 0; //遥控器控制速度等级
 int battery_level_ = 3;
-short charge_voltage_ = 0;
 double current_charge_value_ = 0.0;
+double charger_voltage_ = 0;
 double charger_low_voltage_ = 0.0;
 int remote_id = 1;
 int protector_num = 8; //防撞条个数
@@ -90,14 +93,16 @@ std::string laser_connection_status = std::string("true");
 std::string router_connection_status = std::string("true");
 
 std::thread *p_checkConnectionThread;
-std::thread *p_updateDeviceStatusThread;
+//std::thread *p_updateDeviceStatusThread;
 
 
 std::string *ultrasonic;
 std::string *special_ultrasonic;
 float special_ultrasonic_offset_dismeter;
 unsigned int protector_value = NONE_HIT; //防撞条的值．0:表示防撞条没有被触发　!0:表示防撞条被触发
-double protector_hit_time = 0;  //防撞条触发开始时间
 bool ultrasonic_board_connection = true; //true:超声转接板连接正常
+double protector_hit_time = 0.0;  //防撞条触发开始时间
 bool on_charge = false; //在充电true 停止充电false
+double charge_on_time_ = 0.0; //检测到充电条电压正常的时间
+double go_forward_start_time_ = 0.0; //初始化的时候，检测到正在充电或在充电条上，机器人向前走2s
 

@@ -105,6 +105,8 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
 //    double battery_value = 0.2298 * (battery_ADC - 516);
 //    double battery_value = 0.2352 * (battery_ADC - 507);
     double battery_value = 0.2318 * (battery_ADC - 516);
+    battery_value = battery_value < 0.0 ? 0.0 : battery_value;
+    battery_value = battery_value > 35.0 ? 0.0 : battery_value;
     int current_battery_capacity;
     current_battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
     if(current_battery_capacity < 0) current_battery_capacity = 0;
@@ -112,13 +114,17 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
     // do battery voltage filter
     ++battery_count;
     if(battery_count == 0) {
+      battery_value_ = battery_value;
       display_battery_capacity = current_battery_capacity;
     } else if(battery_count > 0) {
       sum_battery_capacity += current_battery_capacity;
+      sum_battery_value_ += battery_value;
       if(battery_count == 300) {
         display_battery_capacity = sum_battery_capacity / 300;
+        battery_value_ = sum_battery_value_ / 300;
         battery_count = 0;
         sum_battery_capacity = 0;
+        sum_battery_value_ = 0.0;
       }
     }
 
@@ -132,15 +138,30 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
       battery_level_ = 3;
     }
 
-    GAUSSIAN_INFO("[wc_chassis] battery_ADC: %d; battery_value: %lf;display_battery_capacity: %d; battery_level_: %d",
-                  battery_ADC, battery_value, display_battery_capacity, battery_level_);
+    GAUSSIAN_INFO("[wc_chassis] battery_ADC: %d; battery_value: %lf;display_battery_capacity: %d; battery_level_: %d", battery_ADC, battery_value, display_battery_capacity, battery_level_);
 //    std::cout << "battery_ADC " << battery_ADC << "; battery_value " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << " battery_level_" << battery_level_ << std::endl;
     device_value.key = std::string("battery");
     device_value.value = std::to_string(display_battery_capacity);
     device_status.values.push_back(device_value);
 
+    device_value.key = std::string("battery_voltage");
+    device_value.value = std::to_string(battery_value_);
+    device_status.values.push_back(device_value);
+
+    device_value.key = std::string("charger_status");
+    if (charger_status_ == STA_CHARGER_ON) {
+       device_value.value = std::string("true");
+    } else {
+       device_value.value = std::string("false");
+    }
+    device_status.values.push_back(device_value);
+
+    device_value.key = std::string("charger_voltage");
+    device_value.value = std::to_string(charger_voltage_);
+    device_status.values.push_back(device_value);
+
     device_value.key = std::string("mileage");
-    unsigned int mileage = (unsigned int)((g_chassis_mcu->mileage_left_ + g_chassis_mcu->mileage_left_) / 2);
+    double mileage = (g_chassis_mcu->mileage_left_ + g_chassis_mcu->mileage_left_) / 2;
     device_value.value = std::to_string(mileage);
     device_status.values.push_back(device_value);
 

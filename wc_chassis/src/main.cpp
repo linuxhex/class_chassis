@@ -62,24 +62,33 @@ int main(int argc, char **argv) {
     g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
     g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
     g_chassis_mcu->getUltra();
-
+    updateDeviceStatus();
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
     if(start_rotate_flag) {
-      DoRotate(rotate_finished_pub);
+        if (charger_voltage_ > charger_low_voltage_) {
+             go_forward_start_time_ = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+         } else {
+             go_forward_start_time_ = time_now + 1.0;
+         }
+        if (time_now - go_forward_start_time_ > -0.0001 && time_now - go_forward_start_time_ < 1.0 && !(protector_hit & FRONT_HIT)) {
+            g_chassis_mcu->setTwoWheelSpeed(0.15, 0.0);
+         } else {
+            DoRotate(rotate_finished_pub);
+         }
     } else {
       if ((time_now - last_cmd_vel_time >= max_cmd_interval) ||
           ((protector_hit & FRONT_HIT) && m_speed_v > 0.001) || 
           ((protector_hit & REAR_HIT)  && m_speed_v < -0.001) || 
-          (charger_cmd_ == CMD_CHARGER_MONITOR && current_charge_value_ > charger_low_voltage_) ||
-           charger_cmd_ == CMD_CHARGER_ON) {
-            if (charger_cmd_ == CMD_CHARGER_ON || charger_cmd_ == CMD_CHARGER_MONITOR) {
-              GAUSSIAN_INFO("WC CHASSIS: charge_voltage = %lf > charger_low_voltage = %lf", current_charge_value_, charger_low_voltage_);
-        }
+          ((charger_status_ == STA_CHARGER_ON || charger_status_ == STA_CHARGER_TOUCHED) && m_speed_v < -0.001)) {
         g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
       } else {
-        g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
+          if (charger_status_ == STA_CHARGER_ON && m_speed_v > 0.001) {
+                 charger_cmd_ = CMD_CHARGER_OFF;
+                 g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+               }
+          g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
       }
     }
 

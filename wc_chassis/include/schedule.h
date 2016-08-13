@@ -5,5 +5,6 @@
 void updateDeviceStatusThread(void);
 bool ping(const char*);
 void protectorManage(void);
+void chargeValueManage(void);
 void checkConnectionHealthThread(void);
 #endif // SCHEDULE_H
