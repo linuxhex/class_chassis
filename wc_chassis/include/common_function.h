@@ -12,8 +12,6 @@
 #define SETTING_PRIORITY
 
 unsigned int GenerateJSHash(unsigned int);
-bool ping(const char*);
-void checkConnectionHealthThread(void);
 std::string get_key_value(int, int);
 void freeResource(void);
 void SetSchedPriority(void);

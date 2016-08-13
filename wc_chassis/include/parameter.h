@@ -166,8 +166,8 @@ extern std::string router_ip;
 extern std::string laser_ip;
 extern std::string laser_connection_status;
 extern std::string router_connection_status;
-extern std::thread *checkConnectionThread;
-
+extern std::thread *p_checkConnectionThread;
+extern std::thread *p_updateDeviceStatusThread;
 extern unsigned int protector_value;
 extern double protector_hit_time;
 extern int protector_num;
@@ -177,7 +177,5 @@ extern double inplace_rotating_theta;
 extern bool ultrasonic_board_connection;
 extern bool on_charge; //在充电true 停止充电false
 
-extern boost::asio::io_service *p_io;
-extern boost::asio::deadline_timer *p_update_device_timer;
 
 #endif
