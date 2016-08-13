@@ -143,6 +143,7 @@ void InitDevice(void)
   unsigned int check_key = GenerateJSHash(seed_key);
   unsigned int verify_key = g_chassis_mcu->checkRemoteVerifyKey(seed_key);
   if (check_key != verify_key) {
+    GAUSSIAN_INFO("[wc_chassis] VERIFY_REMOTE_KEY is not correct!!!");
     exit(0);
   }
 #endif
@@ -167,12 +168,7 @@ void InitSchedule(void)
 {
     p_checkConnectionThread    = new std::thread(checkConnectionHealthThread);
     p_checkConnectionThread->detach();
-
-//    p_updateDeviceStatusThread = new std::thread(updateDeviceStatusThread);
-//    p_updateDeviceStatusThread->detach();
-
     GAUSSIAN_INFO("[wc_chassis] init schedule completed");
-
 }
 
 /* chassis的初始化*/
