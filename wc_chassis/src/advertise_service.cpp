@@ -28,7 +28,7 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
   if (cmd == CMD_CHARGER_ON) {
     if(charger_cmd_ == CMD_CHARGER_ON){
         GAUSSIAN_INFO("[CHASSIS] current state = CMD_CHARGER_ON");
-　　　　　return true;
+        return true;
     }
      charger_cmd_ = CMD_CHARGER_ON;
     // start a thread to handle auto charger

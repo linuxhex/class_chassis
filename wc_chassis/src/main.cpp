@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
     protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
     going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
     dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
-    gyro_value_pub   = p_device_nh->advertise<autoscrubber_services::gyroValue>("gyro_value", 50);
+    gyro_value_pub  = p_device_nh->advertise<autoscrubber_services::gyroValue>("gyro_value", 50);
 
     for(int i=0;i<15;i++){
       if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
