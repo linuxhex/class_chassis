@@ -26,26 +26,31 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
                       autoscrubber_services::SetChargeCmd::Response& res) {
   unsigned char cmd = req.cmd.data;
   if (cmd == CMD_CHARGER_ON) {
-    charger_cmd_ = CMD_CHARGER_ON;
+    if(charger_cmd_ == CMD_CHARGER_ON){
+        GAUSSIAN_INFO("[CHASSIS] current state = CMD_CHARGER_ON");
+　　　　　return true;
+    }
+     charger_cmd_ = CMD_CHARGER_ON;
     // start a thread to handle auto charger
     std::thread([&](){
       GAUSSIAN_INFO("[CHASSIS] start to check charger volatage = %d", charger_voltage_);
       sleep(3);
       unsigned int sleep_cnt = 0;
       unsigned int check_charger_cnt = 0;
-      while(++sleep_cnt  < 100 && charger_cmd_ == CMD_CHARGER_ON) {
+      while(++sleep_cnt  < 60 && charger_cmd_ == CMD_CHARGER_ON) {
        GAUSSIAN_INFO("[CHASSIS] checking charger volatage = %d", charger_voltage_);
        if (charger_voltage_ >= charger_low_voltage_) {
          ++check_charger_cnt;
        } else {
          check_charger_cnt = 0;
        }
-       if (check_charger_cnt > 30 && charger_cmd_ == CMD_CHARGER_ON) {
+       if (check_charger_cnt > 5 && charger_cmd_ == CMD_CHARGER_ON) {
          GAUSSIAN_INFO("[CHASSIS] check charger voltage normal > 30s, set charger relay on!!!");
          g_chassis_mcu->setChargeCmd(CMD_CHARGER_ON);
          break;
        }
         sleep(1);
+        charger_cmd_ = CMD_CHARGER_NONE;
       }
     }).detach();
 

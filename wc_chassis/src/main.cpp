@@ -69,6 +69,8 @@ int main(int argc, char **argv) {
     if(start_rotate_flag) {
         if (charger_voltage_ > charger_low_voltage_) {
              go_forward_start_time_ = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+             charger_cmd_ = CMD_CHARGER_OFF;
+             g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
          } else {
              go_forward_start_time_ = time_now + 1.0;
          }

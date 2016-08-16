@@ -49,7 +49,7 @@ void chargeValueManage(void)
     unsigned int charge_ADC = (g_ultrasonic[22] << 8) | (g_ultrasonic[23] & 0xff);
     //  double current_charge_voltage = 0.2298 * (charge_ADC - 516);
     //  double current_charge_voltage = 0.2352 * (charge_ADC - 507);
-    double current_charge_voltage = 0.2318 * (charge_ADC - 512);
+    double current_charge_voltage = 0.2398 * (charge_ADC - 512);
     current_charge_voltage = current_charge_voltage < 10.0 ? 0.0 : current_charge_voltage;
     current_charge_voltage = current_charge_voltage > 50.0 ? 0.0 : current_charge_voltage;
     if (charger_cmd_ == CMD_CHARGER_MONITOR && charger_voltage_ < charger_low_voltage_ && current_charge_voltage > charger_low_voltage_) {
@@ -175,12 +175,7 @@ void freeResource(void){
   ss >> str;
   GAUSSIAN_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
 
-//  ss << p_updateDeviceStatusThread->get_id();
-//  ss >> str;
-//  GAUSSIAN_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
-
   delete p_checkConnectionThread;
-  //delete p_updateDeviceStatusThread;
   delete g_chassis_mcu;
   delete p_odom_broadcaster;
   delete p_n;

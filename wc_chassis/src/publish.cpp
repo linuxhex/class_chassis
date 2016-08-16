@@ -104,7 +104,7 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
     unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
 //    double battery_value = 0.2298 * (battery_ADC - 516);
 //    double battery_value = 0.2352 * (battery_ADC - 507);
-    double battery_value = 0.2318 * (battery_ADC - 516);
+    double battery_value = 0.2460 * (battery_ADC - 516);
     battery_value = battery_value < 0.0 ? 0.0 : battery_value;
     battery_value = battery_value > 35.0 ? 0.0 : battery_value;
     int current_battery_capacity;
