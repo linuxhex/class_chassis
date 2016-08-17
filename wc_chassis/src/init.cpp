@@ -47,10 +47,10 @@ void InitService()
     auto_charge_cmd_srv           = p_device_nh->advertiseService("auto_charge_cmd",&SetAutoChargeCmd);
     check_auto_charge_status_srv  = p_device_nh->advertiseService("auto_charge_status",&CheckAutoChargeStatus);
 
-    Navi_sub = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
-    remote_ret_sub = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);
+    Navi_sub              = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
+    remote_ret_sub        = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);
     gyro_update_state_sub = p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
-    shutdown_sub = p_n->subscribe("/device/shutdown", 10, ShutdownCallback);
+    shutdown_sub          = p_n->subscribe("/device/shutdown", 10, ShutdownCallback);
     GAUSSIAN_INFO("[wc_chassis] init service & topic caller completed");
 
 }
@@ -113,6 +113,7 @@ void InitParameter()
     p_nh->param("charger_low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化旋转速度
     p_nh->param("new_hand_touch", new_hand_touch_, false);//新板子手触开关和防撞条共用一个接口
     p_nh->param("old_ultrasonic", old_ultrasonic_, false);//旧板子里面没有超声板状态
+    p_nh->param("charger_delay_time",charger_delay_time_,30);//充电继电器打开延时时间
 
     // 前面防撞条配置
     if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {

@@ -44,14 +44,14 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
        } else {
          check_charger_cnt = 0;
        }
-       if (check_charger_cnt > 5 && charger_cmd_ == CMD_CHARGER_ON) {
+       if (check_charger_cnt > charger_delay_time_ && charger_cmd_ == CMD_CHARGER_ON) {
          GAUSSIAN_INFO("[CHASSIS] check charger voltage normal > 30s, set charger relay on!!!");
          g_chassis_mcu->setChargeCmd(CMD_CHARGER_ON);
          break;
        }
         sleep(1);
-        charger_cmd_ = CMD_CHARGER_NONE;
       }
+      charger_cmd_ = CMD_CHARGER_NONE;
     }).detach();
 
   } else if (cmd == CMD_CHARGER_OFF) {

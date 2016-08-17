@@ -105,4 +105,4 @@ double protector_hit_time = 0.0;  //防撞条触发开始时间
 bool on_charge = false; //在充电true 停止充电false
 double charge_on_time_ = 0.0; //检测到充电条电压正常的时间
 double go_forward_start_time_ = 0.0; //初始化的时候，检测到正在充电或在充电条上，机器人向前走2s
-
+int charger_delay_time_ = 30; //充电继电器打开延时时间，默认值30秒

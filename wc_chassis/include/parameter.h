@@ -182,6 +182,6 @@ extern double sum_battery_value_;
 extern double charge_on_time_;
 extern double go_forward_start_time_;
 extern double protector_hit_time;  //防撞条触发开始时间
-
+extern int charger_delay_time_;
 
 #endif

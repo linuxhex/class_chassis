@@ -59,12 +59,20 @@ int main(int argc, char **argv) {
    timeval tv;
     /*********************************  主循环  ******************************/
    while (ros::ok()) {
+
     g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
     g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
     g_chassis_mcu->getUltra();
+
     updateDeviceStatus();
+
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+
+    //超过１秒，自动清除给导航的状态
+    if((protector_value != NONE_HIT) && (time_now - protector_hit_time > max_cmd_interval)){
+      protector_value = NONE_HIT;
+    }
 
     if(start_rotate_flag) {
         if (charger_voltage_ > charger_low_voltage_) {
