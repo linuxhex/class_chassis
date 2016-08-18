@@ -36,7 +36,7 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
       GAUSSIAN_INFO("[CHASSIS] start to check charger volatage = %d", charger_voltage_);
       sleep(3);
       unsigned int sleep_cnt = 0;
-      unsigned int check_charger_cnt = 0;
+      int check_charger_cnt = 0;
       while(++sleep_cnt  < 60 && charger_cmd_ == CMD_CHARGER_ON) {
        GAUSSIAN_INFO("[CHASSIS] checking charger volatage = %d", charger_voltage_);
        if (charger_voltage_ >= charger_low_voltage_) {
