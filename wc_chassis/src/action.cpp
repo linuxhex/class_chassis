@@ -8,7 +8,7 @@
  * 初始化　旋转操作
  */
 bool DoRotate(ros::Publisher &rotate_finished_pub) {
-  if (fabs(g_chassis_mcu->acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) ) {
+   if (fabs(g_chassis_mcu->acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) || rotate_angle == 0) {
     start_rotate_flag = false;
     is_rotate_finished = true;
     g_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
@@ -20,19 +20,23 @@ bool DoRotate(ros::Publisher &rotate_finished_pub) {
     gettimeofday(&tv, NULL);
     last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
   } else {
-    is_rotate_finished = false;
-    if (rotate_angle > 0) {
-      g_chassis_mcu->setTwoWheelSpeed(0.0, inplace_rotating_theta);
-    } else if (rotate_angle < 0) {
-      g_chassis_mcu->setTwoWheelSpeed(0.0, - inplace_rotating_theta);
-    } else {
-      is_rotate_finished = true;
-      start_rotate_flag = false;
-      std_msgs::Int32 msg;
-      msg.data = 1;
-      rotate_finished_pub.publish(msg);
-      g_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
-    }
+       is_rotate_finished = false;
+       int remain_angle = fabs(rotate_angle) - fabs(g_chassis_mcu->acc_odom_theta_) / M_PI *180;
+       if(remain_angle < 20){
+         double speed_w = remain_angle / 20.0 * inplace_rotating_theta;
+         speed_w = (speed_w < 0.10) ? 0.10 : speed_w;
+         if (rotate_angle > 0) {
+           g_chassis_mcu->setTwoWheelSpeed(0.0, speed_w);
+         }else{
+           g_chassis_mcu->setTwoWheelSpeed(0.0, -speed_w);
+         }
+       } else {
+         if(rotate_angle > 0) {
+           g_chassis_mcu->setTwoWheelSpeed(0.0, inplace_rotating_theta);
+         } else {
+           g_chassis_mcu->setTwoWheelSpeed(0.0, -inplace_rotating_theta);
+         }
+       }
   }
   return true;
 }
