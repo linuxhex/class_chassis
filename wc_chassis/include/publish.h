@@ -37,7 +37,5 @@
  void PublishGyro(ros::Publisher &gyro_pub);
  void publish_protector_status(ros::Publisher &protector_pub);
  void UpdateDeviceStatus(void);
-
- void PublishGyroValue(ros::Publisher &gyro_value_pub);
-
+ void publish_protector_value(ros::Publisher &protector_pub);
 #endif

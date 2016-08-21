@@ -24,7 +24,7 @@ ros::Publisher protector_pub;
 ros::Publisher going_back_pub;
 ros::Publisher dio_pub;
 ros::Publisher gyro_value_pub;
-
+ros::Publisher protector_value_pub;
 
 
 int main(int argc, char **argv) {
@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
     going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
     dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
     gyro_value_pub  = p_device_nh->advertise<autoscrubber_services::gyroValue>("gyro_value", 50);
-
+    protector_value_pub   = p_device_nh->advertise<std_msgs::UInt32>("protector_status", 50);
     for(int i=0;i<15;i++){
       if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
         ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
@@ -83,11 +83,12 @@ int main(int argc, char **argv) {
             DoRotate(rotate_finished_pub);
          }
     } else {
-      if ((time_now - last_cmd_vel_time >= max_cmd_interval) ||
-          ((protector_hit & FRONT_HIT) && m_speed_v > 0.001) || 
-          ((protector_hit & REAR_HIT)  && m_speed_v < -0.001) || 
-          ((charger_status_ == STA_CHARGER_ON || charger_status_ == STA_CHARGER_TOUCHED) && m_speed_v < -0.001)) {
-        g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
+      if ((time_now - last_cmd_vel_time >= max_cmd_interval)
+          || ((protector_hit & FRONT_HIT) && m_speed_v > 0.001)
+          || ((protector_hit & REAR_HIT)  && m_speed_v < -0.001)
+          || ((charger_status_ == STA_CHARGER_ON || charger_status_ == STA_CHARGER_TOUCHED) && m_speed_v < -0.001)) {
+
+          g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
       } else {
           if (charger_status_ == STA_CHARGER_ON && m_speed_v > 0.001) {
                  charger_cmd_ = CMD_CHARGER_OFF;
@@ -112,9 +113,9 @@ int main(int argc, char **argv) {
     PublishOdom(p_odom_broadcaster,odom_pub);
     PublishYaw(yaw_pub);
     PublishGyro(gyro_pub);
-    PublishGyroValue(gyro_value_pub);
     PublishUltrasonic(ultrasonic_pub);
     publish_protector_status(protector_pub);
+    publish_protector_value(protector_value_pub);
     ros::spinOnce();
     p_loop_rate->sleep();
   }

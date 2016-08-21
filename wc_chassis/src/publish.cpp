@@ -167,7 +167,17 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
 
     device_pub.publish(device_status);
 }
-
+/*
+ * 发送防撞条数据给导航
+ */
+void publish_protector_value(ros::Publisher &protector_status_pub){
+    std_msgs::UInt32 protect_data;
+    if(new_hand_touch_){
+        protector_value = NONE_HIT;
+    }
+    protect_data.data = protector_value;
+    protector_status_pub.publish(protect_data);
+}
 /*
  * 发送防撞条状态
  */
@@ -255,14 +265,5 @@ void PublishYaw(ros::Publisher &yaw_pub){
   std_msgs::Float32 msg;
   msg.data = g_odom_tha * 180.0 / M_PI;
   yaw_pub.publish(msg);
-}
-
-void PublishGyroValue(ros::Publisher &gyro_value_pub)
-{
-  autoscrubber_services::gyroValue msg;
-  msg.roll  = g_chassis_mcu->roll_angle_;
-  msg.pitch = g_chassis_mcu->pitch_angle_;
-  msg.yaw   = g_chassis_mcu->yaw_angle_;
-  gyro_value_pub.publish(msg);
 }
 
