@@ -89,12 +89,12 @@ double inplace_rotating_theta = 0.2; //初始化时旋转角度
 std::string hardware_id;
 std::string router_ip = std::string("10.7.5.1");
 std::string laser_ip = std::string("10.7.5.100");
-std::string laser_connection_status = std::string("true");
-std::string router_connection_status = std::string("true");
+std::string internet_url = std::string("www.baidu.com");
+std::string laser_connection_status    = std::string("true");
+std::string router_connection_status   = std::string("true");
+std::string internet_connection_status = std::string("true");
 
 std::thread *p_checkConnectionThread;
-//std::thread *p_updateDeviceStatusThread;
-
 
 std::string *ultrasonic;
 std::string *special_ultrasonic;

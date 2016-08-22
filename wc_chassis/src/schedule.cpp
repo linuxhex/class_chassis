@@ -26,13 +26,12 @@ bool ping(const char* ip) {
 }
 
 /*
- * 检测激光＋路由器网关口连接状态
+ * 检测激光＋路由器网关口+外网连接状态
 */
 void checkConnectionHealthThread(void)
 {
-
-    while(1){
-        if(!ping(laser_ip.c_str()) || !ping(router_ip.c_str())){
+    while(1) {
+        if (!ping(laser_ip.c_str()) || !ping(router_ip.c_str()) || !ping(internet_url.c_str())){
             sleep(3);
             if(!ping(laser_ip.c_str())){
                 laser_connection_status = std::string("false");
@@ -40,9 +39,13 @@ void checkConnectionHealthThread(void)
             if(!ping(router_ip.c_str())){
                 router_connection_status = std::string("false");
             }
-        }else{
+            if(!ping(internet_url.c_str())){
+                internet_connection_status = std::string("false");
+            }
+        } else {
           laser_connection_status = std::string("true");
           router_connection_status = std::string("true");
+          internet_connection_status = std::string("false");
         }
         sleep(30);
     }

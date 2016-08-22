@@ -817,12 +817,9 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   float speed_right = 0.0;
   short m_speed_left = 0;
   short m_speed_right = 0;
-  speed_v = fabs(speed_v) > max_speed_v_ ?  sign(speed_v) * max_speed_v_ : speed_v;
-  speed_w = fabs(speed_w) > max_speed_w_ ?  sign(speed_w) * max_speed_w_ : speed_w;
-  GAUSSIAN_INFO("[CHASSIS]  cc get max_speed_v_  = %.2f, max_speed_w_ = %.2f", max_speed_v_, max_speed_w_);
+
   float delta_speed_v = speed_v - last_speed_v_;
   float delta_speed_w = speed_w - last_speed_w_;
-  //speed_v = fabs(delta_speed_v) > DELTA_SPEED_V_TH ? (last_speed_v_ + sign(delta_speed_v) * DELTA_SPEED_V_TH) : speed_v;
 
   if(delta_speed_v > 0.0) {
     float delta_speed_v_acc = fabs(speed_v) < 0.01 ? 0.25 : speed_v_acc_;
@@ -833,8 +830,12 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   }
   speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;
 
+  speed_v = fabs(speed_v) > max_speed_v_ ?  sign(speed_v) * max_speed_v_ : speed_v;
+  speed_w = fabs(speed_w) > max_speed_w_ ?  sign(speed_w) * max_speed_w_ : speed_w;
+
   GAUSSIAN_INFO("[CHASSIS] set real speed v = %.2f, w = %.2f", speed_v, speed_w);
-    //calculate angle and speed
+
+  //calculate angle and speed
   if (IsInPlaceRotation(speed_v, speed_w))  {
     speed_right = Axle_ * tan(speed_w * TimeWidth_) / (2 * TimeWidth_);
     speed_left = -1.0 * speed_right;
@@ -842,11 +843,11 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
     speed_left = 0.0;
     speed_right = 0.0;
   } else {
-    if (speed_w > 0.0) {  //Left
+    if (speed_w > 0.0) {
       //speed_left = speed_v - (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
       speed_left = speed_v - (Axle_ * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
       speed_right = 2 * speed_v - speed_left;
-    } else { // right
+    } else {
       //speed_right = speed_v + (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
       speed_right = speed_v + (Axle_ * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
       speed_left = 2 * speed_v - speed_right;
@@ -856,7 +857,6 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   m_speed_left = getMotorSpeed(speed_left);
   m_speed_right= getMotorSpeed(speed_right);
 
-  GAUSSIAN_INFO("[CHASSIS] cc set motor cmd Left: %d, Right: %d", m_speed_left, m_speed_right);
 
   unsigned char send[1024] = {0};
   int len = 0;

@@ -30,7 +30,7 @@ ros::Publisher protector_value_pub;
 int main(int argc, char **argv) {
 
     SetSchedPriority();   //设置chassis进程运行的优先级和占用的cpu核
-    ROS_INFO("[wc_chassis] chassis version: 1.1.4.0");
+    ROS_INFO("[wc_chassis] chassis version: 1.1.4.6");
     InitChassis(argc, argv,"wc_chassis");
     GAUSSIAN_INFO("[wc_chassis] chassis init completed");
 

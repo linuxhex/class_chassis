@@ -167,12 +167,20 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
   value.value = get_key_value(hardware_s, Ultrasonic_board);
   hardware_status.values.push_back(value);
 
+  value.key = std::string("power_board");
+  value.value = get_key_value(hardware_s, Power_board);
+  hardware_status.values.push_back(value);
+
   value.key = std::string("laser_connection");
   value.value = laser_connection_status;
   hardware_status.values.push_back(value);
 
   value.key = std::string("router_connection");
   value.value = router_connection_status;
+  hardware_status.values.push_back(value);
+
+  value.key = std::string("internet_connection");
+  value.value = internet_connection_status;
   hardware_status.values.push_back(value);
 
   //超声状态

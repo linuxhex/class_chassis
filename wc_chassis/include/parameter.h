@@ -165,8 +165,9 @@ extern std::string router_ip;
 extern std::string laser_ip;
 extern std::string laser_connection_status;
 extern std::string router_connection_status;
+extern std::string internet_connection_status;
+
 extern std::thread *p_checkConnectionThread;
-//extern std::thread *p_updateDeviceStatusThread;
 extern unsigned int protector_value;
 extern int protector_num;
 extern unsigned int protector_bits;
@@ -183,5 +184,5 @@ extern double charge_on_time_;
 extern double go_forward_start_time_;
 extern double protector_hit_time;  //防撞条触发开始时间
 extern int charger_delay_time_;
-
+extern std::string internet_url;
 #endif

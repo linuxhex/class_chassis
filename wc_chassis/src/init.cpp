@@ -109,6 +109,7 @@ void InitParameter()
     p_nh->param("protector_num",protector_num,8);//防撞条使用数量
     p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
     p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
+    p_nh->param("internet_url",internet_url,std::string("www.baidu.com"));//外网url用于测试外网状态
     p_nh->param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));//初始化旋转速度
     p_nh->param("charger_low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化旋转速度
     p_nh->param("new_hand_touch", new_hand_touch_, false);//新板子手触开关和防撞条共用一个接口
