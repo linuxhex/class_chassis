@@ -81,10 +81,10 @@ void Socket::Read_data(unsigned char* r_data, int &len, int need, int timeout) {
     len = 0;
     int len_tmp = 0;
     while (1) {
-      socket_connection_status = true;
       len_tmp = m_lReadBuffer->Size();
       if (len_tmp >= need){
-          break;
+         socket_connection_status = true;
+         break;
       }
       if (timeout--) {
         SLEEP(1);

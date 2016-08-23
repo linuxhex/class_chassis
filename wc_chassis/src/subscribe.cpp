@@ -29,11 +29,7 @@ void RemoteRetCallback(const std_msgs::UInt32& ret) {
  * 停车时关闭陀螺仪 仅扫地图使能
  */
 void GyroUpdateCallback(const std_msgs::UInt32& state) {
-  if (state.data == 0) {
-    g_chassis_mcu->gyro_state_ = 0;
-  } else {
-    g_chassis_mcu->gyro_state_ = 1;
-  }
+  g_chassis_mcu->gyro_state_ = state.data;
   GAUSSIAN_INFO("[wc_chassis] set gyro state = %d", g_chassis_mcu->gyro_state_);
 }
 

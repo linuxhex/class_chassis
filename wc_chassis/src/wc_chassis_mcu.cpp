@@ -38,13 +38,12 @@ WC_chassis_mcu::WC_chassis_mcu(){
     this->Dia_F_ = 0.2;
     this->Dia_B_ = 0.2;
     this->Axle_  = 0.6;
-    this->Counts_=4000;
+    this->Counts_= 4000;
     this->Reduction_ratio_ = 25;
-    this->Speed_ratio_     =1.0;
-    this->odom_x_          =0.0;
+    this->Speed_ratio_     = 1.0;
+    this->odom_x_          = 0.0;
     this->odom_y_ = 0.0;
     this->odom_a_ = 0.0;
-    this->odom_a_gyro_ = 0.0;
     this->acc_odom_theta_= 0.0;
     this->delta_counts_left_ = 0;
     this->delta_counts_right_ = 0;
@@ -60,7 +59,8 @@ WC_chassis_mcu::WC_chassis_mcu(){
     this->first_odo_ = true;
     this->direction = 0;
     this->speed_v_ = 0;
-    this->speed_w_ =0;
+    this->speed_w_ = 0;
+    this->gyro_state_ = 0;
     if (transfer_ != NULL) {
         delete transfer_;
         transfer_ = NULL;
@@ -339,7 +339,6 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
       odom_x_ = 0;
       odom_y_ = 0;
       odom_a_ = 0;
-      odom_a_gyro_ = 0;
       acc_odom_theta_ = 0.0;
 
       last_odo_delta_counts_right_ = delta_counts_right_;
@@ -390,7 +389,11 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     odom_x_ += dx * cos(odom_a_);
     odom_y_ += dx * sin(odom_a_);
 
-    if (gyro_state_ == 0 || (gyro_state_ == 1 && !(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta))) {
+    if(gyro_state_ == 2){
+      double da = asin((r_wheel_pos - l_wheel_pos) / Axle_);
+      odom_a_ += da;
+      acc_odom_theta_ += fabs(da);
+    }else if (gyro_state_ == 0 || (gyro_state_ == 1 && !(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta))) {
       double temp_dtheta = yaw_angle_ - last_yaw_angle_;
       if(temp_dtheta > 3000.0) {
         temp_dtheta = -1.0 * (3600.0 - temp_dtheta);
@@ -401,7 +404,6 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
       double gyro_dtheta =  (temp_dtheta / 10.0) / 180.0 * M_PI;
       odom_a_ += gyro_dtheta;
       acc_odom_theta_ += fabs(gyro_dtheta);
-      odom_a_gyro_ = odom_a_;
     }
 
     while (odom_a_ <= - M_PI) {
@@ -410,13 +412,6 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     while (odom_a_ > M_PI) {
       odom_a_ -= M_PI*2;
     }
-    while (odom_a_gyro_ <= - M_PI) {
-      odom_a_gyro_ += M_PI*2;
-    }
-    while (odom_a_gyro_ > M_PI) {
-      odom_a_gyro_ -= M_PI*2;
-    }
-
     x = odom_x_;
     y = odom_y_;
     a = odom_a_;
