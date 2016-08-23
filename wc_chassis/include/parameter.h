@@ -71,7 +71,7 @@ typedef enum Protector_Hit_ {
 } Protector_Hit;
 
 typedef enum Relay_Cmd_ {
-  CMD_CHARGER_NONE    = 0x00,
+  CMD_CHARGER_STATUS    = 0x00,
   CMD_CHARGER_ON      = 0x01,
   CMD_CHARGER_OFF     = 0x02,
   CMD_CHARGER_MONITOR = 0x03,
@@ -139,7 +139,7 @@ extern int charge_count;
 extern int display_battery_capacity ;
 extern int sum_battery_capacity;
 
-extern unsigned int connection_status; // mcu ethernet connection status: 0>bad 1>good
+extern bool socket_connection_status;
 extern int ultrasonic_num;
 extern float ultrasonic_min_range;  //超声检测的最小距离  默认值0.04
 extern float ultrasonic_max_range;   //超声检测的最大距离  默认值1.0
@@ -163,9 +163,9 @@ extern int remote_id ;
 extern std::string hardware_id;
 extern std::string router_ip;
 extern std::string laser_ip;
-extern std::string laser_connection_status;
-extern std::string router_connection_status;
-extern std::string internet_connection_status;
+extern bool laser_connection_status;
+extern bool router_connection_status;
+extern bool internet_connection_status;
 
 extern std::thread *p_checkConnectionThread;
 extern unsigned int protector_value;

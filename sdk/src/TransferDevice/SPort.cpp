@@ -81,16 +81,15 @@ void Socket::Read_data(unsigned char* r_data, int &len, int need, int timeout) {
     len = 0;
     int len_tmp = 0;
     while (1) {
-      connection_status = 1;
+      socket_connection_status = true;
       len_tmp = m_lReadBuffer->Size();
       if (len_tmp >= need){
           break;
       }
       if (timeout--) {
-        connection_status = 2;
         SLEEP(1);
       } else {
-        connection_status = 0;
+        socket_connection_status = false;
         ROS_INFO("[SOCKET] time out");
         break;
       }

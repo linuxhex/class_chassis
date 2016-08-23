@@ -67,13 +67,16 @@ void chargeValueManage(void)
     charger_voltage_ = current_charge_voltage;
     GAUSSIAN_INFO("[wc_chassis] adc_charge = %d, charger_voltage_: %lf", charge_ADC, charger_voltage_);
 
-    relay_status_ = g_chassis_mcu->setChargeCmd(0);
+    relay_status_ = g_chassis_mcu->setChargeCmd(CMD_CHARGER_STATUS);
     if ((relay_status_ & 0x03) == STA_CHARGER_ON) {
       charger_status_ = STA_CHARGER_ON;
     } else if (charger_voltage_ >= charger_low_voltage_) {
       charger_status_ = STA_CHARGER_TOUCHED;
     } else {
-      charger_status_ = STA_CHARGER_OFF;
+      if(charger_status_ != STA_CHARGER_OFF){
+        charger_status_ = STA_CHARGER_OFF;
+        g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+      }
     }
     GAUSSIAN_INFO("[wc_chassis] get relay status = 0x%.2x, charger_status_ = %d", relay_status_, charger_status_);
 

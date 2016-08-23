@@ -38,7 +38,7 @@ unsigned int cur_emergency_status = 1;
 double battery_full_level;
 double battery_empty_level;
 unsigned int remote_ret_     = 0x0a00;
-unsigned int charger_cmd_    = CMD_CHARGER_NONE;
+unsigned int charger_cmd_    = CMD_CHARGER_STATUS;
 unsigned int remote_ret_cnt_ = 0;
 unsigned char remote_cmd_    = 0;
 unsigned int charger_status_ = STA_CHARGER_OFF;
@@ -48,7 +48,7 @@ pthread_mutex_t speed_mutex;
 std::vector<int> g_ultrasonic(24);
 std::vector<unsigned int> front_protector_list;
 std::vector<unsigned int> rear_protector_list;
-unsigned int connection_status = 1; // mcu ethernet connection status: 0>bad 1>good
+bool socket_connection_status = true; // mcu ethernet connection status: false>bad true>good
 int battery_count = -1;
 int charge_count = -1;
 int display_battery_capacity = 0;
@@ -90,9 +90,9 @@ std::string hardware_id;
 std::string router_ip = std::string("10.7.5.1");
 std::string laser_ip = std::string("10.7.5.100");
 std::string internet_url = std::string("www.baidu.com");
-std::string laser_connection_status    = std::string("true");
-std::string router_connection_status   = std::string("true");
-std::string internet_connection_status = std::string("true");
+bool laser_connection_status    = true;
+bool router_connection_status   = true;
+bool internet_connection_status = true;
 
 std::thread *p_checkConnectionThread;
 

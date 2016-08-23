@@ -51,7 +51,7 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
        }
         sleep(1);
       }
-      charger_cmd_ = CMD_CHARGER_NONE;
+      charger_cmd_ = CMD_CHARGER_STATUS;
     }).detach();
 
   } else if (cmd == CMD_CHARGER_OFF) {
@@ -62,7 +62,7 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
     GAUSSIAN_INFO("[CHASSIS] set charger moniter on!!!");
     charger_cmd_ = CMD_CHARGER_MONITOR;
   } else {
-    charger_cmd_ = CMD_CHARGER_NONE;
+    charger_cmd_ = CMD_CHARGER_STATUS;
   }
   return true;
 }
@@ -160,7 +160,7 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
   hardware_status.hardware_id = hardware_id;
 
   value.key = std::string("MCU_connection"); // 0:bad 1:good
-  value.value = (connection_status == 1) ? std::string("true") : std::string("false");
+  value.value = socket_connection_status ? std::string("true") : std::string("false");
   hardware_status.values.push_back(value);
 
   value.key = std::string("ultrasonic_board");
@@ -172,15 +172,15 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
   hardware_status.values.push_back(value);
 
   value.key = std::string("laser_connection");
-  value.value = laser_connection_status;
+  value.value = laser_connection_status ? std::string("true") : std::string("false");
   hardware_status.values.push_back(value);
 
   value.key = std::string("router_connection");
-  value.value = router_connection_status;
+  value.value = router_connection_status ? std::string("true") : std::string("false");
   hardware_status.values.push_back(value);
 
   value.key = std::string("internet_connection");
-  value.value = internet_connection_status;
+  value.value = internet_connection_status ? std::string("true") : std::string("false");
   hardware_status.values.push_back(value);
 
   //超声状态

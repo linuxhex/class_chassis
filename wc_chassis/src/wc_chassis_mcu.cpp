@@ -390,7 +390,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     odom_x_ += dx * cos(odom_a_);
     odom_y_ += dx * sin(odom_a_);
 
-    if (!gyro_state_ || (gyro_state_ && !(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta))) {
+    if (gyro_state_ == 0 || (gyro_state_ == 1 && !(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta))) {
       double temp_dtheta = yaw_angle_ - last_yaw_angle_;
       if(temp_dtheta > 3000.0) {
         temp_dtheta = -1.0 * (3600.0 - temp_dtheta);
