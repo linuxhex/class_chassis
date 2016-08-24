@@ -89,14 +89,16 @@ int main(int argc, char **argv) {
           || (time_now - last_cmd_vel_time >= max_cmd_interval)
           || ((protector_hit & FRONT_HIT) && m_speed_v > 0.001)
           || ((protector_hit & REAR_HIT)  && m_speed_v < -0.001)
-          || ((charger_status_ == STA_CHARGER_ON || charger_status_ == STA_CHARGER_TOUCHED) && m_speed_v < -0.001)) {
+          || (charger_status_ == STA_CHARGER_ON)
+          || (charger_status_ == STA_CHARGER_TOUCHED && m_speed_v < -0.001)) {
 
-          g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
-      } else {
           if (charger_status_ == STA_CHARGER_ON && m_speed_v > 0.001) {
                  charger_cmd_ = CMD_CHARGER_OFF;
                  g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
-               }
+          }
+          g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
+
+      } else {
           g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
       }
     }
