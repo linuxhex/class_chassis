@@ -20,4 +20,5 @@ bool ReadConfigFromParams(std::string param_name, ros::NodeHandle* nh, std::vect
 void protectorManage(void);
 void chargeValueManage(void);
 void updateDeviceStatus(void);
+void relayStatusManage(void);
 #endif // COMMON_FUNCTION_H

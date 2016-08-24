@@ -161,7 +161,7 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
     device_status.values.push_back(device_value);
 
     device_value.key = std::string("mileage");
-    double mileage = (g_chassis_mcu->mileage_left_ + g_chassis_mcu->mileage_left_) / 2;
+    double mileage = (g_chassis_mcu->mileage_right_ + g_chassis_mcu->mileage_left_) / 2;
     device_value.value = std::to_string(mileage);
     device_status.values.push_back(device_value);
 

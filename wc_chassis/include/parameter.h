@@ -57,7 +57,7 @@ enum Hardware_ID {
   Power_board,
   Ultrasonic_board,
   Motor_driver,
-  Decoder,
+  Gyro_board,
   Motor,
   Ultrasonic,
   Hardware_MAX
@@ -124,6 +124,7 @@ extern double battery_empty_level;
 extern unsigned int remote_ret_;
 extern unsigned int charger_cmd_;
 extern double charger_low_voltage_;
+extern double charger_full_voltage_;
 extern unsigned int remote_ret_cnt_;
 extern unsigned char remote_cmd_;
 extern unsigned short remote_index_;
@@ -185,4 +186,13 @@ extern double go_forward_start_time_;
 extern double protector_hit_time;  //防撞条触发开始时间
 extern int charger_delay_time_;
 extern std::string internet_url;
+extern unsigned int sleep_cnt;
+
+extern bool charger_relay; //充电继电器状态　false:打开，　true:闭合
+extern bool inner_relay;  //内部继电器状态
+extern bool outer_relay;  //外部继电器状态
+extern bool user_relay;  //用户继电器状态
+
+extern double pre_mileage;  //
+
 #endif

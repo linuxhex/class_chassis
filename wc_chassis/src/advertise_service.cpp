@@ -5,7 +5,7 @@
 #include "init.h"
 #include "parameter.h"
 #include "common_function.h"
-
+#include "action.h"
 
 /*
  *  自动充电 状态查询
@@ -26,34 +26,12 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
                       autoscrubber_services::SetChargeCmd::Response& res) {
   unsigned char cmd = req.cmd.data;
   if (cmd == CMD_CHARGER_ON) {
-    if(charger_cmd_ == CMD_CHARGER_ON){
-        GAUSSIAN_INFO("[CHASSIS] current state = CMD_CHARGER_ON");
+    if(charger_status_ == STA_CHARGER_ON) {
+        GAUSSIAN_INFO("[CHASSIS] current charger_status_ = STA_CHARGER_ON || charger_cmd_ == CMD_CHARGER_ON");
         return true;
     }
-     charger_cmd_ = CMD_CHARGER_ON;
     // start a thread to handle auto charger
-    std::thread([&](){
-      GAUSSIAN_INFO("[CHASSIS] start to check charger volatage = %d", charger_voltage_);
-      sleep(3);
-      unsigned int sleep_cnt = 0;
-      int check_charger_cnt = 0;
-      while(++sleep_cnt  < 60 && charger_cmd_ == CMD_CHARGER_ON) {
-       GAUSSIAN_INFO("[CHASSIS] checking charger volatage = %d", charger_voltage_);
-       if (charger_voltage_ >= charger_low_voltage_) {
-         ++check_charger_cnt;
-       } else {
-         check_charger_cnt = 0;
-       }
-       if (check_charger_cnt > charger_delay_time_ && charger_cmd_ == CMD_CHARGER_ON) {
-         GAUSSIAN_INFO("[CHASSIS] check charger voltage normal > 30s, set charger relay on!!!");
-         g_chassis_mcu->setChargeCmd(CMD_CHARGER_ON);
-         break;
-       }
-        sleep(1);
-      }
-      charger_cmd_ = CMD_CHARGER_STATUS;
-    }).detach();
-
+    onCharge();
   } else if (cmd == CMD_CHARGER_OFF) {
     GAUSSIAN_INFO("[CHASSIS] set charger off!!!");
     charger_cmd_ = CMD_CHARGER_OFF;
@@ -171,6 +149,10 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
   value.value = get_key_value(hardware_s, Power_board);
   hardware_status.values.push_back(value);
 
+  value.key = std::string("gyro_board");
+  value.value = get_key_value(hardware_s, Gyro_board);
+  hardware_status.values.push_back(value);
+
   value.key = std::string("laser_connection");
   value.value = laser_connection_status ? std::string("true") : std::string("false");
   hardware_status.values.push_back(value);
@@ -181,6 +163,22 @@ bool CheckHardware(autoscrubber_services::CheckHardware::Request& req, autoscrub
 
   value.key = std::string("internet_connection");
   value.value = internet_connection_status ? std::string("true") : std::string("false");
+  hardware_status.values.push_back(value);
+
+  value.key = std::string("inner_relay_status");
+  value.value = inner_relay ? std::string("true") : std::string("false");
+  hardware_status.values.push_back(value);
+
+  value.key = std::string("outer_relay_status");
+  value.value = outer_relay ? std::string("true") : std::string("false");
+  hardware_status.values.push_back(value);
+
+  value.key = std::string("charger_relay_status");
+  value.value = charger_relay ? std::string("true") : std::string("false");
+  hardware_status.values.push_back(value);
+
+  value.key = std::string("user_relay_status");
+  value.value = user_relay ? std::string("true") : std::string("false");
   hardware_status.values.push_back(value);
 
   //超声状态

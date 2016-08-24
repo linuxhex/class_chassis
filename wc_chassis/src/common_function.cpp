@@ -3,6 +3,7 @@
 #include"common_function.h"
 #include"init.h"
 #include"parameter.h"
+#include "action.h"
 
 
 /*
@@ -11,6 +12,8 @@
 void protectorManage(void)
 {
     if(protector_num <= 0){
+        protector_hit = NONE_HIT;
+        protector_value = NONE_HIT;
         return;
     }
     // check protector hit
@@ -48,6 +51,35 @@ void protectorManage(void)
     protector_hit = temp_hit;
 
 }
+void relayStatusManage(void)
+{
+
+    relay_status_ = g_chassis_mcu->setChargeCmd(CMD_CHARGER_STATUS);
+    if((relay_status_ & 0x03) == STA_CHARGER_ON){
+        charger_relay = true;
+    } else if((relay_status_ & 0x03) == STA_CHARGER_OFF){
+        charger_relay = false;
+    }
+
+    if((relay_status_ & (0x03 << 2)) == STA_CTRL_PWR_ON){
+        inner_relay = true;
+    } else if((relay_status_ & (0x03 << 2)) == STA_CTRL_PWR_OFF){
+        inner_relay = false;
+    }
+
+    if((relay_status_ & (0x03 << 4)) == STA_MOTOR_PWR_ON){
+        outer_relay = true;
+    } else if((relay_status_ & (0x03 << 4)) == STA_MOTOR_PWR_OFF){
+        outer_relay = false;
+    }
+
+    if((relay_status_ & (0x03 << 6)) == STA_CUSTERM_PWR_ON){
+        outer_relay = true;
+    } else if((relay_status_ & (0x03 << 6)) == STA_CUSTERM_PWR_OFF){
+        outer_relay = false;
+    }
+
+}
 /*
  * 充电电压数据处理
 */
@@ -67,16 +99,26 @@ void chargeValueManage(void)
     charger_voltage_ = current_charge_voltage;
     GAUSSIAN_INFO("[wc_chassis] adc_charge = %d, charger_voltage_: %lf", charge_ADC, charger_voltage_);
 
-    relay_status_ = g_chassis_mcu->setChargeCmd(CMD_CHARGER_STATUS);
-    if ((relay_status_ & 0x03) == STA_CHARGER_ON) {
+    if(charger_full_voltage_ < battery_value_){
+       g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+       charger_cmd_    = CMD_CHARGER_OFF;
+       charger_status_ = STA_CHARGER_OFF;
+       return;
+    }
+
+    if (charger_relay) {
       charger_status_ = STA_CHARGER_ON;
-    } else if (charger_voltage_ >= charger_low_voltage_) {
-      charger_status_ = STA_CHARGER_TOUCHED;
-    } else {
-      if(charger_status_ != STA_CHARGER_OFF){
-        charger_status_ = STA_CHARGER_OFF;
-        g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+      double mileage = (g_chassis_mcu->mileage_right_ + g_chassis_mcu->mileage_left_) / 2;
+      if(charger_voltage_ < charger_low_voltage_ || (fabs(mileage - pre_mileage) >= 0.12)){
+          g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+          charger_cmd_    = CMD_CHARGER_OFF;
+          charger_status_ = STA_CHARGER_OFF;
       }
+    } else if (charger_voltage_ > charger_low_voltage_) {
+      charger_status_ = STA_CHARGER_TOUCHED;
+      onCharge();
+    } else {
+      charger_status_ = STA_CHARGER_OFF;
     }
     GAUSSIAN_INFO("[wc_chassis] get relay status = 0x%.2x, charger_status_ = %d", relay_status_, charger_status_);
 
@@ -91,6 +133,7 @@ void updateDeviceStatus(void)
   if (!old_ultrasonic_) {
      std::istringstream(get_key_value(g_ultrasonic[19], Ultrasonic_board)) >> std::boolalpha >> ultrasonic_board_connection;
   }
+  relayStatusManage();
   chargeValueManage();
   protectorManage();
 }

@@ -61,6 +61,10 @@ WC_chassis_mcu::WC_chassis_mcu(){
     this->speed_v_ = 0;
     this->speed_w_ = 0;
     this->gyro_state_ = 0;
+    this->last_yaw_angle_  = 0;
+    this->pre_yaw_angle_ = 0;
+    this->sum_delta_yaw_angle_ = 0;
+    this->yaw_count_ = 0;
     if (transfer_ != NULL) {
         delete transfer_;
         transfer_ = NULL;
@@ -329,11 +333,46 @@ int getsign(int t) {
   return t >= 0 ? (1) : (-1);
 }
 
+/*
+ * 陀螺仪漂太多切换成码盘
+*/
+void WC_chassis_mcu::yawSwitch(void){
+
+    if(delta_counts_left_ == 0 && (delta_counts_right_) == 0){
+        if(yaw_count_ == 0){
+            pre_yaw_angle_ = yaw_angle_;
+            return;
+        }
+        float delta_yaw_angle = yaw_angle_ - pre_yaw_angle_;
+        if(delta_yaw_angle < 0){
+            delta_yaw_angle = delta_yaw_angle + 3600;
+        }
+        sum_delta_yaw_angle_ += delta_yaw_angle;
+        pre_yaw_angle_ = yaw_angle_;
+        if(yaw_count_ > 300){
+           if(sum_delta_yaw_angle_ > 120){
+               gyro_state_ = 2;
+           } else {
+               gyro_state_ = 0;
+           }
+           yaw_count_  = 0;
+           sum_delta_yaw_angle_ = 0;
+        }
+        yaw_count_ ++ ;
+    }else{
+        yaw_count_ = 0;
+        sum_delta_yaw_angle_ = 0.0;
+    }
+
+}
+
 bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     comunication();
 
     GAUSSIAN_INFO("[WC CHASSIS] left: %d right: %d dleft: %d dright: %d ddleft: %d ddright: %d angle: %f", counts_left_, counts_right_, delta_counts_left_, delta_counts_right_, delta_counts_left_ - last_odo_delta_counts_left_, delta_counts_right_ - last_odo_delta_counts_right_, yaw_angle_ / 10.0);
     GAUSSIAN_INFO("[WC CHASSIS] counts_per_second: left = %d; right = %d", delta_counts_left_ * 20, delta_counts_right_ * 20);
+
+
 
     if (first_odo_) {
       odom_x_ = 0;
@@ -352,6 +391,9 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
       }
       return false;
     }
+
+   // yawSwitch();
+
     int critical_delta = 2;
 
     int delta_counts_left = (counts_left_ - last_counts_left_) * getsign(delta_counts_left_);

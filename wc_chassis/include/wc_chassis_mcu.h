@@ -38,11 +38,15 @@ class WC_chassis_mcu{
   unsigned int checkRemoteVerifyKey(unsigned int seed_key);
   unsigned char setChargeCmd(unsigned char cmd);
   void setShutdownCmd(unsigned char cmd);
+  void yawSwitch(void);
 
   int V2RPM(float v);
   int GetCopleySpeed(float v);
   int GetCopleyAngle(float angle);
   short yaw_angle_;
+  short pre_yaw_angle_;
+  short sum_delta_yaw_angle_;
+  unsigned int yaw_count_;
   short pitch_angle_;
   short roll_angle_;
   double acc_odom_theta_;
@@ -72,7 +76,6 @@ class WC_chassis_mcu{
   double odom_x_;
   double odom_y_;
   double odom_a_;
-  double odom_a_gyro_;
   double odom_v;
   double odom_w;
 

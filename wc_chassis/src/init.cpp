@@ -111,7 +111,8 @@ void InitParameter()
     p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
     p_nh->param("internet_url",internet_url,std::string("www.baidu.com"));//外网url用于测试外网状态
     p_nh->param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));//初始化旋转速度
-    p_nh->param("charger_low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化旋转速度
+    p_nh->param("charger_low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化
+    p_nh->param("charger_full_voltage", charger_full_voltage_, static_cast<double>(27.5));//初始化旋转速度
     p_nh->param("new_hand_touch", new_hand_touch_, false);//新板子手触开关和防撞条共用一个接口
     p_nh->param("old_ultrasonic", old_ultrasonic_, false);//旧板子里面没有超声板状态
     p_nh->param("charger_delay_time",charger_delay_time_,30);//充电继电器打开延时时间
