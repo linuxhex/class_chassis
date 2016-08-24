@@ -67,7 +67,6 @@ int main(int argc, char **argv) {
     if(!old_ultrasonic_){  //旧板子没有这些功能
         updateDeviceStatus();
     }
-
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
