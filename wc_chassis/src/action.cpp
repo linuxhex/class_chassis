@@ -64,7 +64,7 @@ void onCharge(void)
            }
             sleep(1);
           }
-          sleep_cnt = 0; //需改允许下次线程能够进入
+          sleep_cnt = 0; //允许下次线程能够进入
         }).detach();
     }
 }

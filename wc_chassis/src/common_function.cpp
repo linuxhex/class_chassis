@@ -51,6 +51,10 @@ void protectorManage(void)
     protector_hit = temp_hit;
 
 }
+
+/*
+ *继电器状态
+*/
 void relayStatusManage(void)
 {
 
@@ -109,7 +113,7 @@ void chargeValueManage(void)
     if (charger_relay) {
       charger_status_ = STA_CHARGER_ON;
       double mileage = (g_chassis_mcu->mileage_right_ + g_chassis_mcu->mileage_left_) / 2;
-      if(charger_voltage_ < charger_low_voltage_ || (fabs(mileage - pre_mileage) >= 0.12)){
+      if(charger_voltage_ < charger_low_voltage_ || (fabs(mileage - pre_mileage) >= 0.05)){
           g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
           charger_cmd_    = CMD_CHARGER_OFF;
           charger_status_ = STA_CHARGER_OFF;
