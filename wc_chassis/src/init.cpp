@@ -51,7 +51,7 @@ void InitService()
     remote_ret_sub        = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);
     gyro_update_state_sub = p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
     shutdown_sub          = p_n->subscribe("/device/shutdown", 10, ShutdownCallback);
-    GAUSSIAN_INFO("[wc_chassis] init service & topic caller completed");
+    GS_INFO("[wc_chassis] init service & topic caller completed");
 
 }
 
@@ -119,11 +119,11 @@ void InitParameter()
 
     // 前面防撞条配置
     if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {
-      GAUSSIAN_ERROR("[SERVICEROBOT] read front_protector_list failed");
+      GS_ERROR("[SERVICEROBOT] read front_protector_list failed");
     }
     // 后面防撞条配置
     if (!ReadConfigFromParams("rear_protector", p_nh, &rear_protector_list)) {
-      GAUSSIAN_ERROR("[SERVICEROBOT] read rear_protector_list failed");
+      GS_ERROR("[SERVICEROBOT] read rear_protector_list failed");
     }
 
     pthread_mutex_init(&speed_mutex, NULL);
@@ -133,7 +133,7 @@ void InitParameter()
                         max_speed_v, max_speed_w, speed_v_acc, speed_v_dec,
                         speed_v_dec_zero, speed_w_acc, speed_w_dec,full_speed,delta_counts_th);
 
-    GAUSSIAN_INFO("[wc_chassis] init param completed");
+    GS_INFO("[wc_chassis] init param completed");
 }
 
 /* 设备的初始化*/
@@ -146,7 +146,7 @@ void InitDevice(void)
   unsigned int check_key = GenerateJSHash(seed_key);
   unsigned int verify_key = g_chassis_mcu->checkRemoteVerifyKey(seed_key);
   if (check_key != verify_key) {
-    GAUSSIAN_INFO("[wc_chassis] VERIFY_REMOTE_KEY is not correct!!!");
+    GS_INFO("[wc_chassis] VERIFY_REMOTE_KEY is not correct!!!");
     exit(0);
   }
 #endif
@@ -163,7 +163,7 @@ void InitDevice(void)
   }
 #endif
   g_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
-  GAUSSIAN_INFO("[wc_chassis] init device completed");
+  GS_INFO("[wc_chassis] init device completed");
 }
 
 /* 多线程任务初始化 */
@@ -171,14 +171,14 @@ void InitSchedule(void)
 {
     p_checkConnectionThread    = new std::thread(checkConnectionHealthThread);
     p_checkConnectionThread->detach();
-    GAUSSIAN_INFO("[wc_chassis] init schedule completed");
+    GS_INFO("[wc_chassis] init schedule completed");
 }
 
 /* chassis的初始化*/
 bool InitChassis(int argc, char **argv,const char *node_name)
 {
 
-     GAUSSIAN_INFO("[wc_chassis] init ros!");
+     GS_INFO("[wc_chassis] init ros!");
      ros::init(argc, argv, node_name);
 
      p_n = new ros::NodeHandle();

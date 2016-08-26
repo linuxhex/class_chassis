@@ -16,11 +16,11 @@ bool ping(const char* ip) {
         } else if (1 == ping_ret) {
             return false;
         } else {
-            GAUSSIAN_ERROR("[chassis] unknown ping status:%d", ping_ret);
+            GS_ERROR("[chassis] unknown ping status:%d", ping_ret);
             return false;
         }
     } else {
-        GAUSSIAN_ERROR("[chassis] ping program can not use");
+        GS_ERROR("[chassis] ping program can not use");
         return false;
     }
 }

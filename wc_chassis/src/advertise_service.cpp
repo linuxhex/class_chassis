@@ -14,7 +14,7 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
                            autoscrubber_services::CheckChargeStatus::Response& res) {
     res.charge_status.status = charger_status_;
     res.charge_status.value  = charger_voltage_ >= charger_low_voltage_ ? (short)(charger_voltage_ * 10) : 0;
-    GAUSSIAN_INFO("[CHASSIS] get real charge status = %d, value = %d, raw_voltage = %lf!!!",
+    GS_INFO("[CHASSIS] get real charge status = %d, value = %d, raw_voltage = %lf!!!",
                    res.charge_status.status, res.charge_status.value, charger_voltage_);
     return true;
 }
@@ -27,17 +27,17 @@ bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
   unsigned char cmd = req.cmd.data;
   if (cmd == CMD_CHARGER_ON) {
     if(charger_status_ == STA_CHARGER_ON) {
-        GAUSSIAN_INFO("[CHASSIS] current charger_status_ = STA_CHARGER_ON || charger_cmd_ == CMD_CHARGER_ON");
+        GS_INFO("[CHASSIS] current charger_status_ = STA_CHARGER_ON || charger_cmd_ == CMD_CHARGER_ON");
         return true;
     }
     // start a thread to handle auto charger
     onCharge();
   } else if (cmd == CMD_CHARGER_OFF) {
-    GAUSSIAN_INFO("[CHASSIS] set charger off!!!");
+    GS_INFO("[CHASSIS] set charger off!!!");
     charger_cmd_ = CMD_CHARGER_OFF;
     g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
   } else if (cmd == CMD_CHARGER_MONITOR) {
-    GAUSSIAN_INFO("[CHASSIS] set charger moniter on!!!");
+    GS_INFO("[CHASSIS] set charger moniter on!!!");
     charger_cmd_ = CMD_CHARGER_MONITOR;
   } else {
     charger_cmd_ = CMD_CHARGER_STATUS;

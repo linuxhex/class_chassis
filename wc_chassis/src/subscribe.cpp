@@ -23,14 +23,14 @@ void DoNavigationCallback(const geometry_msgs::Twist& Navigation_msg) {
 void RemoteRetCallback(const std_msgs::UInt32& ret) {
     remote_ret_ = ret.data;
     remote_ret_cnt_ = 0;
-    GAUSSIAN_INFO("[wc_chassis] get remote ret cmd = %d, state = %d", (remote_ret_ & 0xff), (remote_ret_ >> 8) & 0xff);
+    GS_INFO("[wc_chassis] get remote ret cmd = %d, state = %d", (remote_ret_ & 0xff), (remote_ret_ >> 8) & 0xff);
 }
 /*
  * 停车时关闭陀螺仪 仅扫地图使能
  */
 void GyroUpdateCallback(const std_msgs::UInt32& state) {
   g_chassis_mcu->gyro_state_ = state.data;
-  GAUSSIAN_INFO("[wc_chassis] set gyro state = %d", g_chassis_mcu->gyro_state_);
+  GS_INFO("[wc_chassis] set gyro state = %d", g_chassis_mcu->gyro_state_);
 }
 
 /*
@@ -40,5 +40,5 @@ void ShutdownCallback(const std_msgs::UInt32& cmd)
 {
     unsigned char shutdown = (unsigned char)cmd.data;
     g_chassis_mcu->setShutdownCmd(shutdown);
-    GAUSSIAN_ERROR("[wc_chassis] set shutdown cmd = %d", shutdown);
+    GS_ERROR("[wc_chassis] set shutdown cmd = %d", shutdown);
 }

@@ -1,0 +1,55 @@
+COPTS = [
+    "-fopenmp",
+]
+LINK_OPTS = [
+    "-pthread",
+    "-lgomp",
+    "-lm",
+]
+
+TEST_CPP = [
+    "bench.cpp",
+    "bench2.cpp",
+    "test.cpp",
+    "validat1.cpp",
+    "validat2.cpp",
+    "validat3.cpp",
+    "adhoc.cpp",
+    "datatest.cpp",
+    "regtest.cpp",
+    "fipsalgt.cpp",
+    "dlltest.cpp",
+]
+
+INCLUDE_CPP = [
+    "strciphr.cpp",
+    "algebra.cpp",
+    "eprecomp.cpp",
+    "eccrypto.cpp",
+    "polynomi.cpp",
+]
+
+cc_library(
+    name = "cryptopp",
+    srcs = glob([
+        "*.cpp",
+    ], exclude = TEST_CPP + INCLUDE_CPP),
+    hdrs = glob([
+        "*.h",
+    ] + INCLUDE_CPP),
+    includes = [
+         ".",
+    ],
+    copts = COPTS,
+    linkopts = LINK_OPTS,
+    linkstatic = True,
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "cryptest",
+    srcs = TEST_CPP,
+    deps = [
+        ":cryptopp",
+    ],
+)

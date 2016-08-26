@@ -9,6 +9,7 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+
 #include "SPort.h"
 #include "protocol.h"
 #include "wc_chassis_mcu.h"
@@ -195,7 +196,7 @@ void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,
 void WC_chassis_mcu::setRemoteID(unsigned char id) {
   unsigned char remote_id = id & 0x0f;
   if (remote_id < 1 || remote_id > 9) {
-    GAUSSIAN_ERROR("[wc_chassis] remote id = %d, beyond (1 ~ 9)", remote_id);
+    GS_ERROR("[wc_chassis] remote id = %d, beyond (1 ~ 9)", remote_id);
     return ;
   }
   unsigned char send[1024] = {0};
@@ -204,7 +205,7 @@ void WC_chassis_mcu::setRemoteID(unsigned char id) {
   unsigned char rec[1024] = {0};
   int rlen = 0;
 
-  GAUSSIAN_INFO("[wc_chassis] set chassis remote id = %d, speed_level = %d, power_level = %d", remote_id, (remote_id >> 4) & 0x03, (remote_id >> 6) & 0x03);
+  GS_INFO("[wc_chassis] set chassis remote id = %d, speed_level = %d, power_level = %d", remote_id, (remote_id >> 4) & 0x03, (remote_id >> 6) & 0x03);
 
   CreateRemoteID(send, &len, id);
 
@@ -213,15 +214,15 @@ void WC_chassis_mcu::setRemoteID(unsigned char id) {
   if (transfer_) {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
-    double send_time = GetTimeInSeconds(); 
+    double send_time = GetTimeInSeconds();
     if (send_time - start_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] setRemoteID: send time = %lf", send_time - start_time);
+      GS_INFO("[CHASSIS-ETHERNET] setRemoteID: send time = %lf", send_time - start_time);
 #endif
     transfer_->Read_data(rec, rlen, 12, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] setRemoteID: recv time = %lf", recv_time - send_time);
+      GS_INFO("[CHASSIS-ETHERNET] setRemoteID: recv time = %lf", recv_time - send_time);
 #endif
   }
 
@@ -235,7 +236,7 @@ void WC_chassis_mcu::setRemoteID(unsigned char id) {
  * 自动充电   cmd  01:开始充电　　02:结束充电
  *            sta  01:正在充电　　02:不在充电
  *    bit 对应关系：   01        23            45         67
- *                    充电   内部(12V)   外部(电机24V)   客户 
+ *                    充电   内部(12V)   外部(电机24V)   客户
  */
 unsigned char WC_chassis_mcu::setChargeCmd(unsigned char cmd) {
   unsigned char send[1024] = {0};
@@ -325,7 +326,7 @@ bool WC_chassis_mcu::getCSpeed(double &v, double &w) {
     v = 0;
     w = 0;
   }
-  GAUSSIAN_INFO("get v = %lf, w = %lf; set v = %lf, w = %lf",v, w, speed_v_, speed_w_);
+  GS_INFO("get v = %lf, w = %lf; set v = %lf, w = %lf",v, w, speed_v_, speed_w_);
   return true;
 }
 
@@ -369,8 +370,8 @@ void WC_chassis_mcu::yawSwitch(void){
 bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     comunication();
 
-    GAUSSIAN_INFO("[WC CHASSIS] left: %d right: %d dleft: %d dright: %d ddleft: %d ddright: %d angle: %f", counts_left_, counts_right_, delta_counts_left_, delta_counts_right_, delta_counts_left_ - last_odo_delta_counts_left_, delta_counts_right_ - last_odo_delta_counts_right_, yaw_angle_ / 10.0);
-    GAUSSIAN_INFO("[WC CHASSIS] counts_per_second: left = %d; right = %d", delta_counts_left_ * 20, delta_counts_right_ * 20);
+    GS_INFO("[WC CHASSIS] left: %d right: %d dleft: %d dright: %d ddleft: %d ddright: %d angle: %f", counts_left_, counts_right_, delta_counts_left_, delta_counts_right_, delta_counts_left_ - last_odo_delta_counts_left_, delta_counts_right_ - last_odo_delta_counts_right_, yaw_angle_ / 10.0);
+    GS_INFO("[WC CHASSIS] counts_per_second: left = %d; right = %d", delta_counts_left_ * 20, delta_counts_right_ * 20);
 
 
 
@@ -412,17 +413,17 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
 
     //防止码盘抖动
     if (abs(delta_counts_right) > delta_counts_th_) {
-      GAUSSIAN_ERROR("err delta_counts_right: %d", delta_counts_right);
+      GS_ERROR("err delta_counts_right: %d", delta_counts_right);
       delta_counts_right = last_odo_delta_counts_right_;
     }
     if (abs(delta_counts_left) > delta_counts_th_) {
-      GAUSSIAN_ERROR("err delta_counts_left: %d", delta_counts_left);
+      GS_ERROR("err delta_counts_left: %d", delta_counts_left);
       delta_counts_left = last_odo_delta_counts_left_;
     }
     last_odo_delta_counts_right_ = delta_counts_right;
     last_odo_delta_counts_left_ = delta_counts_left;
 
-    GAUSSIAN_INFO("[WC CHASSIS] gotOdo:: delta_counts_left: %d delta_counts_right: %d last_odo_delta_counts_left_: %d last_odo_delta_counts_right_: %d", delta_counts_left, delta_counts_right, last_odo_delta_counts_left_, last_odo_delta_counts_right_);
+    GS_INFO("[WC CHASSIS] gotOdo:: delta_counts_left: %d delta_counts_right: %d last_odo_delta_counts_left_: %d last_odo_delta_counts_right_: %d", delta_counts_left, delta_counts_right, last_odo_delta_counts_left_, last_odo_delta_counts_right_);
 
     double l_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_left * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
     double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
@@ -476,16 +477,16 @@ void WC_chassis_mcu::getUltra(void) {
   if (transfer_) {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
-    double send_time = GetTimeInSeconds(); 
+    double send_time = GetTimeInSeconds();
     if (send_time - start_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get_Ultra: send time = %lf", send_time - start_time);
+      GS_INFO("[CHASSIS-ETHERNET] get_Ultra: send time = %lf", send_time - start_time);
 #endif
 
     transfer_->Read_data(rec, rlen, 23, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get_Ultra: recv time = %lf", recv_time - send_time);
+      GS_INFO("[CHASSIS-ETHERNET] get_Ultra: recv time = %lf", recv_time - send_time);
 #endif
   }
 
@@ -516,15 +517,15 @@ unsigned int WC_chassis_mcu::checkRemoteVerifyKey(unsigned int seed_key) {
   if (transfer_) {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
-    double send_time = GetTimeInSeconds(); 
+    double send_time = GetTimeInSeconds();
     if (send_time - start_time > 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] checkRemoteVerifyKey: send time = %lf", send_time - start_time);
+      GS_INFO("[CHASSIS-ETHERNET] checkRemoteVerifyKey: send time = %lf", send_time - start_time);
 #endif
     transfer_->Read_data(rec, rlen, 15, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time > 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] checkRemoteVerifyKey: recv time = %lf", recv_time - send_time);
+      GS_INFO("[CHASSIS-ETHERNET] checkRemoteVerifyKey: recv time = %lf", recv_time - send_time);
 #endif
   }
 
@@ -552,15 +553,15 @@ void WC_chassis_mcu::getRemoteCmd(unsigned char& cmd, unsigned short& index) {
   if (transfer_) {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
-    double send_time = GetTimeInSeconds(); 
+    double send_time = GetTimeInSeconds();
     if (send_time - start_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get remote cmd: send time = %lf", send_time - start_time);
+      GS_INFO("[CHASSIS-ETHERNET] get remote cmd: send time = %lf", send_time - start_time);
 #endif
     transfer_->Read_data(rec, rlen, 14, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get remote cmd: recv time = %lf", recv_time - send_time);
+      GS_INFO("[CHASSIS-ETHERNET] get remote cmd: recv time = %lf", recv_time - send_time);
 #endif
   }
 
@@ -573,7 +574,7 @@ void WC_chassis_mcu::getRemoteCmd(unsigned char& cmd, unsigned short& index) {
     for (int i = 0; i < rlen; ++i) {
       if (IRQ_CH(rec[i])) {
         getRemote(cmd, index);
-        // GAUSSIAN_INFO("[wc_chassis] cmd = %d; index = %d", cmd, index);
+        // GS_INFO("[wc_chassis] cmd = %d; index = %d", cmd, index);
       }
     }
   }
@@ -592,15 +593,15 @@ void WC_chassis_mcu::getYawAngle(short& yaw, short& pitch, short& roll) {
   if (transfer_) {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
-    double send_time = GetTimeInSeconds(); 
+    double send_time = GetTimeInSeconds();
     if (send_time - start_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get Yaw Angle: send time = %lf", send_time - start_time);
+      GS_INFO("[CHASSIS-ETHERNET] get Yaw Angle: send time = %lf", send_time - start_time);
 #endif
     transfer_->Read_data(rec, rlen, 17, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get Yaw Angle: recv time = %lf", recv_time - send_time);
+      GS_INFO("[CHASSIS-ETHERNET] get Yaw Angle: recv time = %lf", recv_time - send_time);
 #endif
   }
 
@@ -632,15 +633,15 @@ int WC_chassis_mcu::getLPos() {
   if (transfer_) {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
-    double send_time = GetTimeInSeconds(); 
+    double send_time = GetTimeInSeconds();
     if (send_time - start_time > 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get left pos: send time = %lf", send_time - start_time);
+      GS_INFO("[CHASSIS-ETHERNET] get left pos: send time = %lf", send_time - start_time);
 #endif
     transfer_->Read_data(rec, rlen, 23, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time > 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get left pos: recv time = %lf", recv_time - send_time);
+      GS_INFO("[CHASSIS-ETHERNET] get left pos: recv time = %lf", recv_time - send_time);
 #endif
   }
 
@@ -675,16 +676,16 @@ int WC_chassis_mcu::getRPos() {
   if (transfer_) {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
-    double send_time = GetTimeInSeconds(); 
+    double send_time = GetTimeInSeconds();
     if (send_time - start_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get right pos: send time = %lf", send_time - start_time);
+      GS_INFO("[CHASSIS-ETHERNET] get right pos: send time = %lf", send_time - start_time);
 #endif
 
     transfer_->Read_data(rec, rlen, 23, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get right pos: recv time = %lf", recv_time - send_time);
+      GS_INFO("[CHASSIS-ETHERNET] get right pos: recv time = %lf", recv_time - send_time);
 #endif
   }
 
@@ -719,16 +720,16 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
   if (transfer_) {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
-    double send_time = GetTimeInSeconds(); 
+    double send_time = GetTimeInSeconds();
     if (send_time - start_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] set_DO: cost time = %lf", send_time - start_time);
+      GS_INFO("[CHASSIS-ETHERNET] set_DO: cost time = %lf", send_time - start_time);
 #endif
 
     transfer_->Read_data(rec, rlen, 15, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] get_DI: cost time = %lf", recv_time - send_time);
+      GS_INFO("[CHASSIS-ETHERNET] get_DI: cost time = %lf", recv_time - send_time);
 #endif
   }
   // std::string str_send = cComm::ByteToHexString(send, len);
@@ -742,25 +743,25 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
         return GetDI();
       }
     }
-  } 
-  
+  }
+
   transfer_->Send_data(rec,rlen); // Gavin request
-  transfer_->Read_data(rec,rlen,rlen,500); // Gavin request 
+  transfer_->Read_data(rec,rlen,rlen,500); // Gavin request
 
   return 0xffffffff;
 }
 
 void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
-  if (ret == 0) { 
-    GAUSSIAN_INFO("[wc_chassis] send remote ret == 0!");
+  if (ret == 0) {
+    GS_INFO("[wc_chassis] send remote ret == 0!");
   }
   unsigned char send[1024] = {0};
   int len = 0;
 
   unsigned char rec[1024] = {0};
   int rlen = 0;
-  
-  GAUSSIAN_INFO("chassis remote ret cmd = %d, state = %d", (ret & 0xff), (ret >> 8) & 0xff);
+
+  GS_INFO("chassis remote ret cmd = %d, state = %d", (ret & 0xff), (ret >> 8) & 0xff);
 
   CreateRemoteRet(send, &len, 0, ret);
 
@@ -768,16 +769,16 @@ void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
   if (transfer_) {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
-    double send_time = GetTimeInSeconds(); 
+    double send_time = GetTimeInSeconds();
     if (send_time - start_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] setRemoteRet: cost time = %lf", send_time - start_time);
+      GS_INFO("[CHASSIS-ETHERNET] setRemoteRet: cost time = %lf", send_time - start_time);
 #endif
 
     transfer_->Read_data(rec, rlen, 12, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS-ETHERNET] setRemoteRet: cost time = %lf", recv_time - send_time);
+      GS_INFO("[CHASSIS-ETHERNET] setRemoteRet: cost time = %lf", recv_time - send_time);
 #endif
   }
 
@@ -843,13 +844,13 @@ short WC_chassis_mcu::getMotorSpeed(float speed) {
   ret = ret < ((-1) * SPEED_TH) ? ((-1) * SPEED_TH) : ret;
   return ret;
 }
-	
+
 double sign(double t){
   return t >= 0.0 ? (1.0) : (-1.0);
 }
 
 void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
-  GAUSSIAN_INFO("[CHASSIS] get speed v = %.2f, w = %.2f", speed_v, speed_w);
+  GS_INFO("[CHASSIS] get speed v = %.2f, w = %.2f", speed_v, speed_w);
   float speed_left = 0.0;
   float speed_right = 0.0;
   short m_speed_left = 0;
@@ -870,7 +871,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   speed_v = fabs(speed_v) > max_speed_v_ ?  sign(speed_v) * max_speed_v_ : speed_v;
   speed_w = fabs(speed_w) > max_speed_w_ ?  sign(speed_w) * max_speed_w_ : speed_w;
 
-  GAUSSIAN_INFO("[CHASSIS] set real speed v = %.2f, w = %.2f", speed_v, speed_w);
+  GS_INFO("[CHASSIS] set real speed v = %.2f, w = %.2f", speed_v, speed_w);
 
   //calculate angle and speed
   if (IsInPlaceRotation(speed_v, speed_w))  {
@@ -890,7 +891,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
       speed_left = 2 * speed_v - speed_right;
     }
   }
-  GAUSSIAN_INFO("[CHASSIS] raw speed Left: %.2f, Right: %.2f", speed_left, speed_right);
+  GS_INFO("[CHASSIS] raw speed Left: %.2f, Right: %.2f", speed_left, speed_right);
   m_speed_left = getMotorSpeed(speed_left);
   m_speed_right= getMotorSpeed(speed_right);
 
@@ -909,15 +910,15 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   if (transfer_) {
     transfer_->Send_data(send, len);
 #ifdef DEBUG_ETHERNET
-    double send_time = GetTimeInSeconds(); 
+    double send_time = GetTimeInSeconds();
     if (send_time - start_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS] set speed: send time = %lf", send_time - start_time);
+      GS_INFO("[CHASSIS] set speed: send time = %lf", send_time - start_time);
 #endif
     transfer_->Read_data(rec, rlen, 23, 500);
 #ifdef DEBUG_ETHERNET
     double recv_time = GetTimeInSeconds();
     if (recv_time - send_time> 0.002)
-      GAUSSIAN_INFO("[CHASSIS] set speed: recv time = %lf", recv_time - send_time);
+      GS_INFO("[CHASSIS] set speed: recv time = %lf", recv_time - send_time);
 #endif
   }
   usleep(1000);
@@ -932,6 +933,6 @@ void WC_chassis_mcu::comunication(void) {
   usleep(1000);
   getYawAngle(yaw_angle_, pitch_angle_, roll_angle_);
   yaw_angle_ = yaw_angle_ < 0 ? (3600 + yaw_angle_) : yaw_angle_;
-  usleep(1000); 
-  GAUSSIAN_INFO("[CHASSIS] yaw_angle %d", yaw_angle_);
+  usleep(1000);
+  GS_INFO("[CHASSIS] yaw_angle %d", yaw_angle_);
 }

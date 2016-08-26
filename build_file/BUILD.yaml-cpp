@@ -1,0 +1,55 @@
+COPTS = [
+    "-std=c++11",
+]
+LINK_OPTS = [
+]
+
+cc_library(
+    name = "yaml-cpp",
+    srcs = glob([
+        "src/*.cpp",
+        "src/contrib/*.cpp",
+    ]),
+    hdrs = glob([
+        "include/**/*.h",
+        "src/**/*.h",
+    ]),
+    includes = [
+        "include",
+        "src",
+    ],
+    copts = COPTS,
+    linkopts = LINK_OPTS,
+    linkstatic = True,
+    deps = [
+        "@io_bazel_rules_ros//ros:boost",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "parse",
+    srcs = ["util/parse.cpp"],
+    linkstatic = True,
+    deps = [
+        ":yaml-cpp",
+    ],
+)
+
+cc_binary(
+    name = "sandbox",
+    srcs = ["util/sandbox.cpp"],
+    linkstatic = True,
+    deps = [
+        ":yaml-cpp",
+    ],
+)
+
+cc_binary(
+    name = "read",
+    srcs = ["util/read.cpp"],
+    linkstatic = True,
+    deps = [
+        ":yaml-cpp",
+    ],
+)

@@ -46,18 +46,18 @@ void onCharge(void)
     if(sleep_cnt == 0){
         charger_cmd_ = CMD_CHARGER_ON;
         std::thread([&](){
-          GAUSSIAN_INFO("[CHASSIS] start to check charger volatage = %d", charger_voltage_);
+          GS_INFO("[CHASSIS] start to check charger volatage = %d", charger_voltage_);
           sleep(3);
           int check_charger_cnt = 0;
           while(++sleep_cnt  < 60 && charger_cmd_ == CMD_CHARGER_ON) {
-           GAUSSIAN_INFO("[CHASSIS] checking charger volatage = %d", charger_voltage_);
+           GS_INFO("[CHASSIS] checking charger volatage = %d", charger_voltage_);
            if (charger_voltage_ >= charger_low_voltage_) {
              ++check_charger_cnt;
            } else {
              check_charger_cnt = 0;
            }
            if (check_charger_cnt > charger_delay_time_ && charger_cmd_ == CMD_CHARGER_ON) {
-             GAUSSIAN_INFO("[CHASSIS] check charger voltage normal > 30s, set charger relay on!!!");
+             GS_INFO("[CHASSIS] check charger voltage normal > 30s, set charger relay on!!!");
              g_chassis_mcu->setChargeCmd(CMD_CHARGER_ON);
              pre_mileage = (g_chassis_mcu->mileage_right_ + g_chassis_mcu->mileage_left_) / 2;
              break;
@@ -74,14 +74,14 @@ void onCharge(void)
  */
 void DoDIO(ros::Publisher going_back_pub) {
   unsigned int temp_di_data = g_chassis_mcu->doDIO(g_do_data_);
-  GAUSSIAN_INFO("[wc_chassis] get_di data: 0x%x", temp_di_data);
+  GS_INFO("[wc_chassis] get_di data: 0x%x", temp_di_data);
   cur_emergency_status = (temp_di_data >> (8 + Emergency_stop)) & 0x01;
   // new version hardware hand touch
   if (new_hand_touch_) {
     temp_di_data = g_ultrasonic[0];
   }
   if (++g_dio_count > 2 && ((g_di_data_ & 0x03) != 0x03) && ((temp_di_data & 0x03) == 0x03)) {
-    GAUSSIAN_INFO("[wc_chassis] get_di data: 0x%x, and then publish going back!!!", temp_di_data);
+    GS_INFO("[wc_chassis] get_di data: 0x%x, and then publish going back!!!", temp_di_data);
     std_msgs::UInt32 msg;
     msg.data = 1;
     going_back_pub.publish(msg);

@@ -46,31 +46,9 @@ void PublishUltrasonic(ros::Publisher ultrasonic_pub[]) {
   for(int i=0;i<15;i++){
     if(ultrasonic_pub[i] != 0){  //==0表示不是文件里配置的超声
       publish_ultrasonic(ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i], i, raw_range);
-      GAUSSIAN_INFO("[wc chassis] get ultra[%d] raw range = %lf", i, raw_range);
+      GS_INFO("[wc chassis] get ultra[%d] raw range = %lf", i, raw_range);
     }
   }
-}
-
-/*
- * 发送陀螺仪数据
- */
-void PublishGyro(ros::Publisher &gyro_pub) {
-  sensor_msgs::Imu imu_msg;
-  imu_msg.header.stamp = ros::Time::now();
-  imu_msg.header.frame_id = "world";
-
-  tf::Quaternion temp;
-  double roll, pitch, yaw;
-  roll = g_chassis_mcu->roll_angle_ / 10.0 / 180.0 * M_PI;
-  pitch = g_chassis_mcu->pitch_angle_ / 10.0 / 180.0 * M_PI;
-  yaw = g_chassis_mcu->yaw_angle_ / 10.0 / 180.0 * M_PI;
-  temp.setRPY(roll, pitch, yaw);
-
-  imu_msg.orientation.x = temp.getX();
-  imu_msg.orientation.y = temp.getY();
-  imu_msg.orientation.z = temp.getZ();
-  imu_msg.orientation.w = temp.getW();
-  gyro_pub.publish(imu_msg);
 }
 
 /*
@@ -79,7 +57,7 @@ void PublishGyro(ros::Publisher &gyro_pub) {
 void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index) {
   std_msgs::UInt32 remote_cmd;
   if (cmd > 0 && cmd < 12) {
-    GAUSSIAN_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
+    GS_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
   }
   remote_cmd.data = (index << 8) | cmd;
   remote_cmd_pub.publish(remote_cmd);
@@ -138,7 +116,7 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
       battery_level_ = 3;
     }
 
-    GAUSSIAN_INFO("[wc_chassis] battery_ADC: %d; battery_value: %lf;display_battery_capacity: %d; battery_level_: %d", battery_ADC, battery_value, display_battery_capacity, battery_level_);
+    GS_INFO("[wc_chassis] battery_ADC: %d; battery_value: %lf;display_battery_capacity: %d; battery_level_: %d", battery_ADC, battery_value, display_battery_capacity, battery_level_);
 //    std::cout << "battery_ADC " << battery_ADC << "; battery_value " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << " battery_level_" << battery_level_ << std::endl;
     device_value.key = std::string("battery");
     device_value.value = std::to_string(display_battery_capacity);

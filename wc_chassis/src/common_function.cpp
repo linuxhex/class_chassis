@@ -1,5 +1,6 @@
 /* common_function.cpp文件工程用到的所有的共有函数
 */
+
 #include"common_function.h"
 #include"init.h"
 #include"parameter.h"
@@ -22,14 +23,14 @@ void protectorManage(void)
     for (unsigned int i = 0; i < front_protector_list.size(); ++i) {
       if (!(protector_status & (1 << front_protector_list.at(i)))) {
         temp_hit |= FRONT_HIT;
-        GAUSSIAN_ERROR("[WC_CHASSIS] front protector bit[%d] hit!!!", front_protector_list.at(i));
+        GS_ERROR("[WC_CHASSIS] front protector bit[%d] hit!!!", front_protector_list.at(i));
         break;
       }
     }
     for (unsigned int i = 0; i < rear_protector_list.size(); ++i) {
      if (!(protector_status & (1 << rear_protector_list.at(i)))) {
         temp_hit |= REAR_HIT;
-        GAUSSIAN_ERROR("[WC_CHASSIS] rear protector bit[%d] hit!!!", rear_protector_list.at(i));
+        GS_ERROR("[WC_CHASSIS] rear protector bit[%d] hit!!!", rear_protector_list.at(i));
         break;
       }
     }
@@ -101,7 +102,7 @@ void chargeValueManage(void)
       charge_on_time_ = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
      }
     charger_voltage_ = current_charge_voltage;
-    GAUSSIAN_INFO("[wc_chassis] adc_charge = %d, charger_voltage_: %lf", charge_ADC, charger_voltage_);
+    GS_INFO("[wc_chassis] adc_charge = %d, charger_voltage_: %lf", charge_ADC, charger_voltage_);
 
     if(charger_full_voltage_ < battery_value_){
        g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
@@ -124,7 +125,7 @@ void chargeValueManage(void)
     } else {
       charger_status_ = STA_CHARGER_OFF;
     }
-    GAUSSIAN_INFO("[wc_chassis] get relay status = 0x%.2x, charger_status_ = %d", relay_status_, charger_status_);
+    GS_INFO("[wc_chassis] get relay status = 0x%.2x, charger_status_ = %d", relay_status_, charger_status_);
 
 }
 
@@ -153,7 +154,7 @@ void ReadConfigFromXMLRPC(XmlRpc::XmlRpcValue& config_xmlrpc, const std::string&
       throw std::runtime_error( "The config must be specified as list of parameter server eg: [1, 2, ..., n],, but this spec is not of that form");
     }
     config = static_cast<int>(value);
-    GAUSSIAN_INFO("[SERVICEROBOT] get config[%d] px = %d", i, config);
+    GS_INFO("[SERVICEROBOT] get config[%d] px = %d", i, config);
     config_list->push_back(config);
   }
 }
@@ -164,15 +165,15 @@ bool ReadConfigFromParams(std::string param_name, ros::NodeHandle* nh, std::vect
   if (nh->searchParam(param_name, full_param_name)) {
     XmlRpc::XmlRpcValue config_xmlrpc;
     nh->getParam(full_param_name, config_xmlrpc);
-    GAUSSIAN_INFO("[CHASSIS] %s: config_list size = %zu",param_name.c_str(), config_xmlrpc.size());
+    GS_INFO("[CHASSIS] %s: config_list size = %zu",param_name.c_str(), config_xmlrpc.size());
     if (config_xmlrpc.getType() == XmlRpc::XmlRpcValue::TypeArray && config_xmlrpc.size() > 0) {
       ReadConfigFromXMLRPC(config_xmlrpc, full_param_name, config_list);
       for (unsigned int i = 0; i < config_list->size(); ++i) {
-        GAUSSIAN_INFO("[CHASSIS] %s: config_list[%d/%zu] = %d",param_name.c_str() ,i, config_list->size(), config_list->at(i));
+        GS_INFO("[CHASSIS] %s: config_list[%d/%zu] = %d",param_name.c_str() ,i, config_list->size(), config_list->at(i));
       }
       return true;
     } else {
-      GAUSSIAN_ERROR("[CHASSIS] %s: config_list param's type is not Array!", param_name.c_str());
+      GS_ERROR("[CHASSIS] %s: config_list param's type is not Array!", param_name.c_str());
     }
   }
   return false;
@@ -230,7 +231,7 @@ void freeResource(void){
   std::string str;
   ss << p_checkConnectionThread->get_id();
   ss >> str;
-  GAUSSIAN_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
+  GS_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
 
   delete p_checkConnectionThread;
   delete g_chassis_mcu;

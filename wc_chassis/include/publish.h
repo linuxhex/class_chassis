@@ -34,7 +34,6 @@
  void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index);
  void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int,unsigned int ultrasonic_offset, double& ultra_range);
  void PublishUltrasonic(ros::Publisher ultrasonic_pub[]);
- void PublishGyro(ros::Publisher &gyro_pub);
  void publish_protector_status(ros::Publisher &protector_pub);
  void UpdateDeviceStatus(void);
  void publish_protector_value(ros::Publisher &protector_pub);

@@ -1,10 +1,12 @@
 /* Copyright(C) Gaussian Robot. All rights reserved.
 */
+
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <std_msgs/UInt32.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/Float32.h>
+
 #include "wc_chassis_mcu.h"
 #include "init.h"
 #include "parameter.h"
@@ -16,14 +18,12 @@
 ros::Publisher ultrasonic_pub[15];
 ros::Publisher yaw_pub;
 ros::Publisher odom_pub;
-ros::Publisher gyro_pub;
 ros::Publisher remote_cmd_pub;
 ros::Publisher device_pub;
 ros::Publisher rotate_finished_pub;
 ros::Publisher protector_pub;
 ros::Publisher going_back_pub;
 ros::Publisher dio_pub;
-ros::Publisher gyro_value_pub;
 ros::Publisher protector_value_pub;
 
 
@@ -32,19 +32,17 @@ int main(int argc, char **argv) {
     SetSchedPriority();   //设置chassis进程运行的优先级和占用的cpu核
     ROS_INFO("[wc_chassis] chassis version: 1.1.4.6");
     InitChassis(argc, argv,"wc_chassis");
-    GAUSSIAN_INFO("[wc_chassis] chassis init completed");
+    GS_INFO("[wc_chassis] chassis init completed");
 
     /*********************************publish handle init ******************************/
     yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
     odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
-    gyro_pub        = p_device_nh->advertise<sensor_msgs::Imu>("gyro", 50);
     remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
     device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
     rotate_finished_pub = p_device_nh->advertise<std_msgs::Int32>("rotate_finished", 5);
     protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
     going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
     dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
-    gyro_value_pub  = p_device_nh->advertise<autoscrubber_services::gyroValue>("gyro_value", 50);
     protector_value_pub   = p_device_nh->advertise<std_msgs::UInt32>("protector_status", 50);
     for(int i=0;i<15;i++){
       if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
@@ -116,7 +114,6 @@ int main(int argc, char **argv) {
     PublishDIO(dio_pub);
     PublishOdom(p_odom_broadcaster,odom_pub);
     PublishYaw(yaw_pub);
-    PublishGyro(gyro_pub);
     PublishUltrasonic(ultrasonic_pub);
     publish_protector_status(protector_pub);
     publish_protector_value(protector_value_pub);
@@ -124,7 +121,7 @@ int main(int argc, char **argv) {
     p_loop_rate->sleep();
   }
 
-  GAUSSIAN_INFO("[wc_chassis] wc_chassis has closed, now free resource!");
+  GS_INFO("[wc_chassis] wc_chassis has closed, now free resource!");
   freeResource();
   return 0;
 }
