@@ -10,3 +10,6 @@ bazel-*
 core
 *.autosave
 output/
+autoscrubber_services/
+gslib/
+gs/
