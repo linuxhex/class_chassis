@@ -17,8 +17,4 @@ void freeResource(void);
 void SetSchedPriority(void);
 void ReadConfigFromXMLRPC(XmlRpc::XmlRpcValue& config_xmlrpc, const std::string& full_param_name, std::vector<unsigned int>* config_list);
 bool ReadConfigFromParams(std::string param_name, ros::NodeHandle* nh, std::vector<unsigned int>* config_list);
-void protectorManage(void);
-void chargeValueManage(void);
-void updateDeviceStatus(void);
-void relayStatusManage(void);
 #endif // COMMON_FUNCTION_H

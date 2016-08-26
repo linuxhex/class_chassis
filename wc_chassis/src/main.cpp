@@ -6,7 +6,6 @@
 #include <std_msgs/UInt32.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/Float32.h>
-
 #include "wc_chassis_mcu.h"
 #include "init.h"
 #include "parameter.h"
@@ -14,6 +13,7 @@
 #include "action.h"
 #include "parameter.h"
 #include "common_function.h"
+#include "data_process.h"
 
 ros::Publisher ultrasonic_pub[15];
 ros::Publisher yaw_pub;
