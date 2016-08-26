@@ -1,0 +1,59 @@
+before_script:
+  # Install ssh-agent if not already installed, it is required by Docker.
+  # (change apt-get to yum if you use a CentOS-based image)
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+
+  # Run ssh-agent (inside the build environment)
+  - eval $(ssh-agent -s)
+
+  # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+
+  # For Docker builds disable host key checking. Be aware that by adding that
+  # you are suspectible to man-in-the-middle attacks.
+  # WARNING: Use this only with the Docker executor, if you use it with shell
+  # you will overwrite your user's SSH config.
+  - mkdir -p ~/.ssh
+  - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+stages:
+  - download
+  - build
+  - deploy
+
+download:
+  stage: download
+  script:
+    - bazel clean
+    - rm -rf autoscrubber_services && git clone git@git.gs-robot.com:autoscrubber/autoscrubber_services.git
+    - rm -rf gs && git clone git@git.gs-robot.com:chenkan/gs.git
+    - rm -rf gslib && git clone git@git.gs-robot.com:chenkan/gslib.git
+  artifacts:
+    paths:
+      - autoscrubber_services/
+      - gs/
+      - gslib/
+
+build:
+  stage: build
+  script:
+    - bazel build //:wc_chassis --cpu=k8 --host_cpu=k8 -c opt --copt=-g0 --copt=-O3 --copt=-s --strip=always --curses=no
+    - mkdir -p deploy
+    - cp bazel-bin/wc_chassis deploy/
+  dependencies:
+    - download
+  artifacts:
+    paths:
+      - deploy/
+
+deploy:
+  stage: deploy
+  script:
+    - echo "start deploy..."
+    - strip deploy/wc_chassis
+  dependencies:
+    - build
+  artifacts:
+    name: "${CI_BUILD_NAME}_${CI_BUILD_REF_NAME}"
+    paths:
+      - deploy/
