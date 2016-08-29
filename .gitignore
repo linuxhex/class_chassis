@@ -1,7 +1,7 @@
 *.swp
 *.swo
 *.config
-*.creator.*
+*.creator*
 *.files
 *.includes
 gs/
