@@ -117,6 +117,9 @@ void InitParameter()
 //    p_nh->param("old_ultrasonic", old_ultrasonic_, false);//旧板子里面没有超声板状态
 //    p_nh->param("charger_delay_time",charger_delay_time_,30);//充电继电器打开延时时间
 
+    
+    
+    
     // 前面防撞条配置
     if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {
       GS_ERROR("[SERVICEROBOT] read front_protector_list failed");

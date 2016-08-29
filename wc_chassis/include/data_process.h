@@ -6,6 +6,6 @@ void chargeValueManage(void);
 void updateDeviceStatus(void);
 void relayStatusManage(void);
 
-#define TEST_RESTART
+//#define TEST_RESTART  //测试下位机的滴答时钟
 
 #endif // DATA_PROCESS_H

@@ -5,6 +5,7 @@
 #include "SPort.h"
 #include <vector>
 #include "protocol.h"
+#include "data_process.h"
 
 #ifdef MCU
 #include "UART.h"
@@ -369,13 +370,14 @@ void CreateRUltra(unsigned char* ch, int* len) {
   Coder(ch,len,&sendProtocol,&data);
 }
 
+#ifdef TEST_RESTART
 void CreateCntTime(unsigned char* ch, int* len){
 
   Data data;
   SInit_Proto(&sendProtocol,RCNT_TIME);
   Coder(ch,len,&sendProtocol,&data);
 }
-
+#endif
 
 void createYawAngle(unsigned char* ch, int* len) {
   Data data;
@@ -503,10 +505,12 @@ unsigned int getRemoteVerifyKey(void)
   return m_remote_check_key;
 }
 
+#ifdef TEST_RESTART
 unsigned int getTime(void)
 {
   return cnt_time;
 }
+#endif
 
 void CreateRemoteVerifyKey(unsigned char* ch,int* len,int id, unsigned int key)
 {
