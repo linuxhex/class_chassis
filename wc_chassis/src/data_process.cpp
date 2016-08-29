@@ -127,6 +127,13 @@ void chargeValueManage(void)
 
 }
 
+#ifdef TEST_RESTART
+void mainBoardTicksManage(void){
+    unsigned int cnt_time = g_chassis_mcu->getCntTime();
+    std::cout << "[wc_chassis] main_board ticks = " << cnt_time <<std::endl;
+}
+#endif
+
 /*
  * 获取防撞条＋超声这些设备的状态数据＋充电电压的处理
 */
@@ -139,4 +146,7 @@ void updateDeviceStatus(void)
   relayStatusManage();
   chargeValueManage();
   protectorManage();
+ #ifdef TEST_RESTART
+  mainBoardTicksManage();
+ #endif
 }
