@@ -52,6 +52,7 @@ unsigned int volatile m_remote_check_key = 0;
 unsigned char  m_charge_status = 0;
 
 unsigned int m_di = 0;
+unsigned int cnt_time = 0;
 
 unsigned int m_ad[4] = {0};
 
@@ -230,6 +231,8 @@ int Coder(unsigned char* ch,int* len,AGVProtocol* protol,Data* data){
         case SHUTDOWN_CMD:
             protol->data.shutdownCmd.cmd = data->shutdownCmd.cmd;
             protol->len = sizeof(ShutDownProtocol);
+        case RCNT_TIME:
+            protol->len = sizeof(RCntTimeProtocol);
         default:
             break;
     }
@@ -292,6 +295,8 @@ int Decoder(AGVProtocol* protol,unsigned char* ch,int len){
         case DI:
             m_di = protol->data.di_.usdi;
             break;
+        case CNT_TIME:
+            cnt_time = protol->data.cnt_time_.cnt_time;
         case TIME:
             break;
         case RCURRENT:
@@ -363,6 +368,14 @@ void CreateRUltra(unsigned char* ch, int* len) {
 
   Coder(ch,len,&sendProtocol,&data);
 }
+
+void CreateCntTime(unsigned char* ch, int* len){
+
+  Data data;
+  SInit_Proto(&sendProtocol,RCNT_TIME);
+  Coder(ch,len,&sendProtocol,&data);
+}
+
 
 void createYawAngle(unsigned char* ch, int* len) {
   Data data;
@@ -477,17 +490,26 @@ float GetAD(int id){
   }
   return ad;
 }
-int GetDelta(int id) {
+int GetDelta(int id)
+{
   if (id == 0) {
     return m_left_delta;
   } else{
     return m_right_delta;
   }
 }
-unsigned int getRemoteVerifyKey(void) {
+unsigned int getRemoteVerifyKey(void)
+{
   return m_remote_check_key;
 }
-void CreateRemoteVerifyKey(unsigned char* ch,int* len,int id, unsigned int key) {
+
+unsigned int getTime(void)
+{
+  return cnt_time;
+}
+
+void CreateRemoteVerifyKey(unsigned char* ch,int* len,int id, unsigned int key)
+{
   Data data;
 
   data.r_remote_verify_key_.key = key;

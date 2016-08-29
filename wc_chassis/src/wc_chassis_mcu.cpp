@@ -23,7 +23,7 @@
 #define DELTA_SPEED_V_DEC_TH    (-0.12)
 #define DELTA_SPEED_W_TH	    (0.25)
 #define DT                      (0.1)
-#define DEBUG_ETHERNET
+//#define DEBUG_ETHERNET
 
 const float  H = 0.92;
 float current_v = 0.0;
@@ -503,6 +503,34 @@ void WC_chassis_mcu::getUltra(void) {
   }
 
 }
+
+unsigned int WC_chassis_mcu::getCntTime(void) {
+  unsigned char send[1024] = {0};
+  int len = 0;
+
+  unsigned char rec[1024] = {0};
+  int rlen = 0;
+
+  CreateCntTime(send, &len);
+  if (transfer_) {
+    transfer_->Send_data(send, len);
+    transfer_->Read_data(rec, rlen, 15, 500);
+  }
+  std::string str = cComm::ByteToHexString(rec, rlen);
+#ifdef DEBUG_ETHERNET
+  std::cout << "recv cnt: " << str << std::endl;
+  std::cout << "recv rlen: " << rlen << std::endl;
+#endif
+  if (rlen == 15) {
+    for (int i = 0; i < rlen; ++i) {
+      if (IRQ_CH(rec[i])) {
+          return getTime();
+      }
+    }
+  }
+
+}
+
 
 unsigned int WC_chassis_mcu::checkRemoteVerifyKey(unsigned int seed_key) {
   unsigned char send[1024] = {0};
