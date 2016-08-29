@@ -39,7 +39,6 @@ class WC_chassis_mcu{
   unsigned char setChargeCmd(unsigned char cmd);
   void setShutdownCmd(unsigned char cmd);
   void yawSwitch(void);
-
   unsigned int getCntTime(void);
   int V2RPM(float v);
   int GetCopleySpeed(float v);

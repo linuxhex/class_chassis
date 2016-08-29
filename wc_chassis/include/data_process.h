@@ -6,4 +6,6 @@ void chargeValueManage(void);
 void updateDeviceStatus(void);
 void relayStatusManage(void);
 
+#define TEST_RESTART
+
 #endif // DATA_PROCESS_H

@@ -14,6 +14,7 @@
 #include "protocol.h"
 #include "wc_chassis_mcu.h"
 #include "common_function.h"
+#include "data_process.h"
 
 #define REDUCTION_RATIO	        (25)
 #define SPEED_TH	            (1000)
@@ -504,6 +505,7 @@ void WC_chassis_mcu::getUltra(void) {
 
 }
 
+#ifdef TEST_RESTART
 unsigned int WC_chassis_mcu::getCntTime(void) {
   unsigned char send[1024] = {0};
   int len = 0;
@@ -530,6 +532,7 @@ unsigned int WC_chassis_mcu::getCntTime(void) {
   }
 
 }
+#endif
 
 
 unsigned int WC_chassis_mcu::checkRemoteVerifyKey(unsigned int seed_key) {
