@@ -37,6 +37,7 @@ cc_binary(
     linkopts = LINK_OPTS,
     defines = [
         "VERIFY_REMTOE_ID=0",
+#        "TEST",
     ],
     linkstatic = True,
     deps = [

@@ -71,6 +71,8 @@ typedef enum{
   RREMOTE_CMD = 0x8c, 	//Request for remote cmd
   REMOTE_CMD = 0x8d,
   REMOTE_RET = 0x8e,   //send remote ret
+  RCNT_TIME = 0x92,
+  CNT_TIME  = 0x93,
   SHUTDOWN_CMD = 0x94, //send shutdown cmd on charging
 }CMDTypes;
 
@@ -216,6 +218,10 @@ typedef struct _RUltra {
 typedef struct _RYAWANGLE {
 }RYawAngleProtocol;
 
+typedef struct _RCNTTIME {
+}RCntTimeProtocol;
+
+
 typedef struct _YAWANGLE {
   short yaw;
   short roll;
@@ -263,6 +269,10 @@ typedef struct _REMOTECMD {
   unsigned char index_L;
 }RemoteCmdProtocol;
 
+typedef struct _CNTTIME {
+  unsigned int cnt_time;
+}CntTimeProtocol;
+
 typedef struct _REMOTERET {
   unsigned short ret;
 }RemoteRetProtocol;
@@ -297,6 +307,7 @@ typedef union _Data{
   RChargeCmdProtocol chargeCmd;
   RChargeStatusProtocol chargeStatus;
   ShutDownProtocol shutdownCmd;
+  CntTimeProtocol cnt_time_;
 }Data;
 
 typedef struct _AGVProtocol
@@ -361,5 +372,6 @@ int IRQ_CH(unsigned char c);
 void CreateChargeCmd(unsigned char* ch,int *len,unsigned char cmd);
 unsigned char getChargeStatusValue(void);
 void CreateShutdownCmd(unsigned char* ch,int *len,unsigned char cmd);
-
+void CreateCntTime(unsigned char* ch, int* len);
+unsigned int getTime(void);
 #endif//_PROTOCOL_WANGHONGTAO_2015_01_16_
