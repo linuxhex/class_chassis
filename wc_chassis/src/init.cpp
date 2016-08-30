@@ -76,8 +76,11 @@ void InitParameter()
 
 //    p_nh->param("max_cmd_interval", max_cmd_interval, 1.0);
 //    p_nh->param("TimeWidth", timeWidth, static_cast<double>(0.1));
-//    p_nh->param("host_name", host_name, std::string("10.7.5.199"));
-//    p_nh->param("port", port, 5000);
+  //  p_nh->param("host_name", host_name, std::string("10.7.5.199"));
+  //  p_nh->param("port", port, 5000);
+    //    p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
+    //    p_nh->param("laser_ip", laser_ip, std::sscp tring("10.7.5.100"));//激光ip
+    //    p_nh->param("internet_url",internet_url,std::string("www.baidu.com"));//外网url用于测试外网状态
 
 //    p_nh->param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
 //    p_nh->param("B_DIA", b_dia, static_cast<double>(0.125));
@@ -108,7 +111,7 @@ void InitParameter()
 //    p_nh->param("hardware_id", hardware_id, std::string("   "));//硬件设备名称
 //    p_nh->param("protector_num",protector_num,8);//防撞条使用数量
 //    p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
-//    p_nh->param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
+//    p_nh->param("laser_ip", laser_ip, std::sscp tring("10.7.5.100"));//激光ip
 //    p_nh->param("internet_url",internet_url,std::string("www.baidu.com"));//外网url用于测试外网状态
 //    p_nh->param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));//初始化旋转速度
 //    p_nh->param("charger_low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化
@@ -117,14 +120,106 @@ void InitParameter()
 //    p_nh->param("old_ultrasonic", old_ultrasonic_, false);//旧板子里面没有超声板状态
 //    p_nh->param("charger_delay_time",charger_delay_time_,30);//充电继电器打开延时时间
 
-    // 前面防撞条配置
-    if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {
-      GS_ERROR("[SERVICEROBOT] read front_protector_list failed");
+    //read device param
+    ros::NodeHandle chassis_param_nh("~/chassis_param");
+    std::string device_params;
+    chassis_param_nh.param("device", device_params, std::string(""));
+    std::cout<<"device"<<" "<<device_params<<std::endl;
+
+    std::stringstream device_ss(device_params);
+    std::string device_param;
+    while (device_ss >> device_param) {
+      if (device_param == "charger") {
+          ros::NodeHandle charger_nh("~/chassis_param/charger");
+          charger_nh.param("low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化
+          charger_nh.param("full_voltage", charger_full_voltage_, static_cast<double>(27.5));//初始化旋转速度
+          charger_nh.param("delay_time",charger_delay_time_,30);//充电继电器打开延时时间
+      } else if (device_param == "protector") {
+          ros::NodeHandle protector_nh("~/chassis_param/protector");
+          protector_nh.param("protector_num",protector_num,8);//防撞条使用数量
+      } else if (device_param == "hand_touch") {
+          ros::NodeHandle hand_touch_nh("~/chassis_param/hand_touch");
+          hand_touch_nh.param("new_hand_touch", new_hand_touch_, false);//新板子手触开关和防撞条共用一个接口
+
+      } else if (device_param == "ultrasonic") {
+          ros::NodeHandle ultrasonic_nh("~/chassis_param/ultrasonic");
+          ultrasonic_nh.param("name",*ultrasonic,std::string(" "));//配置的超声
+          ultrasonic_nh.param("min_range",ultrasonic_min_range,static_cast<float>(0.04));//超声最小距离
+          ultrasonic_nh.param("max_range",ultrasonic_max_range,static_cast<float>(1.0));//超声最大距离
+          ultrasonic_nh.param("effective_range", ultral_effective_range, static_cast<double>(0.4));//超声有效检测距离
+          ultrasonic_nh.param("specialer",*special_ultrasonic,std::string(" "));//特殊配置的超声
+          ultrasonic_nh.param("specialer_offset_dismeter",special_ultrasonic_offset_dismeter,static_cast<float>(0.15)); //特殊超声偏置距离
+
+      } else if (device_param == "battery") {
+          ros::NodeHandle battery_nh("~/chassis_param/battery");
+          battery_nh.param("full_level", battery_full_level, static_cast<double>(27.5));
+          battery_nh.param("empty_level", battery_empty_level, static_cast<double>(20.0));
+
+      } else if (device_param == "machine") {
+          std::cout<<"test"<<"";
+          ros::NodeHandle machine_nh("~/chassis_param/machine");
+          machine_nh.param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
+          machine_nh.param("B_DIA", b_dia, static_cast<double>(0.125));
+          machine_nh.param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
+          machine_nh.param("COUNTS", counts, 12);//霍尔数
+          machine_nh.param("REDUCTION_RATIO", reduction_ratio, static_cast<double>(30.0));//减速比
+          machine_nh.param("max_cmd_interval", max_cmd_interval, 1.0);
+          machine_nh.param("TimeWidth", timeWidth, static_cast<double>(0.1));
+          machine_nh.param("delta_counts_th",delta_counts_th,800); //码盘防抖动阈值
+
+      } else if (device_param == "network") {
+          ros::NodeHandle network_nh("~/chassis_param/network");
+          network_nh.param("host_name", host_name, std::string("10.7.5.199"));
+          network_nh.param("port", port, 5000);
+          network_nh.param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
+          network_nh.param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
+          network_nh.param("internet_url",internet_url,std::string("www.baidu.com"));//外网url用于测试外网状态
+
+      } else if (device_param == "checker_id") {
+          ros::NodeHandle checker_id_nh("~/chassis_param/checker_id");
+          checker_id_nh.param("hardware_id", hardware_id, std::string("   "));//硬件设备名称
+
+      } else if (device_param == "footprint") {
+          ros::NodeHandle footprint_nh("~/chassis_param/footprint");
+
+      } else if (device_param == "laser") {
+          ros::NodeHandle laser_nh("~/chassis_param/laser");
+
+      }
     }
-    // 后面防撞条配置
-    if (!ReadConfigFromParams("rear_protector", p_nh, &rear_protector_list)) {
-      GS_ERROR("[SERVICEROBOT] read rear_protector_list failed");
+
+    //read strategy param
+    std::string strategy_params;
+    chassis_param_nh.param("strategy", strategy_params, std::string(""));
+    std::stringstream strategy_ss(strategy_params);
+    std::string strategy_param;
+    while (strategy_ss >> strategy_param) {
+      if (strategy_param == "speed_v") {
+          ros::NodeHandle speed_v_nh("~/chassis_param/speed_v");
+          speed_v_nh.param("max", max_speed_v, static_cast<double>(0.6));//最大速度
+          speed_v_nh.param("acc", speed_v_acc, static_cast<double>(0.025));//速度加速度
+          speed_v_nh.param("dec", speed_v_dec, static_cast<double>(-0.12));//速度减速度
+          speed_v_nh.param("dec_to_zero", speed_v_dec_zero, static_cast<double>(-0.12));
+          speed_v_nh.param("full",full_speed,static_cast<double>(3.0)); //电机满转速度
+          speed_v_nh.param("remote_level", remote_speed_level_, 0);//遥控器控制速度
+
+      } else if (strategy_param == "speed_w") {
+          ros::NodeHandle speed_w_nh("~/chassis_param/speed_w");
+          speed_w_nh.param("max", max_speed_w, static_cast<double>(0.6));//最大角速度
+          speed_w_nh.param("speed_w_acc", speed_w_acc, static_cast<double>(0.25));//角速度加速度
+          speed_w_nh.param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));//角速度减速度
+
+      }
     }
+
+//    // 前面防撞条配置
+//    if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {
+//      GS_ERROR("[SERVICEROBOT] read front_protector_list failed");
+//    }
+//    // 后面防撞条配置
+//    if (!ReadConfigFromParams("rear_protector", p_nh, &rear_protector_list)) {
+//      GS_ERROR("[SERVICEROBOT] read rear_protector_list failed");
+//    }
 
     pthread_mutex_init(&speed_mutex, NULL);
 
