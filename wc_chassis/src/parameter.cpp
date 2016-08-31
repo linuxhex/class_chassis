@@ -1,8 +1,9 @@
 /* parameter.cpp  wc_chassis工程所有的全局参数定义
 */
 
-#include"parameter.h"
-#include"param/speed_v.h"
+#include "parameter.h"
+#include "param/speed_v.h"
+#include "publish.h"
 double ultral_effective_range = 0.4;
 double g_odom_x   = 0;
 double g_odom_y   = 0;
@@ -115,4 +116,5 @@ bool outer_relay   = true;  //外部继电器状态
 bool user_relay    = true;  //用户继电器状态
 double pre_mileage = 0.0;  //
 
-Speed_v *p_speed_v = NULL;
+Speed_v   *p_speed_v   = NULL;
+Publisher *p_publisher = NULL;
