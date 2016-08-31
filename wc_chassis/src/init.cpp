@@ -173,7 +173,7 @@ void InitParameter()
           network_nh.param("port", port, 5000);
           network_nh.param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
           network_nh.param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
-          network_nh.param("internet_url",internet_url,std::string("www.baidu.com"));//外网url用于测试外网状态
+          network_nh.param("internet_url",internet_url,std::string(""));//外网url用于测试外网状态
 
       } else if (device_param == "checker_id") {
           ros::NodeHandle checker_id_nh("~/chassis_param/checker_id");
@@ -188,6 +188,7 @@ void InitParameter()
       }
     }
 
+    std::cout<<"F_DIA"<<f_dia<<"B_DIA"<<b_dia<<"AXLE"<<axle<<"COUNTS"<<counts<<"REDUCTION_RATIO"<<reduction_ratio<<"internet_url"<<internet_url<<std::endl;
     //read strategy param
     std::string strategy_params;
     chassis_param_nh.param("strategy", strategy_params, std::string(""));
@@ -208,6 +209,8 @@ void InitParameter()
           speed_w_nh.param("max", max_speed_w, static_cast<double>(0.6));//最大角速度
           speed_w_nh.param("speed_w_acc", speed_w_acc, static_cast<double>(0.25));//角速度加速度
           speed_w_nh.param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));//角速度减速度
+          speed_w_nh.param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));//初始化旋转速度
+
 
       }
     }

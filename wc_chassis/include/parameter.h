@@ -33,6 +33,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "param/speed_v.h"
 
 extern  double ultral_effective_range ;
 extern  double g_odom_x   ;
@@ -193,5 +194,7 @@ extern bool outer_relay;  //外部继电器状态
 extern bool user_relay;  //用户继电器状态
 
 extern double pre_mileage;  //
+extern Speed_v *p_speed_v;
+
 
 #endif

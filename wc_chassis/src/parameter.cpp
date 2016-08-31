@@ -2,7 +2,7 @@
 */
 
 #include"parameter.h"
-
+#include"param/speed_v.h"
 double ultral_effective_range = 0.4;
 double g_odom_x   = 0;
 double g_odom_y   = 0;
@@ -114,3 +114,5 @@ bool inner_relay   = true;  //内部继电器状态
 bool outer_relay   = true;  //外部继电器状态
 bool user_relay    = true;  //用户继电器状态
 double pre_mileage = 0.0;  //
+
+Speed_v *p_speed_v = NULL;
