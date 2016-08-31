@@ -5,47 +5,74 @@
 #include "init.h"
 #include "parameter.h"
 
+Publisher::Publisher(ros::NodeHandle *p_n){
+
+    this->yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
+    this->odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
+    this->remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
+    this->device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
+    this->rotate_finished_pub = p_device_nh->advertise<std_msgs::Int32>("rotate_finished", 5);
+    this->protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
+    this->going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
+    this->dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
+    this->protector_value_pub   = p_device_nh->advertise<std_msgs::UInt32>("protector_status", 50);
+    for(int i=0;i<15;i++){
+      if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
+        this->ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
+        if(special_ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
+          special_ultrasonic_id[i] = i;
+        }
+        ultrasonic_num ++;
+      }
+    }
+
+}
+
+Publisher::~Publisher(){}
+
 /*
  * 发送超声
  */
-void publish_ultrasonic(ros::Publisher& publisher, const char* frame_id, int recv_int,unsigned int ultrasonic_offset, double& ultra_range) {  // NOLINT
-  sensor_msgs::Range range;
-  range.header.seq = 0;
-  range.header.stamp = ros::Time::now();
-  range.header.frame_id = frame_id;
+void Publisher::publishUltrasonic(ros::Publisher& publisher,const char* frame_id, int recv_int,unsigned int ultrasonic_offset, double& ultra_range){
 
-  range.radiation_type = sensor_msgs::Range::ULTRASOUND;
-  range.field_of_view = M_PI / 90.0;
-  range.min_range = ultrasonic_min_range;
-  range.max_range = ultrasonic_max_range;
+    sensor_msgs::Range range;
+    range.header.seq = 0;
+    range.header.stamp = ros::Time::now();
+    range.header.frame_id = frame_id;
 
-  float dis_meter = recv_int * 5.44 / 1000.0;
-  ultra_range = dis_meter;
+    range.radiation_type = sensor_msgs::Range::ULTRASOUND;
+    range.field_of_view = M_PI / 90.0;
+    range.min_range = ultrasonic_min_range;
+    range.max_range = ultrasonic_max_range;
 
-  if(special_ultrasonic_id[ultrasonic_offset] == ultrasonic_offset){ //特殊位置超声处理
-    dis_meter = dis_meter - special_ultrasonic_offset_dismeter;
-  }
-  if (dis_meter < range.min_range) {
-    range.range = range.min_range;
-  } else if (dis_meter > ultral_effective_range) {  // effective range
-    range.range = range.max_range;
-  } else {
-    range.range = dis_meter;
-  }
+    float dis_meter = recv_int * 5.44 / 1000.0;
+    ultra_range = dis_meter;
 
-  if(((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
-    range.range = ultrasonic_max_range;
-  }
+    if(special_ultrasonic_id[ultrasonic_offset] == ultrasonic_offset){ //特殊位置超声处理
+      dis_meter = dis_meter - special_ultrasonic_offset_dismeter;
+    }
+    if (dis_meter < range.min_range) {
+      range.range = range.min_range;
+    } else if (dis_meter > ultral_effective_range) {  // effective range
+      range.range = range.max_range;
+    } else {
+      range.range = dis_meter;
+    }
 
-  publisher.publish(range);
+    if(((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
+      range.range = ultrasonic_max_range;
+    }
+
+    publisher.publish(range);
+
 }
 
 
-void PublishUltrasonic(ros::Publisher ultrasonic_pub[]) {
+void Publisher::PublishUltrasonics(void) {
   double raw_range;
   for(int i=0;i<15;i++){
-    if(ultrasonic_pub[i] != 0){  //==0表示不是文件里配置的超声
-      publish_ultrasonic(ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i], i, raw_range);
+    if(this->ultrasonic_pub[i] != 0){  //==0表示不是文件里配置的超声
+      publish_ultrasonic(this->ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i], i, raw_range);
       GS_INFO("[wc chassis] get ultra[%d] raw range = %lf", i, raw_range);
     }
   }
@@ -54,19 +81,19 @@ void PublishUltrasonic(ros::Publisher ultrasonic_pub[]) {
 /*
  * 发送遥控器命令
  */
-void PublishRemoteCmd(ros::Publisher &remote_cmd_pub,unsigned char cmd, unsigned short index) {
+void Publisher::PublishRemoteCmd(unsigned char cmd, unsigned short index) {
   std_msgs::UInt32 remote_cmd;
   if (cmd > 0 && cmd < 12) {
     GS_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
   }
   remote_cmd.data = (index << 8) | cmd;
-  remote_cmd_pub.publish(remote_cmd);
+  this->remote_cmd_pub.publish(remote_cmd);
 }
 
 /*
  * 发送设备状态
  */
-void publishDeviceStatus(ros::Publisher &device_pub) {
+void Publisher::publishDeviceStatus(void) {
 
     diagnostic_msgs::DiagnosticStatus device_status;
     diagnostic_msgs::KeyValue device_value;
@@ -143,23 +170,25 @@ void publishDeviceStatus(ros::Publisher &device_pub) {
     device_value.value = std::to_string(mileage);
     device_status.values.push_back(device_value);
 
-    device_pub.publish(device_status);
+    this->device_pub.publish(device_status);
 }
 /*
  * 发送防撞条数据给导航
  */
-void publish_protector_value(ros::Publisher &protector_status_pub){
+void Publisher::publishProtectorValue(void)
+{
     std_msgs::UInt32 protect_data;
     if(new_hand_touch_){
         protector_value = NONE_HIT;
     }
     protect_data.data = protector_value;
-    protector_status_pub.publish(protect_data);
+    protector_value_pub.publish(protect_data);
 }
 /*
  * 发送防撞条状态
  */
-void publish_protector_status(ros::Publisher &protector_pub) {
+void Publisher::publishProtectorStatus(void)
+{
 
   if(protector_num <= 0){
       return;
@@ -177,13 +206,14 @@ void publish_protector_status(ros::Publisher &protector_pub) {
       value.value[i] = value.value[value.value.length() -1 -i];
       value.value[value.value.length() -1 -i] = c;
   }
-  protector_pub.publish(value);
+  this->protector_pub.publish(value);
 }
 
 /*
  * 发送里程值
  */
-void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub ) {
+void Publisher::publishOdom(tf::TransformBroadcaster* odom_broadcaster)
+{
   nav_msgs::Odometry odom;
   odom.header.stamp = ros::Time::now();;
 
@@ -223,7 +253,7 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
   odom.twist.twist.linear.x = g_odom_v;
   odom.twist.twist.linear.y = 0;
   odom.twist.twist.angular.z = g_odom_w;
-  odom_pub.publish(odom);
+  this->odom_pub.publish(odom);
 
   ros::Time odom_timestamped = ros::Time::now() + ros::Duration(0.1);
   tf::Quaternion q;
@@ -233,15 +263,17 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
   odom_broadcaster->sendTransform(odom_transform);
 }
 
-void PublishDIO(ros::Publisher &dio_pub) {
+void Publisher::publishDIO(void)
+{
   std_msgs::UInt32 dio_data;
   dio_data.data = g_di_data_;
-  dio_pub.publish(dio_data);
+  this->dio_pub.publish(dio_data);
 }
 
-void PublishYaw(ros::Publisher &yaw_pub){
+void Publisher::publishYaw(void)
+{
   std_msgs::Float32 msg;
   msg.data = g_odom_tha * 180.0 / M_PI;
-  yaw_pub.publish(msg);
+  this->yaw_pub.publish(msg);
 }
 
