@@ -2,8 +2,14 @@
 */
 
 #include "parameter.h"
-#include "param/speed_v.h"
+//#include "param/speed_v.h"
+#include "service.h"
 #include "publish.h"
+#include "subscribe.h"
+#include "wc_chassis_mcu.h"
+#include "param/machine.h"
+
+
 double ultral_effective_range = 0.4;
 double g_odom_x   = 0;
 double g_odom_y   = 0;
@@ -116,5 +122,10 @@ bool outer_relay   = true;  //外部继电器状态
 bool user_relay    = true;  //用户继电器状态
 double pre_mileage = 0.0;  //
 
-Speed_v   *p_speed_v   = NULL;
+//Speed_v   *p_speed_v   = NULL;
 Publisher *p_publisher = NULL;
+Subscribe *p_subscribe = NULL;
+Service   *p_service   = NULL;
+WC_chassis_mcu *p_chassis_mcu = NULL;
+Machine *p_machine = NULL;
+

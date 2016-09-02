@@ -14,13 +14,7 @@
 #include <diagnostic_msgs/KeyValue.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/Range.h>
-#include <autoscrubber_services/StopScrubber.h>
-#include <autoscrubber_services/StartRotate.h>
-#include <autoscrubber_services/StopRotate.h>
-#include <autoscrubber_services/CheckRotate.h>
-#include <autoscrubber_services/CheckHardware.h>
-#include <autoscrubber_services/ProtectorSwitch.h>
-#include <autoscrubber_services/UltrasonicSwitch.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -32,10 +26,8 @@
 #include <vector>
 #include "gs/file_util.h"
 #include <vector>
-#include "wc_chassis_mcu.h"
 
 
-extern WC_chassis_mcu *g_chassis_mcu;
 extern tf::TransformBroadcaster *p_odom_broadcaster;
 extern ros::Rate *p_loop_rate;
 extern ros::NodeHandle *p_n;

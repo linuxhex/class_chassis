@@ -57,7 +57,7 @@ void protectorManage(void)
 void relayStatusManage(void)
 {
 
-    relay_status_ = g_chassis_mcu->setChargeCmd(CMD_CHARGER_STATUS);
+    relay_status_ = p_chassis_mcu->setChargeCmd(CMD_CHARGER_STATUS);
     if((relay_status_ & 0x03) == STA_CHARGER_ON){
         charger_relay = true;
     } else if((relay_status_ & 0x03) == STA_CHARGER_OFF){
@@ -103,7 +103,7 @@ void chargeValueManage(void)
     GS_INFO("[wc_chassis] adc_charge = %d, charger_voltage_: %lf", charge_ADC, charger_voltage_);
 
     if(charger_full_voltage_ < battery_value_){
-       g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+       p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
        charger_cmd_    = CMD_CHARGER_OFF;
        charger_status_ = STA_CHARGER_OFF;
        return;
@@ -111,9 +111,9 @@ void chargeValueManage(void)
 
     if (charger_relay) {
       charger_status_ = STA_CHARGER_ON;
-      double mileage = (g_chassis_mcu->mileage_right_ + g_chassis_mcu->mileage_left_) / 2;
+      double mileage = (p_chassis_mcu->mileage_right_ + p_chassis_mcu->mileage_left_) / 2;
       if(charger_voltage_ < charger_low_voltage_ || (fabs(mileage - pre_mileage) >= 0.05)){
-          g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+          p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
           charger_cmd_    = CMD_CHARGER_OFF;
           charger_status_ = STA_CHARGER_OFF;
       }
@@ -129,7 +129,7 @@ void chargeValueManage(void)
 
 #ifdef TEST_RESTART
 void mainBoardTicksManage(void){
-    unsigned int cnt_time = g_chassis_mcu->getCntTime();
+    unsigned int cnt_time = p_chassis_mcu->getCntTime();
     std::cout << "[wc_chassis] main_board ticks = " << cnt_time <<std::endl;
 }
 #endif

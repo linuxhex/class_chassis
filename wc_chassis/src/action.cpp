@@ -8,10 +8,10 @@
  * 初始化　旋转操作
  */
 bool DoRotate(ros::Publisher &rotate_finished_pub) {
-   if (fabs(g_chassis_mcu->acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) || rotate_angle == 0) {
+   if (fabs(p_chassis_mcu->acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) || rotate_angle == 0) {
     start_rotate_flag = false;
     is_rotate_finished = true;
-    g_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
+    p_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
     std_msgs::Int32 msg;
     msg.data = 1;
     rotate_finished_pub.publish(msg);
@@ -21,20 +21,20 @@ bool DoRotate(ros::Publisher &rotate_finished_pub) {
     last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
   } else {
        is_rotate_finished = false;
-       int remain_angle = fabs(rotate_angle) - fabs(g_chassis_mcu->acc_odom_theta_) / M_PI *180;
+       int remain_angle = fabs(rotate_angle) - fabs(p_chassis_mcu->acc_odom_theta_) / M_PI *180;
        if(remain_angle < 20){
          double speed_w = remain_angle / 20.0 * inplace_rotating_theta;
          speed_w = (speed_w < 0.10) ? 0.10 : speed_w;
          if (rotate_angle > 0) {
-           g_chassis_mcu->setTwoWheelSpeed(0.0, speed_w);
+           p_chassis_mcu->setTwoWheelSpeed(0.0, speed_w);
          }else{
-           g_chassis_mcu->setTwoWheelSpeed(0.0, -speed_w);
+           p_chassis_mcu->setTwoWheelSpeed(0.0, -speed_w);
          }
        } else {
          if(rotate_angle > 0) {
-           g_chassis_mcu->setTwoWheelSpeed(0.0, inplace_rotating_theta);
+           p_chassis_mcu->setTwoWheelSpeed(0.0, inplace_rotating_theta);
          } else {
-           g_chassis_mcu->setTwoWheelSpeed(0.0, -inplace_rotating_theta);
+           p_chassis_mcu->setTwoWheelSpeed(0.0, -inplace_rotating_theta);
          }
        }
   }
@@ -58,8 +58,8 @@ void onCharge(void)
            }
            if (check_charger_cnt > charger_delay_time_ && charger_cmd_ == CMD_CHARGER_ON) {
              GS_INFO("[CHASSIS] check charger voltage normal > 30s, set charger relay on!!!");
-             g_chassis_mcu->setChargeCmd(CMD_CHARGER_ON);
-             pre_mileage = (g_chassis_mcu->mileage_right_ + g_chassis_mcu->mileage_left_) / 2;
+             p_chassis_mcu->setChargeCmd(CMD_CHARGER_ON);
+             pre_mileage = (p_chassis_mcu->mileage_right_ + p_chassis_mcu->mileage_left_) / 2;
              break;
            }
             sleep(1);
@@ -73,7 +73,7 @@ void onCharge(void)
  * IO口控制，手触等
  */
 void DoDIO(ros::Publisher going_back_pub) {
-  unsigned int temp_di_data = g_chassis_mcu->doDIO(g_do_data_);
+  unsigned int temp_di_data = p_chassis_mcu->doDIO(g_do_data_);
   GS_INFO("[wc_chassis] get_di data: 0x%x", temp_di_data);
   cur_emergency_status = (temp_di_data >> (8 + Emergency_stop)) & 0x01;
   // new version hardware hand touch
@@ -96,5 +96,5 @@ void DoRemoteRet(void) {
   if (++remote_ret_cnt_ > 8) {
     remote_ret_ &= 0xff00;
   }
-  g_chassis_mcu->setRemoteRet(remote_ret_);
+  p_chassis_mcu->setRemoteRet(remote_ret_);
 }

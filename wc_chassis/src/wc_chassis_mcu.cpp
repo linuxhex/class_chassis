@@ -37,11 +37,7 @@ double GetTimeInSeconds() {
 }
 
 WC_chassis_mcu::WC_chassis_mcu(){
-    this->Dia_F_ = 0.2;
-    this->Dia_B_ = 0.2;
-    this->Axle_  = 0.6;
     this->Counts_= 4000;
-    this->Reduction_ratio_ = 25;
     this->Speed_ratio_     = 1.0;
     this->odom_x_          = 0.0;
     this->odom_y_ = 0.0;
@@ -84,27 +80,10 @@ WC_chassis_mcu::~WC_chassis_mcu() {
     }
 }
 
-void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,float Dia_F, float Dia_B, float Axle, float TimeWidth, int Counts, double Reduction_ratio, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th) {
+void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,float TimeWidth, int Counts, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th) {
 
     transfer_->Init(host_name, port);
 
-  if ((Dia_F > 0) && (Dia_F < 0.5)) {
-    Dia_F_ = Dia_F;
-  } else {
-    std::cout << "Dia_F err value:" <<Dia_F<< std::endl;
-  }
-
-  if ((Dia_B > 0) && (Dia_B < 0.5)) {
-    Dia_B_ = Dia_B;
-  } else {
-    std::cout << "Dia_B err value:" <<Dia_B<< std::endl;
-  }
-
-  if ((Axle > 0) && (Axle < 1.0)) {
-    Axle_ = Axle;
-  } else {
-    std::cout << "Axle err value:" <<Axle<< std::endl;
-  }
 
   if ((Counts > 0) && (Counts < 11000)) {
     Counts_ = Counts;
@@ -293,7 +272,7 @@ void WC_chassis_mcu::setShutdownCmd(unsigned char cmd) {
 
 int WC_chassis_mcu::V2RPM(float v)
 {
-  int rpm = v * 60 / (M_PI*Dia_F_);
+  int rpm = v * 60 / (M_PI * p_machine->f_dia);
   return rpm;
 }
 
@@ -312,13 +291,13 @@ bool WC_chassis_mcu::getCSpeed(double &v, double &w) {
   }
 
   const double t = 0.05; //stm32 update delta_counts_ in 20Hz
-  double l_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_left_ * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
-  double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right_ * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
+  double l_wheel_pos = static_cast<double>(p_machine->b_dia * delta_counts_left_ * M_PI) / (p_machine->counts * p_machine->reduction_ratio);  // 200000;  // 81920
+  double r_wheel_pos = static_cast<double>(p_machine->b_dia * delta_counts_right_ * M_PI) / (p_machine->counts * p_machine->reduction_ratio);  // 200000;  // 81920
   mileage_left_ += fabs(l_wheel_pos);
   mileage_right_ += fabs(r_wheel_pos);
 
   double dx = (r_wheel_pos + l_wheel_pos) * 0.5;
-  double da = (r_wheel_pos - l_wheel_pos) / Axle_;
+  double da = (r_wheel_pos - l_wheel_pos) / p_machine->axle;
 
   if ((fabs(t) > 10e-3) && (fabs(t) < 10e3)) {
     v = dx / t * Speed_ratio_;
@@ -426,15 +405,15 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
 
     GS_INFO("[WC CHASSIS] gotOdo:: delta_counts_left: %d delta_counts_right: %d last_odo_delta_counts_left_: %d last_odo_delta_counts_right_: %d", delta_counts_left, delta_counts_right, last_odo_delta_counts_left_, last_odo_delta_counts_right_);
 
-    double l_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_left * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
-    double r_wheel_pos = static_cast<double>(Dia_B_ * delta_counts_right * M_PI) / (Counts_ * Reduction_ratio_);  // 200000;  // 81920
+    double l_wheel_pos = static_cast<double>(p_machine->b_dia * delta_counts_left * M_PI) / (p_machine->counts * p_machine->reduction_ratio);  // 200000;  // 81920
+    double r_wheel_pos = static_cast<double>(p_machine->b_dia * delta_counts_right * M_PI) / (p_machine->counts * p_machine->reduction_ratio);  // 200000;  // 81920
 
     double dx = (r_wheel_pos + l_wheel_pos) * 0.5;
     odom_x_ += dx * cos(odom_a_);
     odom_y_ += dx * sin(odom_a_);
 
     if(gyro_state_ == 2){
-      double da = asin((r_wheel_pos - l_wheel_pos) / Axle_);
+      double da = asin((r_wheel_pos - l_wheel_pos) / p_machine->axle);
       odom_a_ += da;
       acc_odom_theta_ += fabs(da);
     }else if (gyro_state_ == 0 || (gyro_state_ == 1 && !(abs(delta_counts_left) < critical_delta && abs(delta_counts_right) < critical_delta))) {
@@ -857,7 +836,7 @@ void CalculateAngleAndSpeed(float* angle, float* speed, float v, float w) {
 
 int WC_chassis_mcu::GetCopleySpeed(float v) {       // 将m/s转换成RPM
   v = v > 0.8 ? 0.8 : v;
-  return v * 60 / (M_PI * Dia_F_);
+  return v * 60 / (M_PI * p_machine->f_dia);
 }
 
 int WC_chassis_mcu::GetCopleyAngle(float angle) {
@@ -870,7 +849,7 @@ int WC_chassis_mcu::GetCopleyAngle(float angle) {
 short WC_chassis_mcu::getMotorSpeed(float speed) {
 
   // transfer real speed to motor comond
-  short ret = (short)(speed / (Dia_B_ * M_PI) * Reduction_ratio_ / full_speed_ * 60.0);
+  short ret = (short)(speed / (p_machine->b_dia * M_PI) * p_machine->reduction_ratio / full_speed_ * 60.0);
   ret = ret > SPEED_TH ? SPEED_TH : ret;
   ret = ret < ((-1) * SPEED_TH) ? ((-1) * SPEED_TH) : ret;
   return ret;
@@ -906,7 +885,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
 
   //calculate angle and speed
   if (IsInPlaceRotation(speed_v, speed_w))  {
-    speed_right = Axle_ * tan(speed_w * TimeWidth_) / (2 * TimeWidth_);
+    speed_right = p_machine->axle * tan(speed_w * TimeWidth_) / (2 * TimeWidth_);
     speed_left = -1.0 * speed_right;
   } else if (IsStop(speed_v, speed_w)) {
     speed_left = 0.0;
@@ -914,11 +893,11 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   } else {
     if (speed_w > 0.0) {
       //speed_left = speed_v - (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
-      speed_left = speed_v - (Axle_ * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
+      speed_left = speed_v - (p_machine->axle * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
       speed_right = 2 * speed_v - speed_left;
     } else {
       //speed_right = speed_v + (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
-      speed_right = speed_v + (Axle_ * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
+      speed_right = speed_v + (p_machine->axle * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
       speed_left = 2 * speed_v - speed_right;
     }
   }

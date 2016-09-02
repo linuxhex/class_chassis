@@ -33,7 +33,12 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include "param/speed_v.h"
+//#include "param/speed_v.h"
+#include "publish.h"
+#include "subscribe.h"
+#include "wc_chassis_mcu.h"
+#include "param/machine.h"
+#include "service.h"
 
 extern  double ultral_effective_range ;
 extern  double g_odom_x   ;
@@ -194,8 +199,14 @@ extern bool outer_relay;  //外部继电器状态
 extern bool user_relay;  //用户继电器状态
 
 extern double pre_mileage;  //
-extern Speed_v *p_speed_v;
+//extern Speed_v *p_speed_v;
 extern Publisher *p_publisher;
+extern Subscribe *p_subscribe;
+extern Service   *p_service;
+extern WC_chassis_mcu *p_chassis_mcu;
+extern Machine *p_machine;
+
+
 
 
 #endif

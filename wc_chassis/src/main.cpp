@@ -6,61 +6,29 @@
 #include <std_msgs/UInt32.h>
 #include <std_msgs/Int32.h>
 #include <std_msgs/Float32.h>
-#include "wc_chassis_mcu.h"
 #include "init.h"
-#include "parameter.h"
 #include "publish.h"
 #include "action.h"
 #include "parameter.h"
 #include "common_function.h"
 #include "data_process.h"
 
-ros::Publisher ultrasonic_pub[15];
-ros::Publisher yaw_pub;
-ros::Publisher odom_pub;
-ros::Publisher remote_cmd_pub;
-ros::Publisher device_pub;
-ros::Publisher rotate_finished_pub;
-ros::Publisher protector_pub;
-ros::Publisher going_back_pub;
-ros::Publisher dio_pub;
-ros::Publisher protector_value_pub;
-
-
 int main(int argc, char **argv) {
 
     SetSchedPriority();   //设置chassis进程运行的优先级和占用的cpu核
+
     ROS_INFO("[wc_chassis] chassis version: 1.1.4.6");
     InitChassis(argc, argv,"wc_chassis");
     GS_INFO("[wc_chassis] chassis init completed");
 
-    /*********************************publish handle init ******************************/
-    yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
-    odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
-    remote_cmd_pub  = p_device_nh->advertise<std_msgs::UInt32>("remote_cmd", 50);
-    device_pub      = p_device_nh->advertise<diagnostic_msgs::DiagnosticStatus>("device_status", 50);
-    rotate_finished_pub = p_device_nh->advertise<std_msgs::Int32>("rotate_finished", 5);
-    protector_pub   = p_device_nh->advertise<diagnostic_msgs::KeyValue>("protector", 50);
-    going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
-    dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
-    protector_value_pub   = p_device_nh->advertise<std_msgs::UInt32>("protector_status", 50);
-    for(int i=0;i<15;i++){
-      if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
-        ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
-        if(special_ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
-          special_ultrasonic_id[i] = i;
-        }
-        ultrasonic_num ++;
-      }
-    }
+    timeval tv;
 
-   timeval tv;
     /*********************************  主循环  ******************************/
    while (ros::ok()) {
 
-    g_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
-    g_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
-    g_chassis_mcu->getUltra();
+    p_chassis_mcu->getOdo(g_odom_x, g_odom_y, g_odom_tha);
+    p_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
+    p_chassis_mcu->getUltra();
 
     if(!old_ultrasonic_){  //旧板子没有这些功能
         updateDeviceStatus();
@@ -72,14 +40,14 @@ int main(int argc, char **argv) {
         if (charger_voltage_ > charger_low_voltage_) {
              go_forward_start_time_ = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
              charger_cmd_ = CMD_CHARGER_OFF;
-             g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+             p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
          } else {
              go_forward_start_time_ = time_now + 1.0;
          }
         if (time_now - go_forward_start_time_ > -0.0001 && time_now - go_forward_start_time_ < 1.0 && !(protector_hit & FRONT_HIT)) {
-            g_chassis_mcu->setTwoWheelSpeed(0.15, 0.0);
+            p_chassis_mcu->setTwoWheelSpeed(0.15, 0.0);
          } else {
-            DoRotate(rotate_finished_pub);
+            DoRotate(p_publisher->getRotateFinishedPub());
          }
     } else {
       if ((!laser_connection_status || !socket_connection_status)
@@ -91,32 +59,32 @@ int main(int argc, char **argv) {
 
           if (charger_status_ == STA_CHARGER_ON && m_speed_v > 0.001) {
                  charger_cmd_ = CMD_CHARGER_OFF;
-                 g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+                 p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
           }
-          g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
+          p_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
 
       } else {
-          g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
+          p_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
       }
     }
 
-    DoDIO(going_back_pub);
+    DoDIO(p_publisher->getGoingBackPub());
     DoRemoteRet();
     if (++loop_count % 2) {
-      g_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);
-      PublishRemoteCmd(remote_cmd_pub,remote_cmd_, remote_index_);
-      publishDeviceStatus(device_pub);
+      p_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);
+      p_publisher->publishRemoteCmd(remote_cmd_, remote_index_);
+      p_publisher->publishDeviceStatus();
     }
     if (loop_count % 10) {//设置遥控器id
-      g_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
+      p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
       loop_count = 0;
     }
-    PublishDIO(dio_pub);
-    PublishOdom(p_odom_broadcaster,odom_pub);
-    PublishYaw(yaw_pub);
-    PublishUltrasonic(ultrasonic_pub);
-    publish_protector_status(protector_pub);
-    publish_protector_value(protector_value_pub);
+    p_publisher->publishDIO();
+    p_publisher->publishOdom(p_odom_broadcaster);
+    p_publisher->publishYaw();
+    p_publisher->publishUltrasonics();
+    p_publisher->publishProtectorStatus();
+    p_publisher->publishProtectorValue();
     ros::spinOnce();
     p_loop_rate->sleep();
   }

@@ -2,69 +2,35 @@
 */
 
 #include "init.h"
-#include "advertise_service.h"
 #include "subscribe.h"
 #include "parameter.h"
 #include "common_function.h"
 #include "schedule.h"
 
 /***ros 相关****/
-tf::TransformBroadcaster *p_odom_broadcaster;
-WC_chassis_mcu *g_chassis_mcu;
-ros::Rate *p_loop_rate;
-ros::NodeHandle *p_n;
-ros::NodeHandle *p_nh;
-ros::NodeHandle *p_device_nh;
+tf::TransformBroadcaster *p_odom_broadcaster = NULL;
+ros::Rate *p_loop_rate = NULL;
+ros::NodeHandle *p_n = NULL;
+ros::NodeHandle *p_nh = NULL;
+ros::NodeHandle *p_device_nh =NULL;
 
-/***ServiceServer***/
-ros::ServiceServer start_rotate_srv;
-ros::ServiceServer stop_rotate_srv;
-ros::ServiceServer check_rotate_srv;
-ros::ServiceServer check_hardware_srv;
-ros::ServiceServer protector_switch_srv;
-ros::ServiceServer ultrasonic_switch_srv;
-ros::ServiceServer check_protector_status_srv;
-ros::ServiceServer auto_charge_cmd_srv;
-ros::ServiceServer check_auto_charge_status_srv;
-
-/***Subscriber***/
-ros::Subscriber    Navi_sub;
-ros::Subscriber    remote_ret_sub;
-ros::Subscriber    gyro_update_state_sub;
-ros::Subscriber    shutdown_sub;
 /***
  * 初始化所有的Service和订阅服务
  */
 void InitService()
 {
-    start_rotate_srv              = p_device_nh->advertiseService("start_rotate", &StartRotate);
-    stop_rotate_srv               = p_device_nh->advertiseService("stop_rotate", &StopRotate);
-    check_rotate_srv              = p_device_nh->advertiseService("check_rotate", &CheckRotate);
-    check_hardware_srv            = p_device_nh->advertiseService("check_hardware", &CheckHardware);
-    protector_switch_srv          = p_device_nh->advertiseService("protector_switch",&ProtectorSwitch);
-    ultrasonic_switch_srv         = p_device_nh->advertiseService("ultrasonic_switch",&UltrasonicSwitch);
-    check_protector_status_srv    = p_device_nh->advertiseService("check_protector_status",&CheckProtectorStatus);
-    auto_charge_cmd_srv           = p_device_nh->advertiseService("auto_charge_cmd",&SetAutoChargeCmd);
-    check_auto_charge_status_srv  = p_device_nh->advertiseService("auto_charge_status",&CheckAutoChargeStatus);
-
-    Navi_sub              = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
-    remote_ret_sub        = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);
-    gyro_update_state_sub = p_n->subscribe("/gyro_update_state", 10, GyroUpdateCallback);
-    shutdown_sub          = p_n->subscribe("/device/shutdown", 10, ShutdownCallback);
+    p_service   = new Service();
+    p_subscribe = new Subscribe();
+    p_publisher = new Publisher();
     GS_INFO("[wc_chassis] init service & topic caller completed");
-
 }
 
 /*  ros参数服务器参数的初始化*/
 void InitParameter()
 {
 
-    g_chassis_mcu = new WC_chassis_mcu();
+    p_chassis_mcu = new WC_chassis_mcu();
     p_odom_broadcaster = new tf::TransformBroadcaster();
-    double f_dia = 0;
-    double b_dia = 0;
-    double axle  = 0;
-    int counts = 0;
     ultrasonic = new std::string();
     special_ultrasonic = new std::string();
     double reduction_ratio = 30.0;
@@ -156,16 +122,12 @@ void InitParameter()
           battery_nh.param("empty_level", battery_empty_level, static_cast<double>(20.0));
 
       } else if (device_param == "machine") {
-          std::cout<<"test"<<"";
-          ros::NodeHandle machine_nh("~/chassis_param/machine");
-          machine_nh.param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
-          machine_nh.param("B_DIA", b_dia, static_cast<double>(0.125));
-          machine_nh.param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
+          p_machine = new Machine();
           machine_nh.param("COUNTS", counts, 12);//霍尔数
-          machine_nh.param("REDUCTION_RATIO", reduction_ratio, static_cast<double>(30.0));//减速比
-          machine_nh.param("max_cmd_interval", max_cmd_interval, 1.0);
-          machine_nh.param("TimeWidth", timeWidth, static_cast<double>(0.1));
-          machine_nh.param("delta_counts_th",delta_counts_th,800); //码盘防抖动阈值
+         machine_nh.param("REDUCTION_RATIO", reduction_ratio, static_cast<double>(30.0));//减速比
+//          machine_nh.param("max_cmd_interval", max_cmd_interval, 1.0);
+//          machine_nh.param("TimeWidth", timeWidth, static_cast<double>(0.1));
+//          machine_nh.param("delta_counts_th",delta_counts_th,800); //码盘防抖动阈值
 
       } else if (device_param == "network") {
           ros::NodeHandle network_nh("~/chassis_param/network");
@@ -188,7 +150,6 @@ void InitParameter()
       }
     }
 
-    std::cout<<"F_DIA"<<f_dia<<"B_DIA"<<b_dia<<"AXLE"<<axle<<"COUNTS"<<counts<<"REDUCTION_RATIO"<<reduction_ratio<<"internet_url"<<internet_url<<std::endl;
     //read strategy param
     std::string strategy_params;
     chassis_param_nh.param("strategy", strategy_params, std::string(""));
@@ -226,7 +187,7 @@ void InitParameter()
 
     pthread_mutex_init(&speed_mutex, NULL);
 
-    g_chassis_mcu->Init(host_name, std::to_string(port),f_dia, b_dia, axle,
+    p_chassis_mcu->Init(host_name, std::to_string(port),
                         timeWidth, counts, reduction_ratio, speed_ratio,
                         max_speed_v, max_speed_w, speed_v_acc, speed_v_dec,
                         speed_v_dec_zero, speed_w_acc, speed_w_dec,full_speed,delta_counts_th);
@@ -242,7 +203,7 @@ void InitDevice(void)
   srand((unsigned int)time(NULL));
   unsigned int seed_key = rand();
   unsigned int check_key = GenerateJSHash(seed_key);
-  unsigned int verify_key = g_chassis_mcu->checkRemoteVerifyKey(seed_key);
+  unsigned int verify_key = p_chassis_mcu->checkRemoteVerifyKey(seed_key);
   if (check_key != verify_key) {
     GS_INFO("[wc_chassis] VERIFY_REMOTE_KEY is not correct!!!");
     exit(0);
@@ -260,7 +221,7 @@ void InitDevice(void)
     std::cout << "remote_id = " << remote_id << std::endl;
   }
 #endif
-  g_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
+  p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
   GS_INFO("[wc_chassis] init device completed");
 }
 

@@ -5,7 +5,7 @@
 #include "init.h"
 #include "parameter.h"
 
-Publisher::Publisher(ros::NodeHandle *p_n){
+Publisher::Publisher(){
 
     this->yaw_pub         = p_n->advertise<std_msgs::Float32>("yaw", 10);
     this->odom_pub        = p_n->advertise<nav_msgs::Odometry>("odom", 50);
@@ -68,11 +68,11 @@ void Publisher::publishUltrasonic(ros::Publisher& publisher,const char* frame_id
 }
 
 
-void Publisher::PublishUltrasonics(void) {
+void Publisher::publishUltrasonics(void) {
   double raw_range;
   for(int i=0;i<15;i++){
     if(this->ultrasonic_pub[i] != 0){  //==0表示不是文件里配置的超声
-      publish_ultrasonic(this->ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i], i, raw_range);
+      publishUltrasonic(this->ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i], i, raw_range);
       GS_INFO("[wc chassis] get ultra[%d] raw range = %lf", i, raw_range);
     }
   }
@@ -81,7 +81,7 @@ void Publisher::PublishUltrasonics(void) {
 /*
  * 发送遥控器命令
  */
-void Publisher::PublishRemoteCmd(unsigned char cmd, unsigned short index) {
+void Publisher::publishRemoteCmd(unsigned char cmd, unsigned short index) {
   std_msgs::UInt32 remote_cmd;
   if (cmd > 0 && cmd < 12) {
     GS_INFO("[wc_chassis] get remote cmd = %d, index = %d", cmd, index);
@@ -166,7 +166,7 @@ void Publisher::publishDeviceStatus(void) {
     device_status.values.push_back(device_value);
 
     device_value.key = std::string("mileage");
-    double mileage = (g_chassis_mcu->mileage_right_ + g_chassis_mcu->mileage_left_) / 2;
+    double mileage = (p_chassis_mcu->mileage_right_ + p_chassis_mcu->mileage_left_) / 2;
     device_value.value = std::to_string(mileage);
     device_status.values.push_back(device_value);
 
