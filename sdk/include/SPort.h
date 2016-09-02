@@ -15,7 +15,7 @@ class Socket {
   Socket();
   ~Socket();
 
-  void Init(const std::string& host_name, const std::string& port);
+  void Init(void);
 
   void Send_data(unsigned char* s_data, unsigned short  len);
   void Read_data(unsigned char* r_data, int &len, int need, int timeout);

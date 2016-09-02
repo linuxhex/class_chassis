@@ -8,6 +8,7 @@
 #include "subscribe.h"
 #include "wc_chassis_mcu.h"
 #include "param/machine.h"
+#include "param/network.h"
 
 
 double ultral_effective_range = 0.4;
@@ -20,7 +21,6 @@ unsigned int g_dio_count  = 0;
 unsigned int g_ret_count  = 0;
 unsigned int g_pc_control = 0;
 double last_cmd_vel_time  = 0.0;
-double max_cmd_interval   = 1.0;
 int current_v_index       = 0;
 int current_w_index       = 0;
 float m_speed_v = 0.0;
@@ -128,4 +128,4 @@ Subscribe *p_subscribe = NULL;
 Service   *p_service   = NULL;
 WC_chassis_mcu *p_chassis_mcu = NULL;
 Machine *p_machine = NULL;
-
+Network *p_network = NULL;

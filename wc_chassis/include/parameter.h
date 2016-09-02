@@ -39,6 +39,7 @@
 #include "wc_chassis_mcu.h"
 #include "param/machine.h"
 #include "service.h"
+#include "param/network.h"
 
 extern  double ultral_effective_range ;
 extern  double g_odom_x   ;
@@ -105,7 +106,6 @@ extern unsigned int g_dio_count ;
 extern unsigned int g_ret_count ;
 extern unsigned int g_pc_control;
 extern double last_cmd_vel_time ;
-extern double max_cmd_interval ;
 extern int current_v_index;
 extern int current_w_index;
 extern float m_speed_v;
@@ -205,8 +205,6 @@ extern Subscribe *p_subscribe;
 extern Service   *p_service;
 extern WC_chassis_mcu *p_chassis_mcu;
 extern Machine *p_machine;
-
-
-
+extern Network *p_network;
 
 #endif

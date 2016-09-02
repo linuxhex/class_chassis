@@ -147,9 +147,9 @@ void Socket::write() {
     }
 }
 
-void Socket::Init(const std::string& host_name, const std::string& port) {
-  port_ = port;
-  host_name_ = host_name;
+void Socket::Init() {
+  port_      = p_network->port;
+  host_name_ = p_network->host_name;
   BeginThread();
 
   while (!socket_) {

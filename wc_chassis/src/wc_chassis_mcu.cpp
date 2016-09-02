@@ -37,7 +37,6 @@ double GetTimeInSeconds() {
 }
 
 WC_chassis_mcu::WC_chassis_mcu(){
-    this->Counts_= 4000;
     this->Speed_ratio_     = 1.0;
     this->odom_x_          = 0.0;
     this->odom_y_ = 0.0;
@@ -80,23 +79,9 @@ WC_chassis_mcu::~WC_chassis_mcu() {
     }
 }
 
-void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,float TimeWidth, int Counts, double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed,int delta_counts_th) {
+void WC_chassis_mcu::Init(double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed) {
 
-    transfer_->Init(host_name, port);
-
-
-  if ((Counts > 0) && (Counts < 11000)) {
-    Counts_ = Counts;
-  } else {
-    std::cout << "Counts err value:" <<Counts<< std::endl;
-  }
-
-  if ((Reduction_ratio > 0.0) && (Reduction_ratio < 100.0)) {
-    Reduction_ratio_ = Reduction_ratio;
-  } else {
-    Reduction_ratio_ = 30.0;
-    std::cout << "Reduction_ratio err value:" << Reduction_ratio<< std::endl;
-  }
+    transfer_->Init();
 
   if ((Speed_ratio > 0) && (Speed_ratio < 2)) {
     Speed_ratio_ = Speed_ratio;
@@ -104,11 +89,6 @@ void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,
     std::cout << "Speed_ratio err value:" << Speed_ratio<< std::endl;
   }
 
-  if ((TimeWidth > 0) && (TimeWidth < 0.2)) {
-    TimeWidth_ = TimeWidth;
-  } else {
-    std::cout << "TimeWidth err value:" <<TimeWidth<< std::endl;
-  }
 
   if (max_speed_v > 0) {
     max_speed_v_ = max_speed_v;
@@ -165,12 +145,7 @@ void WC_chassis_mcu::Init(const std::string& host_name, const std::string& port,
     full_speed_ = 3.0;
     std::cout << "full_speed err value:" <<full_speed<< std::endl;
   }
-  if ((delta_counts_th > 0) && (delta_counts_th < 10000)) {
-    delta_counts_th_ = delta_counts_th;
-  } else {
-    delta_counts_th_ = 800;
-    std::cout << "delta_counts_th err value:" <<delta_counts_th<< std::endl;
-  }
+
 
 }
 void WC_chassis_mcu::setRemoteID(unsigned char id) {
@@ -392,11 +367,11 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     }
 
     //防止码盘抖动
-    if (abs(delta_counts_right) > delta_counts_th_) {
+    if (abs(delta_counts_right) > p_machine->delta_counts_th) {
       GS_ERROR("err delta_counts_right: %d", delta_counts_right);
       delta_counts_right = last_odo_delta_counts_right_;
     }
-    if (abs(delta_counts_left) > delta_counts_th_) {
+    if (abs(delta_counts_left) > p_machine->delta_counts_th) {
       GS_ERROR("err delta_counts_left: %d", delta_counts_left);
       delta_counts_left = last_odo_delta_counts_left_;
     }
@@ -885,19 +860,19 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
 
   //calculate angle and speed
   if (IsInPlaceRotation(speed_v, speed_w))  {
-    speed_right = p_machine->axle * tan(speed_w * TimeWidth_) / (2 * TimeWidth_);
+    speed_right = p_machine->axle * tan(speed_w * p_machine->timeWidth) / (2 * p_machine->timeWidth);
     speed_left = -1.0 * speed_right;
   } else if (IsStop(speed_v, speed_w)) {
     speed_left = 0.0;
     speed_right = 0.0;
   } else {
     if (speed_w > 0.0) {
-      //speed_left = speed_v - (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
-      speed_left = speed_v - (p_machine->axle * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
+      //speed_left = speed_v - (speed_w * Axle_* H_ ) / (2 * speed_v * p_machine->timeWidth);
+      speed_left = speed_v - (p_machine->axle * tan(speed_w * p_machine->timeWidth)) / (2 * p_machine->timeWidth);
       speed_right = 2 * speed_v - speed_left;
     } else {
-      //speed_right = speed_v + (speed_w * Axle_* H_ ) / (2 * speed_v * TimeWidth_);
-      speed_right = speed_v + (p_machine->axle * tan(speed_w * TimeWidth_)) / (2 * TimeWidth_);
+      //speed_right = speed_v + (speed_w * Axle_* H_ ) / (2 * speed_v * p_machine->timeWidth);
+      speed_right = speed_v + (p_machine->axle * tan(speed_w * p_machine->timeWidth)) / (2 * p_machine->timeWidth);
       speed_left = 2 * speed_v - speed_right;
     }
   }

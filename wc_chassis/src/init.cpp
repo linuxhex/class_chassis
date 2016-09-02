@@ -33,9 +33,7 @@ void InitParameter()
     p_odom_broadcaster = new tf::TransformBroadcaster();
     ultrasonic = new std::string();
     special_ultrasonic = new std::string();
-    double reduction_ratio = 30.0;
     double speed_ratio = 1.0;
-    double timeWidth = 0;
     std::string host_name;
     int port;
 
@@ -123,14 +121,10 @@ void InitParameter()
 
       } else if (device_param == "machine") {
           p_machine = new Machine();
-          machine_nh.param("COUNTS", counts, 12);//霍尔数
-         machine_nh.param("REDUCTION_RATIO", reduction_ratio, static_cast<double>(30.0));//减速比
-//          machine_nh.param("max_cmd_interval", max_cmd_interval, 1.0);
-//          machine_nh.param("TimeWidth", timeWidth, static_cast<double>(0.1));
-//          machine_nh.param("delta_counts_th",delta_counts_th,800); //码盘防抖动阈值
 
       } else if (device_param == "network") {
-          ros::NodeHandle network_nh("~/chassis_param/network");
+          p_network = new Network();
+
           network_nh.param("host_name", host_name, std::string("10.7.5.199"));
           network_nh.param("port", port, 5000);
           network_nh.param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
@@ -188,9 +182,9 @@ void InitParameter()
     pthread_mutex_init(&speed_mutex, NULL);
 
     p_chassis_mcu->Init(host_name, std::to_string(port),
-                        timeWidth, counts, reduction_ratio, speed_ratio,
+                        speed_ratio,
                         max_speed_v, max_speed_w, speed_v_acc, speed_v_dec,
-                        speed_v_dec_zero, speed_w_acc, speed_w_dec,full_speed,delta_counts_th);
+                        speed_v_dec_zero, speed_w_acc, speed_w_dec,full_speed);
 
     GS_INFO("[wc_chassis] init param completed");
 }

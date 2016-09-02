@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
          }
     } else {
       if ((!laser_connection_status || !socket_connection_status)
-          || (time_now - last_cmd_vel_time >= max_cmd_interval)
+          || (time_now - last_cmd_vel_time >= p_machine->max_cmd_interval)
           || ((protector_hit & FRONT_HIT) && m_speed_v > 0.001)
           || ((protector_hit & REAR_HIT)  && m_speed_v < -0.001)
           || (charger_status_ == STA_CHARGER_ON)
