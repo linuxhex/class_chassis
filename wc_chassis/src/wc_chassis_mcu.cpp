@@ -342,27 +342,28 @@ void WC_chassis_mcu::yawSwitch(void){
   if(delta_counts_left_ == 0 && (delta_counts_right_) == 0){
     if(yaw_count_ == 0){
       pre_yaw_angle_ = yaw_angle_;
+      yaw_count_++;
       return;
     }
-    float delta_yaw_angle = yaw_angle_ - pre_yaw_angle_;
-    if(delta_yaw_angle < 0){
-      delta_yaw_angle = delta_yaw_angle + 3600;
+    short delta_yaw_angle = yaw_angle_ - pre_yaw_angle_;
+    if(abs(delta_yaw_angle) > 1800){
+        delta_yaw_angle = delta_yaw_angle < 0 ? (delta_yaw_angle + 3600) : (delta_yaw_angle - 3600);
     }
-    sum_delta_yaw_angle_ += delta_yaw_angle;
+    sum_delta_yaw_angle_ += abs(delta_yaw_angle);
     pre_yaw_angle_ = yaw_angle_;
     if(yaw_count_ > 300){
-      if(sum_delta_yaw_angle_ > 120){
-        gyro_state_ = 2;
-      } else {
-        gyro_state_ = 0;
-      }
-      yaw_count_  = 0;
-      sum_delta_yaw_angle_ = 0;
+       if(sum_delta_yaw_angle_ > 200){
+         gyro_state_ = 2;
+       } else {
+         gyro_state_ = 0;
+       }
+       yaw_count_  = 0;
+       sum_delta_yaw_angle_ = 0;
     }
     yaw_count_ ++ ;
-  }else{
+  } else {
     yaw_count_ = 0;
-    sum_delta_yaw_angle_ = 0.0;
+    sum_delta_yaw_angle_ = 0;
   }
 }
 
