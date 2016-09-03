@@ -30,13 +30,15 @@ const float  H = 0.92;
 float current_v = 0.0;
 float current_theta = 0.0;
 
-double GetTimeInSeconds() {
+double GetTimeInSeconds()
+{
   timeval t;
   gettimeofday(&t, NULL);
   return t.tv_sec + 0.000001 * t.tv_usec;
 }
 
-WC_chassis_mcu::WC_chassis_mcu(){
+WC_chassis_mcu::WC_chassis_mcu()
+{
     this->Speed_ratio_     = 1.0;
     this->odom_x_          = 0.0;
     this->odom_y_ = 0.0;
@@ -71,7 +73,8 @@ WC_chassis_mcu::WC_chassis_mcu(){
     memset(rec_, 0, 20);
 }
 
-WC_chassis_mcu::~WC_chassis_mcu() {
+WC_chassis_mcu::~WC_chassis_mcu()
+{
 
     if(transfer_ !=NULL){
         delete transfer_;
@@ -79,76 +82,13 @@ WC_chassis_mcu::~WC_chassis_mcu() {
     }
 }
 
-void WC_chassis_mcu::Init(double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed) {
-
+void WC_chassis_mcu::Init()
+{
     transfer_->Init();
-
-  if ((Speed_ratio > 0) && (Speed_ratio < 2)) {
-    Speed_ratio_ = Speed_ratio;
-  } else {
-    std::cout << "Speed_ratio err value:" << Speed_ratio<< std::endl;
-  }
-
-
-  if (max_speed_v > 0) {
-    max_speed_v_ = max_speed_v;
-  } else {
-    max_speed_v_ = 0.5;
-    std::cout << "max_speed_v err value:" <<max_speed_v<< std::endl;
-  }
-
-  if (max_speed_w > 0) {
-    max_speed_w_ = max_speed_w;
-  } else {
-    max_speed_w_ = 0.5;
-    std::cout << "max_speed_w err value:" <<max_speed_w<< std::endl;
-  }
-
-  if ((speed_v_acc > 0) && (speed_v_acc < max_speed_v_)) {
-    speed_v_acc_ = speed_v_acc;
-  } else {
-    speed_v_acc_ = 0.05;
-    std::cout << "speed_v_acc err value:" <<speed_v_acc<< std::endl;
-  }
-
-  if ((speed_v_dec < 0) && (speed_v_dec > (-1.0 * max_speed_v_))) {
-    speed_v_dec_ = speed_v_dec;
-  } else {
-    speed_v_dec_ = -0.12;
-    std::cout << "speed_v_dec err value:" <<speed_v_dec<< std::endl;
-  }
-
-  if ((speed_v_dec_zero < 0) && (speed_v_dec_zero > (-1.0 * max_speed_v_))) {
-    speed_v_dec_zero_ = speed_v_dec_zero;
-  } else {
-    speed_v_dec_zero_ = -0.12;
-    std::cout << "speed_v_dec_zero err value:" <<speed_v_dec_zero<< std::endl;
-  }
-
-  if ((speed_w_acc > 0) && (speed_w_acc < max_speed_w_)) {
-    speed_w_acc_ = speed_w_acc;
-  } else {
-    speed_w_acc_ = 0.25;
-    std::cout << "speed_w_acc err value:" <<speed_w_acc<< std::endl;
-  }
-
-  if ((speed_w_dec < 0) && (speed_w_dec > (-1.0 * max_speed_w_))) {
-    speed_w_dec_ = speed_w_dec;
-  } else {
-    speed_w_dec_ = -0.25;
-    std::cout << "speed_w_dec err value:" <<speed_w_dec<< std::endl;
-  }
-
-  if ((full_speed > 0) && (full_speed < 20)) {
-    full_speed_ = full_speed;
-  } else {
-    full_speed_ = 3.0;
-    std::cout << "full_speed err value:" <<full_speed<< std::endl;
-  }
-
-
 }
-void WC_chassis_mcu::setRemoteID(unsigned char id) {
+
+void WC_chassis_mcu::setRemoteID(unsigned char id)
+{
   unsigned char remote_id = id & 0x0f;
   if (remote_id < 1 || remote_id > 9) {
     GS_ERROR("[wc_chassis] remote id = %d, beyond (1 ~ 9)", remote_id);
@@ -853,7 +793,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   }
   speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;
 
-  speed_v = fabs(speed_v) > max_speed_v_ ?  sign(speed_v) * max_speed_v_ : speed_v;
+  speed_v = fabs(speed_v) > p_speed_v->max ?  sign(speed_v) * p_speed_v->max : speed_v;
   speed_w = fabs(speed_w) > max_speed_w_ ?  sign(speed_w) * max_speed_w_ : speed_w;
 
   GS_INFO("[CHASSIS] set real speed v = %.2f, w = %.2f", speed_v, speed_w);

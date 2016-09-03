@@ -6,6 +6,7 @@
 #include "parameter.h"
 #include "common_function.h"
 #include "schedule.h"
+#include "param/machine.h"
 
 /***ros 相关****/
 tf::TransformBroadcaster *p_odom_broadcaster = NULL;
@@ -121,10 +122,6 @@ void InitParameter()
 
       } else if (device_param == "network") {
           p_network = new Network();
-
-          network_nh.param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
-          network_nh.param("internet_url",internet_url,std::string(""));//外网url用于测试外网状态
-
       } else if (device_param == "checker_id") {
           ros::NodeHandle checker_id_nh("~/chassis_param/checker_id");
           checker_id_nh.param("hardware_id", hardware_id, std::string("   "));//硬件设备名称
@@ -145,6 +142,7 @@ void InitParameter()
     std::string strategy_param;
     while (strategy_ss >> strategy_param) {
       if (strategy_param == "speed_v") {
+          p_speed_v = new Speed_v();
           ros::NodeHandle speed_v_nh("~/chassis_param/speed_v");
           speed_v_nh.param("max", max_speed_v, static_cast<double>(0.6));//最大速度
           speed_v_nh.param("acc", speed_v_acc, static_cast<double>(0.025));//速度加速度

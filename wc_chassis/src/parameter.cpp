@@ -2,13 +2,10 @@
 */
 
 #include "parameter.h"
-//#include "param/speed_v.h"
 #include "service.h"
 #include "publish.h"
 #include "subscribe.h"
 #include "wc_chassis_mcu.h"
-#include "param/machine.h"
-#include "param/network.h"
 
 
 double ultral_effective_range = 0.4;
@@ -120,7 +117,7 @@ bool outer_relay   = true;  //外部继电器状态
 bool user_relay    = true;  //用户继电器状态
 double pre_mileage = 0.0;  //
 
-//Speed_v   *p_speed_v   = NULL;
+Speed_v   *p_speed_v   = NULL;
 Publisher *p_publisher = NULL;
 Subscribe *p_subscribe = NULL;
 Service   *p_service   = NULL;

@@ -33,7 +33,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
-//#include "param/speed_v.h"
+#include "param/speed_v.h"
 #include "publish.h"
 #include "subscribe.h"
 #include "wc_chassis_mcu.h"
@@ -197,7 +197,7 @@ extern bool outer_relay;  //外部继电器状态
 extern bool user_relay;  //用户继电器状态
 
 extern double pre_mileage;  //
-//extern Speed_v *p_speed_v;
+extern Speed_v *p_speed_v;
 extern Publisher *p_publisher;
 extern Subscribe *p_subscribe;
 extern Service   *p_service;
