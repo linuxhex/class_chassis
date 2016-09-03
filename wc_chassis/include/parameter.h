@@ -167,8 +167,6 @@ extern double charger_voltage_;
 extern double current_charge_value_;
 extern int remote_id ;
 extern std::string hardware_id;
-extern std::string router_ip;
-extern std::string laser_ip;
 extern bool laser_connection_status;
 extern bool router_connection_status;
 extern bool internet_connection_status;

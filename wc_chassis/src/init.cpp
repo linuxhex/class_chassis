@@ -34,9 +34,6 @@ void InitParameter()
     ultrasonic = new std::string();
     special_ultrasonic = new std::string();
     double speed_ratio = 1.0;
-    std::string host_name;
-    int port;
-
 
 //    p_nh->param("max_cmd_interval", max_cmd_interval, 1.0);
 //    p_nh->param("TimeWidth", timeWidth, static_cast<double>(0.1));
@@ -125,9 +122,6 @@ void InitParameter()
       } else if (device_param == "network") {
           p_network = new Network();
 
-          network_nh.param("host_name", host_name, std::string("10.7.5.199"));
-          network_nh.param("port", port, 5000);
-          network_nh.param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
           network_nh.param("laser_ip", laser_ip, std::string("10.7.5.100"));//激光ip
           network_nh.param("internet_url",internet_url,std::string(""));//外网url用于测试外网状态
 
@@ -181,7 +175,7 @@ void InitParameter()
 
     pthread_mutex_init(&speed_mutex, NULL);
 
-    p_chassis_mcu->Init(host_name, std::to_string(port),
+    p_chassis_mcu->Init(
                         speed_ratio,
                         max_speed_v, max_speed_w, speed_v_acc, speed_v_dec,
                         speed_v_dec_zero, speed_w_acc, speed_w_dec,full_speed);

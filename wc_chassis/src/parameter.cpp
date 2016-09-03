@@ -95,8 +95,6 @@ int protector_num = 8; //防撞条个数
 double inplace_rotating_theta = 0.2; //初始化时旋转角度
 
 std::string hardware_id;
-std::string router_ip = std::string("10.7.5.1");
-std::string laser_ip = std::string("10.7.5.100");
 std::string internet_url = std::string("www.baidu.com");
 bool laser_connection_status    = true;
 bool router_connection_status   = true;
