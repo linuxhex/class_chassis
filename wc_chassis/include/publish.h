@@ -27,7 +27,7 @@
 #include <vector>
 #define __PUBLISH__
 
- void PublishYaw(ros::Publisher &yaw_pub);
+ void PublishYaw(ros::Publisher &yaw_pub, double yaw);
  void PublishDIO(ros::Publisher &dio_pub);
  void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom_pub );
  void publishDeviceStatus(ros::Publisher &device_pub);

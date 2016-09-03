@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
     }
     PublishDIO(dio_pub);
     PublishOdom(p_odom_broadcaster,odom_pub);
-    PublishYaw(yaw_pub);
+    PublishYaw(yaw_pub, g_chassis_mcu->yaw_angle_ / 10.0);
     PublishUltrasonic(ultrasonic_pub);
     publish_protector_status(protector_pub);
     publish_protector_value(protector_value_pub);

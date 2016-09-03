@@ -339,33 +339,31 @@ int getsign(int t) {
  * 陀螺仪漂太多切换成码盘
 */
 void WC_chassis_mcu::yawSwitch(void){
-
-    if(delta_counts_left_ == 0 && (delta_counts_right_) == 0){
-        if(yaw_count_ == 0){
-            pre_yaw_angle_ = yaw_angle_;
-            return;
-        }
-        float delta_yaw_angle = yaw_angle_ - pre_yaw_angle_;
-        if(delta_yaw_angle < 0){
-            delta_yaw_angle = delta_yaw_angle + 3600;
-        }
-        sum_delta_yaw_angle_ += delta_yaw_angle;
-        pre_yaw_angle_ = yaw_angle_;
-        if(yaw_count_ > 300){
-           if(sum_delta_yaw_angle_ > 120){
-               gyro_state_ = 2;
-           } else {
-               gyro_state_ = 0;
-           }
-           yaw_count_  = 0;
-           sum_delta_yaw_angle_ = 0;
-        }
-        yaw_count_ ++ ;
-    }else{
-        yaw_count_ = 0;
-        sum_delta_yaw_angle_ = 0.0;
+  if(delta_counts_left_ == 0 && (delta_counts_right_) == 0){
+    if(yaw_count_ == 0){
+      pre_yaw_angle_ = yaw_angle_;
+      return;
     }
-
+    float delta_yaw_angle = yaw_angle_ - pre_yaw_angle_;
+    if(delta_yaw_angle < 0){
+      delta_yaw_angle = delta_yaw_angle + 3600;
+    }
+    sum_delta_yaw_angle_ += delta_yaw_angle;
+    pre_yaw_angle_ = yaw_angle_;
+    if(yaw_count_ > 300){
+      if(sum_delta_yaw_angle_ > 120){
+        gyro_state_ = 2;
+      } else {
+        gyro_state_ = 0;
+      }
+      yaw_count_  = 0;
+      sum_delta_yaw_angle_ = 0;
+    }
+    yaw_count_ ++ ;
+  }else{
+    yaw_count_ = 0;
+    sum_delta_yaw_angle_ = 0.0;
+  }
 }
 
 bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
@@ -373,8 +371,6 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
 
     GS_INFO("[WC CHASSIS] left: %d right: %d dleft: %d dright: %d ddleft: %d ddright: %d angle: %f", counts_left_, counts_right_, delta_counts_left_, delta_counts_right_, delta_counts_left_ - last_odo_delta_counts_left_, delta_counts_right_ - last_odo_delta_counts_right_, yaw_angle_ / 10.0);
     GS_INFO("[WC CHASSIS] counts_per_second: left = %d; right = %d", delta_counts_left_ * 20, delta_counts_right_ * 20);
-
-
 
     if (first_odo_) {
       odom_x_ = 0;
