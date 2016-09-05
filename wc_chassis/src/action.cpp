@@ -8,47 +8,50 @@
  * 初始化　旋转操作
  */
 bool DoRotate(ros::Publisher &rotate_finished_pub) {
-   if (fabs(g_chassis_mcu->acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) || rotate_angle == 0) {
-    start_rotate_flag = false;
-    is_rotate_finished = true;
-    g_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
-    std_msgs::Int32 msg;
-    msg.data = 1;
-    rotate_finished_pub.publish(msg);
 
-    timeval tv;
-    gettimeofday(&tv, NULL);
-    last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
-  } else {
-       is_rotate_finished = false;
-       int remain_angle = fabs(rotate_angle) - fabs(g_chassis_mcu->acc_odom_theta_) / M_PI *180;
-       if(remain_angle < 20){
-         double speed_w = remain_angle / 20.0 * inplace_rotating_theta;
-         speed_w = (speed_w < 0.10) ? 0.10 : speed_w;
-         if (rotate_angle > 0) {
-           g_chassis_mcu->setTwoWheelSpeed(0.0, speed_w);
-         }else{
-           g_chassis_mcu->setTwoWheelSpeed(0.0, -speed_w);
-         }
-       } else {
-         if(rotate_angle > 0) {
-           g_chassis_mcu->setTwoWheelSpeed(0.0, inplace_rotating_theta);
-         } else {
-           g_chassis_mcu->setTwoWheelSpeed(0.0, -inplace_rotating_theta);
-         }
-       }
-  }
-  return true;
+    static double yaw_offset = 0.10;
+    double target_angle = fabs(rotate_angle / 180.0 * M_PI);
+    double target_yaw = target_angle < 1.2 * yaw_offset ? (target_angle + yaw_offset) : target_angle;
+
+    double current_yaw = g_chassis_mcu->acc_odom_theta_;
+    double rotate_yaw = fabs(current_yaw - pre_yaw);
+    sum_yaw += rotate_yaw > M_PI ? (2.0 * M_PI - rotate_yaw) : rotate_yaw;
+    double rest_yaw = target_yaw - sum_yaw;
+    GS_INFO("[CHASSIS] target_yaw = %lf,rest_yaw= %lf,sum_yaw = %lf", target_yaw,rest_yaw,sum_yaw);
+
+    pre_yaw = current_yaw;
+    if (rest_yaw < yaw_offset) {
+        start_rotate_flag = false;
+        is_rotate_finished = true;
+        stop_rotate_flag = true;
+        g_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
+        std_msgs::Int32 msg;
+        msg.data = 1;
+        rotate_finished_pub.publish(msg);
+
+        timeval tv;
+        gettimeofday(&tv, NULL);
+        last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+    }else{
+        double speed_w = inplace_rotating_theta * rotate_angle/abs(rotate_angle);
+        if (rest_yaw < 0.40) speed_w = fabs(rest_yaw) / 0.4 * speed_w;
+        speed_w = (fabs(speed_w) < 0.07) ? speed_w/fabs(speed_w) * 0.07 : speed_w;
+
+        is_rotate_finished = false;
+        g_chassis_mcu->setTwoWheelSpeed(0.0, speed_w);
+    }
+    return true;
 }
 
 void DoGoLine(){
 
-    static double spe = m_speed_v;
+    double spe = m_speed_v;
     current_pose = g_odom_x;
     double rest_dis = distance - fabs(start_pose - current_pose);
     if (rest_dis < 0.03) {
         start_goline_flag = false;
         stop_goline_flag  = true;
+        m_speed_v = 0.0;
     }
     if (rest_dis < 0.15) spe = rest_dis / 0.15 * m_speed_v;
     spe = (fabs(spe) < 0.04) ? 0.04*spe/fabs(spe) : spe;

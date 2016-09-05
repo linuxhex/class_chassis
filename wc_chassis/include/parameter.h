@@ -200,7 +200,6 @@ extern double current_pose;
 extern double distance ;
 extern bool start_goline_flag;
 extern bool stop_goline_flag ;
-
-
-
+extern double pre_yaw;
+extern double sum_yaw;
 #endif

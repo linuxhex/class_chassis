@@ -118,12 +118,16 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
 bool StartRotate(autoscrubber_services::StartRotate::Request& req,
                  autoscrubber_services::StartRotate::Response& res)
 {
-  rotate_angle = req.rotateAngle.data;
-  start_rotate_flag = true;
-  is_rotate_finished = false;
-  m_speed_v  = 0.0;
-  m_speed_w  = 0.0;
-  g_chassis_mcu->acc_odom_theta_ = 0.0;
+  if(stop_rotate_flag) {
+      rotate_angle = req.rotateAngle.data;
+      start_rotate_flag = true;
+      stop_rotate_flag = false;
+      m_speed_v  = 0.0;
+      m_speed_w  = 0.0;
+      pre_yaw = 0.0;
+      sum_yaw = 0.0;
+      g_chassis_mcu->acc_odom_theta_ = 0.0;
+  }
   return true;
 }
 

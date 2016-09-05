@@ -118,3 +118,5 @@ bool user_relay    = true;  //用户继电器状态
 double pre_mileage = 0.0;  //
 double start_pose, current_pose;
 double distance = 0.0;
+double pre_yaw = 0.0;
+double sum_yaw = 0.0;
