@@ -26,6 +26,8 @@ ros::ServiceServer ultrasonic_switch_srv;
 ros::ServiceServer check_protector_status_srv;
 ros::ServiceServer auto_charge_cmd_srv;
 ros::ServiceServer check_auto_charge_status_srv;
+ros::ServiceServer test_go_line_srv;
+
 
 /***Subscriber***/
 ros::Subscriber    Navi_sub;
@@ -46,6 +48,7 @@ void InitService()
     check_protector_status_srv    = p_device_nh->advertiseService("check_protector_status",&CheckProtectorStatus);
     auto_charge_cmd_srv           = p_device_nh->advertiseService("auto_charge_cmd",&SetAutoChargeCmd);
     check_auto_charge_status_srv  = p_device_nh->advertiseService("auto_charge_status",&CheckAutoChargeStatus);
+    test_go_line_srv              = p_device_nh->advertiseService("test_go_line",&TestGoLine);
 
     Navi_sub              = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
     remote_ret_sub        = p_device_nh->subscribe("/device/remote_ret", 10, RemoteRetCallback);

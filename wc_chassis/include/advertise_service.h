@@ -12,5 +12,5 @@ bool UltrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,auto
 bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,autoscrubber_services::CheckProtectorStatus::Response& res);
 bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,autoscrubber_services::SetChargeCmd::Response& res);
 bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,autoscrubber_services::CheckChargeStatus::Response& res);
-
+bool TestGoLine(autoscrubber_services::TestGoLine::Request& req,autoscrubber_services::TestGoLine::Response& res);
 #endif

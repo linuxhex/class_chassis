@@ -6,4 +6,6 @@
  void DoDIO(ros::Publisher going_back_pub);
  void DoRemoteRet(void);
  void onCharge(void);
+ void DoGoLine();
+
 #endif

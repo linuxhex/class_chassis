@@ -18,6 +18,8 @@
 #include <autoscrubber_services/CheckRotate.h>
 #include <autoscrubber_services/CheckProtectorStatus.h>
 #include <autoscrubber_services/CheckChargeStatus.h>
+#include <autoscrubber_services/TestGoLine.h>
+#include <autoscrubber_services/GoLine.h>
 #include <autoscrubber_services/SetChargeCmd.h>
 #include <gs/logging.h>
 #include <stdio.h>
@@ -193,5 +195,10 @@ extern bool outer_relay;  //外部继电器状态
 extern bool user_relay;  //用户继电器状态
 
 extern double pre_mileage;  //
+extern double start_pose;
+extern double current_pose;
+extern double distance ;
+extern bool start_goline_flag;
+
 
 #endif

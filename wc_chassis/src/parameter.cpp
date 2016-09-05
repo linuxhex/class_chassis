@@ -28,6 +28,7 @@ unsigned int protector_bits=0x00;
 unsigned int ultrasonic_bits=0x00;
 
 bool start_rotate_flag    = false;
+bool start_goline_flag    = false;
 bool stop_rotate_flag     = true;
 bool is_rotate_finished   = false;
 bool new_hand_touch_      = false;
@@ -114,3 +115,5 @@ bool inner_relay   = true;  //内部继电器状态
 bool outer_relay   = true;  //外部继电器状态
 bool user_relay    = true;  //用户继电器状态
 double pre_mileage = 0.0;  //
+double start_pose, current_pose;
+double distance = 0.0;
