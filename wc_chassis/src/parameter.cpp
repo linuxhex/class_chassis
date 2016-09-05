@@ -29,6 +29,7 @@ unsigned int ultrasonic_bits=0x00;
 
 bool start_rotate_flag    = false;
 bool start_goline_flag    = false;
+bool stop_goline_flag     = true;
 bool stop_rotate_flag     = true;
 bool is_rotate_finished   = false;
 bool new_hand_touch_      = false;

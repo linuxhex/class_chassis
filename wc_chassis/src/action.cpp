@@ -43,10 +43,13 @@ bool DoRotate(ros::Publisher &rotate_finished_pub) {
 
 void DoGoLine(){
 
-    double spe = m_speed_v;
+    static double spe = m_speed_v;
     current_pose = g_odom_x;
     double rest_dis = distance - fabs(start_pose - current_pose);
-    if (rest_dis < 0.03) start_goline_flag = false;
+    if (rest_dis < 0.03) {
+        start_goline_flag = false;
+        stop_goline_flag  = true;
+    }
     if (rest_dis < 0.15) spe = rest_dis / 0.15 * m_speed_v;
     spe = (fabs(spe) < 0.04) ? 0.04*spe/fabs(spe) : spe;
     g_chassis_mcu->setTwoWheelSpeed(spe,0.0);
