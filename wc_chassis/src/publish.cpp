@@ -225,16 +225,7 @@ void PublishOdom(tf::TransformBroadcaster* odom_broadcaster,ros::Publisher &odom
   odom.twist.twist.angular.z = g_odom_w;
   odom_pub.publish(odom);
 
-  double q0 = odom.pose.pose.orientation.w;
-  double q1 = odom.pose.pose.orientation.x;
-  double q2 = odom.pose.pose.orientation.y;
-  double q3 = odom.pose.pose.orientation.z;
-  double Pitch = asin(-2 * q1 * q3 + 2 * q0* q2);  // pitch
-  double Rool = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2* q2 + 1); // roll
-  double Yaw = -atan2(2 * q1 * q2 + 2 * q0 * q3, -2 * q2*q2 - 2 * q3 * q3 + 1); // yaw
-  std::cout << "get Yaw = " << Yaw << "; Rool = " << Rool << "; Pitch = " << Pitch << "; raw theta = " << g_odom_tha << std::endl; 
-
-  ros::Time odom_timestamped = ros::Time::now() + ros::Duration(0.1);
+  //ros::Time odom_timestamped = ros::Time::now() + ros::Duration(0.1);
   tf::Quaternion q;
   tf::quaternionMsgToTF(odom.pose.pose.orientation, q);
   tf::Transform odom_meas(q, tf::Vector3(odom.pose.pose.position.x, odom.pose.pose.position.y, 0));
