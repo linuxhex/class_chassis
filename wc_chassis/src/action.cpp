@@ -7,14 +7,14 @@
 /*
  * 初始化　旋转操作
  */
-bool DoRotate(ros::Publisher &rotate_finished_pub) {
+bool DoRotate() {
    if (fabs(p_chassis_mcu->acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) || rotate_angle == 0) {
     start_rotate_flag = false;
     is_rotate_finished = true;
     p_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
     std_msgs::Int32 msg;
     msg.data = 1;
-    rotate_finished_pub.publish(msg);
+    p_publisher->getRotateFinishedPub().publish(msg);
 
     timeval tv;
     gettimeofday(&tv, NULL);
@@ -51,12 +51,12 @@ void onCharge(void)
           int check_charger_cnt = 0;
           while(++sleep_cnt  < 60 && charger_cmd_ == CMD_CHARGER_ON) {
            GS_INFO("[CHASSIS] checking charger volatage = %d", charger_voltage_);
-           if (charger_voltage_ >= charger_low_voltage_) {
+           if (charger_voltage_ >= p_charger->low_voltage) {
              ++check_charger_cnt;
            } else {
              check_charger_cnt = 0;
            }
-           if (check_charger_cnt > charger_delay_time_ && charger_cmd_ == CMD_CHARGER_ON) {
+           if (check_charger_cnt > p_charger->delay_time && charger_cmd_ == CMD_CHARGER_ON) {
              GS_INFO("[CHASSIS] check charger voltage normal > 30s, set charger relay on!!!");
              p_chassis_mcu->setChargeCmd(CMD_CHARGER_ON);
              pre_mileage = (p_chassis_mcu->mileage_right_ + p_chassis_mcu->mileage_left_) / 2;
@@ -72,7 +72,7 @@ void onCharge(void)
 /*
  * IO口控制，手触等
  */
-void DoDIO(ros::Publisher going_back_pub) {
+void DoDIO(void) {
   unsigned int temp_di_data = p_chassis_mcu->doDIO(g_do_data_);
   GS_INFO("[wc_chassis] get_di data: 0x%x", temp_di_data);
   cur_emergency_status = (temp_di_data >> (8 + Emergency_stop)) & 0x01;
@@ -84,7 +84,7 @@ void DoDIO(ros::Publisher going_back_pub) {
     GS_INFO("[wc_chassis] get_di data: 0x%x, and then publish going back!!!", temp_di_data);
     std_msgs::UInt32 msg;
     msg.data = 1;
-    going_back_pub.publish(msg);
+    p_publisher->getGoingBackPub().publish(msg);
   }
   g_di_data_ = temp_di_data & 0xff;
   g_do_data_ = g_di_data_;  // just for testing

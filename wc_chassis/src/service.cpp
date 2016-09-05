@@ -26,7 +26,7 @@ Service::~Service(){}
 bool Service::checkAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,
                            autoscrubber_services::CheckChargeStatus::Response& res) {
     res.charge_status.status = charger_status_;
-    res.charge_status.value  = charger_voltage_ >= charger_low_voltage_ ? (short)(charger_voltage_ * 10) : 0;
+    res.charge_status.value  = charger_voltage_ >= p_charger->low_voltage ? (short)(charger_voltage_ * 10) : 0;
     GS_INFO("[CHASSIS] get real charge status = %d, value = %d, raw_voltage = %lf!!!",
                    res.charge_status.status, res.charge_status.value, charger_voltage_);
     return true;
@@ -114,7 +114,7 @@ bool Service::startRotate(autoscrubber_services::StartRotate::Request& req,
   start_rotate_flag = true;
   is_rotate_finished = false;
   p_speed_v->m_speed_v  = 0.0;
-  p_speed_v->m_speed_w  = 0.0;
+  p_speed_w->m_speed_w  = 0.0;
   p_chassis_mcu->acc_odom_theta_ = 0.0;
   return true;
 }

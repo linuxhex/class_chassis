@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
     if(start_rotate_flag) {
-        if (charger_voltage_ > charger_low_voltage_) {
+        if (charger_voltage_ > p_charger->low_voltage) {
              go_forward_start_time_ = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
              charger_cmd_ = CMD_CHARGER_OFF;
              p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
         if (time_now - go_forward_start_time_ > -0.0001 && time_now - go_forward_start_time_ < 1.0 && !(protector_hit & FRONT_HIT)) {
             p_chassis_mcu->setTwoWheelSpeed(0.15, 0.0);
          } else {
-            DoRotate(p_publisher->getRotateFinishedPub());
+            DoRotate();
          }
     } else {
       if ((!laser_connection_status || !socket_connection_status)
@@ -64,11 +64,11 @@ int main(int argc, char **argv) {
           p_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
 
       } else {
-          p_chassis_mcu->setTwoWheelSpeed(p_speed_v->m_speed_v, p_speed_v->m_speed_w);
+          p_chassis_mcu->setTwoWheelSpeed(p_speed_v->m_speed_v, p_speed_w->m_speed_w);
       }
     }
 
-    DoDIO(p_publisher->getGoingBackPub());
+    DoDIO();
     DoRemoteRet();
     if (++loop_count % 2) {
       p_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);

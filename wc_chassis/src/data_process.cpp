@@ -94,7 +94,7 @@ void chargeValueManage(void)
     double current_charge_voltage = 0.2398 * (charge_ADC - 512);
     current_charge_voltage = current_charge_voltage < 10.0 ? 0.0 : current_charge_voltage;
     current_charge_voltage = current_charge_voltage > 50.0 ? 0.0 : current_charge_voltage;
-    if (charger_cmd_ == CMD_CHARGER_MONITOR && charger_voltage_ < charger_low_voltage_ && current_charge_voltage > charger_low_voltage_) {
+    if (charger_cmd_ == CMD_CHARGER_MONITOR && charger_voltage_ < p_charger->low_voltage && current_charge_voltage > p_charger->low_voltage) {
       timeval tv;
       gettimeofday(&tv, NULL);
       charge_on_time_ = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
@@ -102,7 +102,7 @@ void chargeValueManage(void)
     charger_voltage_ = current_charge_voltage;
     GS_INFO("[wc_chassis] adc_charge = %d, charger_voltage_: %lf", charge_ADC, charger_voltage_);
 
-    if(charger_full_voltage_ < battery_value_){
+    if(p_charger->full_voltage < battery_value_){
        p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
        charger_cmd_    = CMD_CHARGER_OFF;
        charger_status_ = STA_CHARGER_OFF;
@@ -112,12 +112,12 @@ void chargeValueManage(void)
     if (charger_relay) {
       charger_status_ = STA_CHARGER_ON;
       double mileage = (p_chassis_mcu->mileage_right_ + p_chassis_mcu->mileage_left_) / 2;
-      if(charger_voltage_ < charger_low_voltage_ || (fabs(mileage - pre_mileage) >= 0.05)){
+      if(charger_voltage_ < p_charger->low_voltage || (fabs(mileage - pre_mileage) >= 0.05)){
           p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
           charger_cmd_    = CMD_CHARGER_OFF;
           charger_status_ = STA_CHARGER_OFF;
       }
-    } else if (charger_voltage_ > charger_low_voltage_) {
+    } else if (charger_voltage_ > p_charger->low_voltage) {
       charger_status_ = STA_CHARGER_TOUCHED;
       onCharge();
     } else {

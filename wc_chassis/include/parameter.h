@@ -41,6 +41,7 @@
 #include "service.h"
 #include "param/network.h"
 #include "param/speed_w.h"
+#include "param/charger.h"
 
 extern  double ultral_effective_range ;
 extern  double g_odom_x   ;
@@ -124,7 +125,6 @@ extern double battery_full_level;
 extern double battery_empty_level;
 extern unsigned int remote_ret_;
 extern unsigned int charger_cmd_;
-extern double charger_low_voltage_;
 extern double charger_full_voltage_;
 extern unsigned int remote_ret_cnt_;
 extern unsigned char remote_cmd_;
@@ -194,5 +194,6 @@ extern Service   *p_service;
 extern WC_chassis_mcu *p_chassis_mcu;
 extern Machine *p_machine;
 extern Network *p_network;
+extern Charger *p_charger;
 
 #endif

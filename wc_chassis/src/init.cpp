@@ -92,10 +92,7 @@ void InitParameter()
     std::string device_param;
     while (device_ss >> device_param) {
       if (device_param == "charger") {
-          ros::NodeHandle charger_nh("~/chassis_param/charger");
-          charger_nh.param("low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化
-          charger_nh.param("full_voltage", charger_full_voltage_, static_cast<double>(27.5));//初始化旋转速度
-          charger_nh.param("delay_time",charger_delay_time_,30);//充电继电器打开延时时间
+          p_charger = new Charger();
       } else if (device_param == "protector") {
           ros::NodeHandle protector_nh("~/chassis_param/protector");
           protector_nh.param("protector_num",protector_num,8);//防撞条使用数量
@@ -119,7 +116,6 @@ void InitParameter()
 
       } else if (device_param == "machine") {
           p_machine = new Machine();
-
       } else if (device_param == "network") {
           p_network = new Network();
       } else if (device_param == "checker_id") {
@@ -144,20 +140,18 @@ void InitParameter()
       if (strategy_param == "speed_v") {
           p_speed_v = new Speed_v();
       } else if (strategy_param == "speed_w") {
-          speed_w_nh.param("max", max_speed_w, static_cast<double>(0.6));//最大角速度
-          speed_w_nh.param("speed_w_acc", speed_w_acc, static_cast<double>(0.25));//角速度加速度
-          speed_w_nh.param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));//角速度减速度
+          p_speed_w = new Speed_w();
       }
     }
 
-//    // 前面防撞条配置
-//    if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {
-//      GS_ERROR("[SERVICEROBOT] read front_protector_list failed");
-//    }
-//    // 后面防撞条配置
-//    if (!ReadConfigFromParams("rear_protector", p_nh, &rear_protector_list)) {
-//      GS_ERROR("[SERVICEROBOT] read rear_protector_list failed");
-//    }
+    // 前面防撞条配置
+    if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {
+      GS_ERROR("[SERVICEROBOT] read front_protector_list failed");
+    }
+    // 后面防撞条配置
+    if (!ReadConfigFromParams("rear_protector", p_nh, &rear_protector_list)) {
+      GS_ERROR("[SERVICEROBOT] read rear_protector_list failed");
+    }
 
     pthread_mutex_init(&speed_mutex, NULL);
 

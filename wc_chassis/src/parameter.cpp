@@ -76,7 +76,6 @@ int delta_counts_th; //满盘变化阀值（用于码盘防抖动）
 int battery_level_ = 3;
 double current_charge_value_ = 0.0;
 double charger_voltage_ = 0;
-double charger_low_voltage_  = 0.0;
 double charger_full_voltage_ = 27.0;
 int remote_id = 1;
 int protector_num = 8; //防撞条个数
@@ -98,7 +97,6 @@ double protector_hit_time = 0.0;  //防撞条触发开始时间
 bool on_charge = false; //在充电true 停止充电false
 double charge_on_time_ = 0.0; //检测到充电条电压正常的时间
 double go_forward_start_time_ = 0.0; //初始化的时候，检测到正在充电或在充电条上，机器人向前走2s
-int charger_delay_time_ = 30; //充电继电器打开延时时间，默认值30秒
 unsigned int sleep_cnt = 0; //充电开启线程睡眠时间，当＝０时允许进入线程
 
 bool charger_relay = false; //充电继电器状态　false:打开，　true:闭合
@@ -115,3 +113,5 @@ Service   *p_service   = NULL;
 WC_chassis_mcu *p_chassis_mcu = NULL;
 Machine *p_machine = NULL;
 Network *p_network = NULL;
+Charger *p_charger = NULL;
+
