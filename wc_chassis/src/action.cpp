@@ -52,6 +52,7 @@ void DoGoLine(){
         start_goline_flag = false;
         stop_goline_flag  = true;
         m_speed_v = 0.0;
+        g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
     }
     if (rest_dis < 0.15) spe = rest_dis / 0.15 * m_speed_v;
     spe = (fabs(spe) < 0.04) ? 0.04*spe/fabs(spe) : spe;
