@@ -11,7 +11,6 @@ Speed_v::Speed_v()
     speed_v_nh.param("remote_level", this->remote_level, 0);//遥控器控制速度
 
     this->m_speed_v = 0.0;
-    this->m_speed_w = 0.0;
 }
 
 Speed_v::~Speed_v(){}

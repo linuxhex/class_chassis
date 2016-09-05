@@ -80,7 +80,6 @@ double charger_low_voltage_  = 0.0;
 double charger_full_voltage_ = 27.0;
 int remote_id = 1;
 int protector_num = 8; //防撞条个数
-double inplace_rotating_theta = 0.2; //初始化时旋转角度
 
 std::string hardware_id;
 std::string internet_url = std::string("www.baidu.com");
@@ -108,6 +107,7 @@ bool outer_relay   = true;  //外部继电器状态
 bool user_relay    = true;  //用户继电器状态
 double pre_mileage = 0.0;  //
 
+Speed_w *p_speed_w = NULL;
 Speed_v   *p_speed_v   = NULL;
 Publisher *p_publisher = NULL;
 Subscribe *p_subscribe = NULL;

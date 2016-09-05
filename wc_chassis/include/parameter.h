@@ -40,6 +40,7 @@
 #include "param/machine.h"
 #include "service.h"
 #include "param/network.h"
+#include "param/speed_w.h"
 
 extern  double ultral_effective_range ;
 extern  double g_odom_x   ;
@@ -165,7 +166,6 @@ extern unsigned int protector_value;
 extern int protector_num;
 extern unsigned int protector_bits;
 extern unsigned int ultrasonic_bits;
-extern double inplace_rotating_theta;
 extern bool ultrasonic_board_connection;
 extern bool on_charge; //在充电true 停止充电false
 
@@ -187,6 +187,7 @@ extern bool user_relay;  //用户继电器状态
 
 extern double pre_mileage;  //
 extern Speed_v *p_speed_v;
+extern Speed_w *p_speed_w;
 extern Publisher *p_publisher;
 extern Subscribe *p_subscribe;
 extern Service   *p_service;

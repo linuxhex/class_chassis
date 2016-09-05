@@ -791,10 +791,10 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
     float delta_speed_v_dec = fabs(speed_v) < 0.01 ? p_speed_v->dec_to_zero : p_speed_v->dec;
     speed_v = delta_speed_v < delta_speed_v_dec ? (last_speed_v_ + delta_speed_v_dec) : speed_v;
   }
-  speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;
+  speed_w = fabs(delta_speed_w) > p_speed_w->acc ? (last_speed_w_ + sign(delta_speed_w) * p_speed_w->acc) : speed_w;
 
   speed_v = fabs(speed_v) > p_speed_v->max ?  sign(speed_v) * p_speed_v->max : speed_v;
-  speed_w = fabs(speed_w) > max_speed_w_ ?  sign(speed_w) * max_speed_w_ : speed_w;
+  speed_w = fabs(speed_w) > p_speed_w->max ?  sign(speed_w) * p_speed_w->max : speed_w;
 
   GS_INFO("[CHASSIS] set real speed v = %.2f, w = %.2f", speed_v, speed_w);
 

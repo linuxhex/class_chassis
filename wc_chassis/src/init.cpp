@@ -144,13 +144,9 @@ void InitParameter()
       if (strategy_param == "speed_v") {
           p_speed_v = new Speed_v();
       } else if (strategy_param == "speed_w") {
-          ros::NodeHandle speed_w_nh("~/chassis_param/speed_w");
           speed_w_nh.param("max", max_speed_w, static_cast<double>(0.6));//最大角速度
           speed_w_nh.param("speed_w_acc", speed_w_acc, static_cast<double>(0.25));//角速度加速度
           speed_w_nh.param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));//角速度减速度
-          speed_w_nh.param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));//初始化旋转速度
-
-
       }
     }
 

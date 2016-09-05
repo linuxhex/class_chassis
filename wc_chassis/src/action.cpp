@@ -23,7 +23,7 @@ bool DoRotate(ros::Publisher &rotate_finished_pub) {
        is_rotate_finished = false;
        int remain_angle = fabs(rotate_angle) - fabs(p_chassis_mcu->acc_odom_theta_) / M_PI *180;
        if(remain_angle < 20){
-         double speed_w = remain_angle / 20.0 * inplace_rotating_theta;
+         double speed_w = remain_angle / 20.0 * p_speed_w->inplace_rotating_theta;
          speed_w = (speed_w < 0.10) ? 0.10 : speed_w;
          if (rotate_angle > 0) {
            p_chassis_mcu->setTwoWheelSpeed(0.0, speed_w);
@@ -32,9 +32,9 @@ bool DoRotate(ros::Publisher &rotate_finished_pub) {
          }
        } else {
          if(rotate_angle > 0) {
-           p_chassis_mcu->setTwoWheelSpeed(0.0, inplace_rotating_theta);
+           p_chassis_mcu->setTwoWheelSpeed(0.0, p_speed_w->inplace_rotating_theta);
          } else {
-           p_chassis_mcu->setTwoWheelSpeed(0.0, -inplace_rotating_theta);
+           p_chassis_mcu->setTwoWheelSpeed(0.0, -1 * p_speed_w->inplace_rotating_theta);
          }
        }
   }

@@ -14,7 +14,6 @@ class Speed_v {
       double full;
       int remote_level;
       float m_speed_v;
-      float m_speed_w;
 };
 
 #endif

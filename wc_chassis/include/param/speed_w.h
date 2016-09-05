@@ -9,7 +9,7 @@ public:
     double max;
     double acc;
     double dec;
-    double inplace_rotating_theta;
+    double inplace_rotating_theta = 0.2;
     float m_speed_w;
 }
 
