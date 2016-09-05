@@ -391,7 +391,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
       return false;
     }
 
-   // yawSwitch();
+     yawSwitch();
 
     int critical_delta = 2;
 
