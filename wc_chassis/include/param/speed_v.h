@@ -13,6 +13,8 @@ class Speed_v {
       double dec_to_zero;
       double full;
       int remote_level;
+      float m_speed_v;
+      float m_speed_w;
 };
 
 #endif

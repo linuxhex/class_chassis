@@ -52,19 +52,19 @@ int main(int argc, char **argv) {
     } else {
       if ((!laser_connection_status || !socket_connection_status)
           || (time_now - last_cmd_vel_time >= p_machine->max_cmd_interval)
-          || ((protector_hit & FRONT_HIT) && m_speed_v > 0.001)
-          || ((protector_hit & REAR_HIT)  && m_speed_v < -0.001)
+          || ((protector_hit & FRONT_HIT) && p_speed_v->m_speed_v > 0.001)
+          || ((protector_hit & REAR_HIT)  && p_speed_v->m_speed_v < -0.001)
           || (charger_status_ == STA_CHARGER_ON)
-          || (charger_status_ == STA_CHARGER_TOUCHED && m_speed_v < -0.001)) {
+          || (charger_status_ == STA_CHARGER_TOUCHED && p_speed_v->m_speed_v < -0.001)) {
 
-          if (charger_status_ == STA_CHARGER_ON && m_speed_v > 0.001) {
+          if (charger_status_ == STA_CHARGER_ON && p_speed_v->m_speed_v > 0.001) {
                  charger_cmd_ = CMD_CHARGER_OFF;
                  p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
           }
           p_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
 
       } else {
-          p_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
+          p_chassis_mcu->setTwoWheelSpeed(p_speed_v->m_speed_v, p_speed_v->m_speed_w);
       }
     }
 
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
       p_publisher->publishDeviceStatus();
     }
     if (loop_count % 10) {//设置遥控器id
-      p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
+      p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((p_speed_v->remote_level & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
       loop_count = 0;
     }
     p_publisher->publishDIO();

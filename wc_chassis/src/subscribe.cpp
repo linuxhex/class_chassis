@@ -23,8 +23,8 @@ void Subscribe::doNavigationCallback(const geometry_msgs::Twist::ConstPtr& Navig
   gettimeofday(&tv, NULL);
   last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
-  m_speed_v = Navigation_msg->linear.x;
-  m_speed_w = Navigation_msg->angular.z;
+  p_speed_v->m_speed_v = Navigation_msg->linear.x;
+  p_speed_v->m_speed_w = Navigation_msg->angular.z;
 }
 
 /*

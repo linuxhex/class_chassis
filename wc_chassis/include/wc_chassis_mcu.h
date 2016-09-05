@@ -17,8 +17,7 @@ class WC_chassis_mcu{
    WC_chassis_mcu();
   ~WC_chassis_mcu();
 
-  void Init(const std::string& host_name, const std::string& port,  double Speed_ratio, double max_speed_v, double max_speed_w, double speed_v_acc, double speed_v_dec, double speed_v_dec_zero, double speed_w_acc, double speed_w_dec,double full_speed);
-
+  void Init();
   void setThaZero(double zero);
   void setThaLeft(double left);
 
@@ -58,10 +57,8 @@ class WC_chassis_mcu{
   int getRPos();
   int    Counts_;
   double Speed_ratio_; 
-  double max_speed_v_, max_speed_w_;
-  double speed_v_acc_, speed_v_dec_, speed_v_dec_zero_;
+  double  max_speed_w_;
   double speed_w_acc_, speed_w_dec_;
-  double full_speed_;
 
   Socket* transfer_ = NULL;
 

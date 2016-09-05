@@ -20,12 +20,7 @@ unsigned int g_pc_control = 0;
 double last_cmd_vel_time  = 0.0;
 int current_v_index       = 0;
 int current_w_index       = 0;
-float m_speed_v = 0.0;
-float m_speed_w = 0.0;
-float g_speed_v[3] = {0.0, 0.0, 0.0};
-float g_speed_w[3] = {0.0, 0.0, 0.0};
-float g_spe = 0.0;
-float g_angle = 0.0;
+
 unsigned int loop_count   = 0;
 int rotate_angle = 0;
 unsigned int protector_bits=0x00;
@@ -76,12 +71,8 @@ float ultrasonic_max_range = 1.0;   //超声检测的最大距离  默认值1.0
 //超声接入的数量
 int ultrasonic_num=0;
 
-double max_speed_v, max_speed_w; //最大速度＆角速度
-double speed_v_acc, speed_v_dec, speed_v_dec_zero; //速度加速度，减速度
 double speed_w_acc, speed_w_dec; //角速度加速度，减速度
-double full_speed;  //满转速度
 int delta_counts_th; //满盘变化阀值（用于码盘防抖动）
-int remote_speed_level_ = 0; //遥控器控制速度等级
 int battery_level_ = 3;
 double current_charge_value_ = 0.0;
 double charger_voltage_ = 0;

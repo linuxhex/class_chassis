@@ -143,14 +143,6 @@ void InitParameter()
     while (strategy_ss >> strategy_param) {
       if (strategy_param == "speed_v") {
           p_speed_v = new Speed_v();
-          ros::NodeHandle speed_v_nh("~/chassis_param/speed_v");
-          speed_v_nh.param("max", max_speed_v, static_cast<double>(0.6));//最大速度
-          speed_v_nh.param("acc", speed_v_acc, static_cast<double>(0.025));//速度加速度
-          speed_v_nh.param("dec", speed_v_dec, static_cast<double>(-0.12));//速度减速度
-          speed_v_nh.param("dec_to_zero", speed_v_dec_zero, static_cast<double>(-0.12));
-          speed_v_nh.param("full",full_speed,static_cast<double>(3.0)); //电机满转速度
-          speed_v_nh.param("remote_level", remote_speed_level_, 0);//遥控器控制速度
-
       } else if (strategy_param == "speed_w") {
           ros::NodeHandle speed_w_nh("~/chassis_param/speed_w");
           speed_w_nh.param("max", max_speed_w, static_cast<double>(0.6));//最大角速度
@@ -173,10 +165,7 @@ void InitParameter()
 
     pthread_mutex_init(&speed_mutex, NULL);
 
-    p_chassis_mcu->Init(
-                        speed_ratio,
-                        max_speed_v, max_speed_w, speed_v_acc, speed_v_dec,
-                        speed_v_dec_zero, speed_w_acc, speed_w_dec,full_speed);
+    p_chassis_mcu->Init();
 
     GS_INFO("[wc_chassis] init param completed");
 }
@@ -207,7 +196,7 @@ void InitDevice(void)
     std::cout << "remote_id = " << remote_id << std::endl;
   }
 #endif
-  p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((remote_speed_level_ & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
+  p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((p_speed_v->remote_level & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
   GS_INFO("[wc_chassis] init device completed");
 }
 

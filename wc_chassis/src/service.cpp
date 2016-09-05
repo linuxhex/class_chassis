@@ -113,8 +113,8 @@ bool Service::startRotate(autoscrubber_services::StartRotate::Request& req,
   rotate_angle = req.rotateAngle.data;
   start_rotate_flag = true;
   is_rotate_finished = false;
-  m_speed_v  = 0.0;
-  m_speed_w  = 0.0;
+  p_speed_v->m_speed_v  = 0.0;
+  p_speed_v->m_speed_w  = 0.0;
   p_chassis_mcu->acc_odom_theta_ = 0.0;
   return true;
 }

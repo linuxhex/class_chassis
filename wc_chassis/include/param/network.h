@@ -10,7 +10,7 @@ public:
     ~Network();
 
     std::string host_name = std::string("10.7.5.199");
-    int port = 5000;
+    std::string port = std::string("5000");
     std::string router_ip = std::string("10.7.5.1");
     std::string laser_ip  = std::string("10.7.5.100");
     std::string internet_url = std::string("www.baidu.com");

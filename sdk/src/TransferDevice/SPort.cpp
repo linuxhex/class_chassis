@@ -153,7 +153,7 @@ void Socket::Init() {
   BeginThread();
 
   while (!socket_) {
-    ROS_INFO("[SOCKET] waitting for socket %s:%s",p_network->host_name.c_str(), p_network->port.c_str());
+    ROS_INFO("[SOCKET] waitting for socket %s:%s",port_.c_str(), host_name_.c_str());
     SLEEP(1000);
   }
 }

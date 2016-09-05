@@ -9,6 +9,9 @@ Speed_v::Speed_v()
     speed_v_nh.param("dec_to_zero", this->dec_to_zero, static_cast<double>(-0.12)); //减到０的减速读
     speed_v_nh.param("full",this->full,static_cast<double>(3.0)); //电机满转速度
     speed_v_nh.param("remote_level", this->remote_level, 0);//遥控器控制速度
+
+    this->m_speed_v = 0.0;
+    this->m_speed_w = 0.0;
 }
 
 Speed_v::~Speed_v(){}

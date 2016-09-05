@@ -764,7 +764,7 @@ int WC_chassis_mcu::GetCopleyAngle(float angle) {
 short WC_chassis_mcu::getMotorSpeed(float speed) {
 
   // transfer real speed to motor comond
-  short ret = (short)(speed / (p_machine->b_dia * M_PI) * p_machine->reduction_ratio / full_speed_ * 60.0);
+  short ret = (short)(speed / (p_machine->b_dia * M_PI) * p_machine->reduction_ratio / p_speed_v->full * 60.0);
   ret = ret > SPEED_TH ? SPEED_TH : ret;
   ret = ret < ((-1) * SPEED_TH) ? ((-1) * SPEED_TH) : ret;
   return ret;
@@ -785,10 +785,10 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   float delta_speed_w = speed_w - last_speed_w_;
 
   if(delta_speed_v > 0.0) {
-    float delta_speed_v_acc = fabs(speed_v) < 0.01 ? 0.25 : speed_v_acc_;
+    float delta_speed_v_acc = fabs(speed_v) < 0.01 ? 0.25 : p_speed_v->acc;
     speed_v = delta_speed_v > delta_speed_v_acc ? (last_speed_v_ + delta_speed_v_acc) : speed_v;
   } else {
-    float delta_speed_v_dec = fabs(speed_v) < 0.01 ? speed_v_dec_zero_ : speed_v_dec_;
+    float delta_speed_v_dec = fabs(speed_v) < 0.01 ? p_speed_v->dec_to_zero : p_speed_v->dec;
     speed_v = delta_speed_v < delta_speed_v_dec ? (last_speed_v_ + delta_speed_v_dec) : speed_v;
   }
   speed_w = fabs(delta_speed_w) > speed_w_acc_ ? (last_speed_w_ + sign(delta_speed_w) * speed_w_acc_) : speed_w;
