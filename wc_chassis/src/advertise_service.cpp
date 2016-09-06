@@ -15,7 +15,8 @@
 bool TestGoLine(autoscrubber_services::TestGoLine::Request& req,
                 autoscrubber_services::TestGoLine::Response& res) {
      if(stop_goline_flag){
-          start_pose = g_odom_x;
+          start_pose = 0.0;
+          g_chassis_mcu->ReSetOdom();
           double dis_offset = 0.03;
           autoscrubber_services::GoLine go_line = req.go_line;
           distance = go_line.distance < dis_offset ? go_line.distance + dis_offset: go_line.distance;
@@ -27,6 +28,26 @@ bool TestGoLine(autoscrubber_services::TestGoLine::Request& req,
       return true;
 }
 
+/*
+ *  测试用走直线
+ */
+bool StopGoLine(autoscrubber_services::StopGoLine::Request& req,
+                 autoscrubber_services::StopGoLine::Response& res) {
+      m_speed_v = 0.0;
+      m_speed_w = 0.0;
+      start_goline_flag = false;
+      stop_goline_flag  = true;
+      return true;
+}
+
+/*
+ * 初始化　旋转检测
+ */
+bool CheckGoLine(autoscrubber_services::CheckGoLine::Request& req,
+                 autoscrubber_services::CheckGoLine::Response& res) {
+  res.isFinished.data = stop_goline_flag;
+  return true;
+}
 
 /*
  *  自动充电 状态查询
@@ -126,7 +147,7 @@ bool StartRotate(autoscrubber_services::StartRotate::Request& req,
       m_speed_w  = 0.0;
       pre_yaw = 0.0;
       sum_yaw = 0.0;
-      g_chassis_mcu->acc_odom_theta_ = 0.0;
+      g_chassis_mcu->ReSetOdom();
   }
   return true;
 }

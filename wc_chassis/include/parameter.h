@@ -20,6 +20,8 @@
 #include <autoscrubber_services/CheckChargeStatus.h>
 #include <autoscrubber_services/TestGoLine.h>
 #include <autoscrubber_services/GoLine.h>
+#include <autoscrubber_services/StopGoLine.h>
+#include <autoscrubber_services/CheckGoLine.h>
 #include <autoscrubber_services/SetChargeCmd.h>
 #include <gs/logging.h>
 #include <stdio.h>

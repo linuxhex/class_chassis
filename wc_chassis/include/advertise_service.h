@@ -13,4 +13,7 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
 bool SetAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,autoscrubber_services::SetChargeCmd::Response& res);
 bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,autoscrubber_services::CheckChargeStatus::Response& res);
 bool TestGoLine(autoscrubber_services::TestGoLine::Request& req,autoscrubber_services::TestGoLine::Response& res);
+bool StopGoLine(autoscrubber_services::StopGoLine::Request& req,autoscrubber_services::StopGoLine::Response& res);
+bool CheckGoLine(autoscrubber_services::CheckGoLine::Request& req,autoscrubber_services::CheckGoLine::Response& res);
+
 #endif
