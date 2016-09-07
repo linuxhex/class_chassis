@@ -335,6 +335,14 @@ int getsign(int t) {
   return t >= 0 ? (1) : (-1);
 }
 
+
+void WC_chassis_mcu::ReSetOdom(void){
+    this->odom_a_ = 0.0;
+    this->odom_x_ = 0.0;
+    this->odom_y_ = 0.0;
+    this->acc_odom_theta_ = 0.0;
+}
+
 /*
  * 陀螺仪漂太多切换成码盘
 */
@@ -391,7 +399,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
       return false;
     }
 
-   // yawSwitch();
+     yawSwitch();
 
     int critical_delta = 2;
 

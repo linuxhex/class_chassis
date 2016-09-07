@@ -68,7 +68,9 @@ int main(int argc, char **argv) {
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
-    if(start_rotate_flag) {
+    if(start_goline_flag){
+       DoGoLine();
+    }else if(start_rotate_flag) {
         if (charger_voltage_ > charger_low_voltage_) {
              go_forward_start_time_ = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
              charger_cmd_ = CMD_CHARGER_OFF;

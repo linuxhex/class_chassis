@@ -7,6 +7,48 @@
 #include "common_function.h"
 #include "action.h"
 
+
+
+/*
+ *  测试用走直线
+ */
+bool TestGoLine(autoscrubber_services::TestGoLine::Request& req,
+                autoscrubber_services::TestGoLine::Response& res) {
+     if(stop_goline_flag){
+          start_pose = sqrt(fabs(g_odom_x*g_odom_x) + fabs(g_odom_y*g_odom_y));
+          //g_chassis_mcu->ReSetOdom();
+          double dis_offset = 0.03;
+          autoscrubber_services::GoLine go_line = req.go_line;
+          distance = go_line.distance < dis_offset ? go_line.distance + dis_offset: go_line.distance;
+          m_speed_v = go_line.line_x;
+          m_speed_w = 0.0;
+          start_goline_flag = true;
+          stop_goline_flag  = false;
+      }
+      return true;
+}
+
+/*
+ *  测试用走直线
+ */
+bool StopGoLine(autoscrubber_services::StopGoLine::Request& req,
+                 autoscrubber_services::StopGoLine::Response& res) {
+      m_speed_v = 0.0;
+      m_speed_w = 0.0;
+      start_goline_flag = false;
+      stop_goline_flag  = true;
+      return true;
+}
+
+/*
+ * 初始化　旋转检测
+ */
+bool CheckGoLine(autoscrubber_services::CheckGoLine::Request& req,
+                 autoscrubber_services::CheckGoLine::Response& res) {
+  res.isFinished.data = stop_goline_flag;
+  return true;
+}
+
 /*
  *  自动充电 状态查询
  */
@@ -97,12 +139,17 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
 bool StartRotate(autoscrubber_services::StartRotate::Request& req,
                  autoscrubber_services::StartRotate::Response& res)
 {
-  rotate_angle = req.rotateAngle.data;
-  start_rotate_flag = true;
-  is_rotate_finished = false;
-  m_speed_v  = 0.0;
-  m_speed_w  = 0.0;
-  g_chassis_mcu->acc_odom_theta_ = 0.0;
+  if(stop_rotate_flag) {
+      rotate_angle = req.rotateAngle.data;
+      start_rotate_flag = true;
+      stop_rotate_flag = false;
+      m_speed_v  = 0.0;
+      m_speed_w  = 0.0;
+      pre_yaw = 0.0;
+      sum_yaw = 0.0;
+      g_chassis_mcu->acc_odom_theta_ = 0.0;
+      //g_chassis_mcu->ReSetOdom();
+  }
   return true;
 }
 

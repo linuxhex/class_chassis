@@ -43,6 +43,7 @@ class WC_chassis_mcu{
   int V2RPM(float v);
   int GetCopleySpeed(float v);
   int GetCopleyAngle(float angle);
+  void ReSetOdom(void);
   short yaw_angle_;
   short pre_yaw_angle_;
   short sum_delta_yaw_angle_;
