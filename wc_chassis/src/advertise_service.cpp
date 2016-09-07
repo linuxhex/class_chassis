@@ -15,8 +15,8 @@
 bool TestGoLine(autoscrubber_services::TestGoLine::Request& req,
                 autoscrubber_services::TestGoLine::Response& res) {
      if(stop_goline_flag){
-          start_pose = 0.0;
-          g_chassis_mcu->ReSetOdom();
+          start_pose = sqrt(fabs(g_odom_x*g_odom_x) + fabs(g_odom_y*g_odom_y));
+          //g_chassis_mcu->ReSetOdom();
           double dis_offset = 0.03;
           autoscrubber_services::GoLine go_line = req.go_line;
           distance = go_line.distance < dis_offset ? go_line.distance + dis_offset: go_line.distance;
@@ -147,7 +147,8 @@ bool StartRotate(autoscrubber_services::StartRotate::Request& req,
       m_speed_w  = 0.0;
       pre_yaw = 0.0;
       sum_yaw = 0.0;
-      g_chassis_mcu->ReSetOdom();
+      g_chassis_mcu->acc_odom_theta_ = 0.0;
+      //g_chassis_mcu->ReSetOdom();
   }
   return true;
 }
