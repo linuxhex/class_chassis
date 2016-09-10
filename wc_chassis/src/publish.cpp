@@ -113,7 +113,7 @@ void Publisher::publishDeviceStatus(void) {
     battery_value = battery_value < 0.0 ? 0.0 : battery_value;
     battery_value = battery_value > 35.0 ? 0.0 : battery_value;
     int current_battery_capacity;
-    current_battery_capacity = (battery_value - battery_empty_level) / (battery_full_level - battery_empty_level) * 100;
+    current_battery_capacity = (battery_value - p_battery->battery_empty_level) / (p_battery->battery_full_level - p_battery->battery_empty_level) * 100;
     if(current_battery_capacity < 0) current_battery_capacity = 0;
     if(current_battery_capacity > 100) current_battery_capacity = 100;
     // do battery voltage filter

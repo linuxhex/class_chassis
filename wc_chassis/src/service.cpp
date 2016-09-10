@@ -148,7 +148,7 @@ bool Service::checkHardware(autoscrubber_services::CheckHardware::Request& req, 
   diagnostic_msgs::KeyValue value;
   hardware_status.name = std::string("hardware_status");
   hardware_status.message = std::string("status_msgs");
-  hardware_status.hardware_id = hardware_id;
+  hardware_status.hardware_id = p_checker_id->hardware_id;
 
   value.key = std::string("MCU_connection"); // 0:bad 1:good
   value.value = socket_connection_status ? std::string("true") : std::string("false");

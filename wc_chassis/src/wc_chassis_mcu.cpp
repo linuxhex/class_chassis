@@ -39,7 +39,6 @@ double GetTimeInSeconds()
 
 WC_chassis_mcu::WC_chassis_mcu()
 {
-    this->Speed_ratio_     = 1.0;
     this->odom_x_          = 0.0;
     this->odom_y_ = 0.0;
     this->odom_a_ = 0.0;
@@ -215,7 +214,7 @@ bool WC_chassis_mcu::getCSpeed(double &v, double &w) {
   double da = (r_wheel_pos - l_wheel_pos) / p_machine->axle;
 
   if ((fabs(t) > 10e-3) && (fabs(t) < 10e3)) {
-    v = dx / t * Speed_ratio_;
+    v = dx / t * p_speed_v->speed_ratio;
     w = da / t;
   } else {
     v = 0;

@@ -56,7 +56,6 @@ class WC_chassis_mcu{
   int getLPos();
   int getRPos();
   int    Counts_;
-  double Speed_ratio_; 
 
   Socket* transfer_ = NULL;
 

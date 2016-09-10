@@ -32,8 +32,6 @@ bool old_ultrasonic_      = false;
 unsigned int g_di_data_   = 0;
 unsigned int g_do_data_   = 0;
 unsigned int cur_emergency_status = 1;
-double battery_full_level;
-double battery_empty_level;
 unsigned int remote_ret_     = 0x0a00;
 unsigned int charger_cmd_    = CMD_CHARGER_STATUS;
 unsigned int remote_ret_cnt_ = 0;
@@ -73,8 +71,6 @@ double charger_voltage_ = 0;
 double charger_full_voltage_ = 27.0;
 int remote_id = 1;
 
-std::string hardware_id;
-std::string internet_url = std::string("www.baidu.com");
 bool laser_connection_status    = true;
 bool router_connection_status   = true;
 bool internet_connection_status = true;
@@ -95,18 +91,21 @@ bool outer_relay   = true;  //外部继电器状态
 bool user_relay    = true;  //用户继电器状态
 double pre_mileage = 0.0;  //
 
-Speed_w *p_speed_w = NULL;
+Speed_w   *p_speed_w = NULL;
 Speed_v   *p_speed_v   = NULL;
 Publisher *p_publisher = NULL;
 Subscribe *p_subscribe = NULL;
 Service   *p_service   = NULL;
-WC_chassis_mcu *p_chassis_mcu = NULL;
-Machine     *p_machine = NULL;
-Network     *p_network = NULL;
-Charger     *p_charger = NULL;
-Protector   *p_protector = NULL;
-HandToucher *p_hand_toucher = NULL;
-Ultrasonicer  *p_ultrasonic  = NULL;
+WC_chassis_mcu  *p_chassis_mcu = NULL;
+Machine         *p_machine = NULL;
+Network         *p_network = NULL;
+Charger         *p_charger = NULL;
+Protector       *p_protector = NULL;
+HandToucher     *p_hand_toucher = NULL;
+Ultrasonicer    *p_ultrasonic  = NULL;
+Param::Battery  *p_battery = NULL;
+Checker_id      *p_checker_id = NULL;
+
 
 
 

@@ -32,53 +32,6 @@ void InitParameter()
 
     p_chassis_mcu = new WC_chassis_mcu();
     p_odom_broadcaster = new tf::TransformBroadcaster();
-    double speed_ratio = 1.0;
-
-//    p_nh->param("max_cmd_interval", max_cmd_interval, 1.0);
-//    p_nh->param("TimeWidth", timeWidth, static_cast<double>(0.1));
-  //  p_nh->param("host_name", host_name, std::string("10.7.5.199"));
-  //  p_nh->param("port", port, 5000);
-    //    p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
-    //    p_nh->param("laser_ip", laser_ip, std::sscp tring("10.7.5.100"));//激光ip
-    //    p_nh->param("internet_url",internet_url,std::string("www.baidu.com"));//外网url用于测试外网状态
-
-//    p_nh->param("F_DIA", f_dia, static_cast<double>(0.125));	// diameter of front wheel
-//    p_nh->param("B_DIA", b_dia, static_cast<double>(0.125));
-//    p_nh->param("AXLE", axle, static_cast<double>(0.383));		// length bettween two wheels
-//    p_nh->param("COUNTS", counts, 12);//霍尔数
-//    p_nh->param("REDUCTION_RATIO", reduction_ratio, static_cast<double>(30.0));//减速比
-//    p_nh->param("SPEED_RATIO", speed_ratio, static_cast<double>(1.0));
-//    p_nh->param("battery_full_level", battery_full_level, static_cast<double>(27.5));
-//    p_nh->param("battery_empty_level", battery_empty_level, static_cast<double>(20.0));
-
-//    p_nh->param("ultrasonic",*ultrasonic,std::string(" "));//配置的超声
-//    p_nh->param("ultrasonic_min_range",ultrasonic_min_range,static_cast<float>(0.04));//超声最小距离
-//    p_nh->param("ultrasonic_max_range",ultrasonic_max_range,static_cast<float>(1.0));//超声最大距离
-//    p_nh->param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));//超声有效检测距离
-//    p_nh->param("special_ultrasonic",*special_ultrasonic,std::string(" "));//特殊配置的超声
-//    p_nh->param("special_ultrasonic_offset_dismeter",special_ultrasonic_offset_dismeter,static_cast<float>(0.15)); //特殊超声偏置距离
-
-//    p_nh->param("max_speed_v", max_speed_v, static_cast<double>(0.6));//最大速度
-//    p_nh->param("max_speed_w", max_speed_w, static_cast<double>(0.6));//最大角速度
-//    p_nh->param("speed_v_acc", speed_v_acc, static_cast<double>(0.025));//速度加速度
-//    p_nh->param("speed_v_dec", speed_v_dec, static_cast<double>(-0.12));//速度减速度
-//    p_nh->param("speed_v_dec_to_zero", speed_v_dec_zero, static_cast<double>(-0.12));
-//    p_nh->param("speed_w_acc", speed_w_acc, static_cast<double>(0.25));//角速度加速度
-//    p_nh->param("speed_w_dec", speed_w_dec, static_cast<double>(-0.25));//角速度减速度
-//    p_nh->param("full_speed",full_speed,static_cast<double>(3.0)); //电机满转速度
-//    p_nh->param("delta_counts_th",delta_counts_th,800); //码盘防抖动阈值
-//    p_nh->param("remote_speed_level", remote_speed_level_, 0);//遥控器控制速度
-//    p_nh->param("hardware_id", hardware_id, std::string("   "));//硬件设备名称
-//    p_nh->param("protector_num",protector_num,8);//防撞条使用数量
-//    p_nh->param("router_ip", router_ip, std::string("10.7.5.1"));//路由ip
-//    p_nh->param("laser_ip", laser_ip, std::sscp tring("10.7.5.100"));//激光ip
-//    p_nh->param("internet_url",internet_url,std::string("www.baidu.com"));//外网url用于测试外网状态
-//    p_nh->param("inplace_rotating_theta", inplace_rotating_theta, static_cast<double>(0.2));//初始化旋转速度
-//    p_nh->param("charger_low_voltage", charger_low_voltage_, static_cast<double>(24.5));//初始化
-//    p_nh->param("charger_full_voltage", charger_full_voltage_, static_cast<double>(27.5));//初始化旋转速度
-//    p_nh->param("new_hand_touch", new_hand_touch_, false);//新板子手触开关和防撞条共用一个接口
-//    p_nh->param("old_ultrasonic", old_ultrasonic_, false);//旧板子里面没有超声板状态
-//    p_nh->param("charger_delay_time",charger_delay_time_,30);//充电继电器打开延时时间
 
     //read device param
     ros::NodeHandle chassis_param_nh("~/chassis_param");
@@ -91,24 +44,27 @@ void InitParameter()
     while (device_ss >> device_param) {
       if (device_param == "charger") {
           p_charger = new Charger();
+
       } else if (device_param == "protector") {
           p_protector = new Protector();
+
       } else if (device_param == "hand_touch") {
           p_hand_toucher = new HandToucher();
+
       } else if (device_param == "ultrasonic") {
           p_ultrasonic = new Ultrasonicer();
+
       } else if (device_param == "battery") {
-          ros::NodeHandle battery_nh("~/chassis_param/battery");
-          battery_nh.param("full_level", battery_full_level, static_cast<double>(27.5));
-          battery_nh.param("empty_level", battery_empty_level, static_cast<double>(20.0));
+          p_battery = new Param::Battery();
 
       } else if (device_param == "machine") {
           p_machine = new Machine();
+
       } else if (device_param == "network") {
           p_network = new Network();
+
       } else if (device_param == "checker_id") {
-          ros::NodeHandle checker_id_nh("~/chassis_param/checker_id");
-          checker_id_nh.param("hardware_id", hardware_id, std::string("   "));//硬件设备名称
+          p_checker_id = new Checker_id();
 
       } else if (device_param == "footprint") {
           ros::NodeHandle footprint_nh("~/chassis_param/footprint");

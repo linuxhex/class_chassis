@@ -1,15 +1,19 @@
 #ifndef BATTERY_H
 #define BATTERY_H
+#include <ros/ros.h>
 
-class Battery{
+namespace Param {
 
-public:
-    Battery();
-    ~Battery();
+    class Battery{
 
-    double battery_full_level;
-    double battery_empty_level;
+    public:
+        Battery();
+        ~Battery();
 
-};
+        double battery_full_level;
+        double battery_empty_level;
+
+    };
+}
 
 #endif // BATTERY_H

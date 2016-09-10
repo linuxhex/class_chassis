@@ -45,6 +45,8 @@
 #include "param/protector.h"
 #include "param/hand_touch.h"
 #include "param/ultrasonic.h"
+#include "param/battery.h"
+#include "param/checker_id.h"
 
 extern  double g_odom_x   ;
 extern  double g_odom_y   ;
@@ -122,8 +124,6 @@ extern bool old_ultrasonic_;
 extern unsigned int g_di_data_;
 extern unsigned int g_do_data_;
 extern unsigned int cur_emergency_status;
-extern double battery_full_level;
-extern double battery_empty_level;
 extern unsigned int remote_ret_;
 extern unsigned int charger_cmd_;
 extern double charger_full_voltage_;
@@ -179,17 +179,21 @@ extern bool outer_relay;  //外部继电器状态
 extern bool user_relay;  //用户继电器状态
 
 extern double pre_mileage;  //
-extern Speed_v *p_speed_v;
-extern Speed_w *p_speed_w;
+extern Speed_v   *p_speed_v;
+extern Speed_w   *p_speed_w;
 extern Publisher *p_publisher;
 extern Subscribe *p_subscribe;
 extern Service   *p_service;
 extern WC_chassis_mcu *p_chassis_mcu;
-extern Machine *p_machine;
-extern Network *p_network;
-extern Charger *p_charger;
-extern Protector *p_protector;
+extern Machine     *p_machine;
+extern Network     *p_network;
+extern Charger     *p_charger;
+extern Protector   *p_protector;
 extern HandToucher *p_hand_toucher;
-extern Ultrasonicer *p_ultrasonic;
+extern Ultrasonicer    *p_ultrasonic;
+extern Param::Battery  *p_battery;
+extern Checker_id      *p_checker_id;
+
+
 
 #endif

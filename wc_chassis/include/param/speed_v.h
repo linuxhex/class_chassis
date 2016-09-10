@@ -14,6 +14,8 @@ class Speed_v {
       double full;
       int remote_level;
       float m_speed_v;
+      double speed_ratio      = 1.0;
+
 };
 
 #endif
