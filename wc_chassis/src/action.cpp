@@ -4,43 +4,72 @@
 #include "init.h"
 #include "parameter.h"
 #include <std_msgs/Int32.h>
+
+
 /*
  * 初始化　旋转操作
  */
-bool DoRotate() {
-   if (fabs(p_chassis_mcu->acc_odom_theta_) >= fabs(rotate_angle / 180.0 * M_PI * 0.98) || rotate_angle == 0) {
-    start_rotate_flag = false;
-    is_rotate_finished = true;
-    p_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
-    std_msgs::Int32 msg;
-    msg.data = 1;
-    p_publisher->getRotateFinishedPub().publish(msg);
+bool DoRotate(void) {
+       static double yaw_offset = 0.10;
+       double target_angle = fabs(rotate_angle / 180.0 * M_PI);
+       double target_yaw = target_angle < 1.2 * yaw_offset ? (target_angle + yaw_offset) : target_angle;
 
-    timeval tv;
-    gettimeofday(&tv, NULL);
-    last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
-  } else {
-       is_rotate_finished = false;
-       int remain_angle = fabs(rotate_angle) - fabs(p_chassis_mcu->acc_odom_theta_) / M_PI *180;
-       if(remain_angle < 20){
-         double speed_w = remain_angle / 20.0 * p_speed_w->inplace_rotating_theta;
-         speed_w = (speed_w < 0.10) ? 0.10 : speed_w;
-         if (rotate_angle > 0) {
+       double current_yaw = p_chassis_mcu->acc_odom_theta_;
+       double rotate_yaw = fabs(current_yaw - pre_yaw);
+       sum_yaw += rotate_yaw > M_PI ? (2.0 * M_PI - rotate_yaw) : rotate_yaw;
+       double rest_yaw = target_yaw - sum_yaw;
+       GS_INFO("[CHASSIS] target_yaw = %lf,rest_yaw= %lf,sum_yaw = %lf", target_yaw,rest_yaw,sum_yaw);
+
+       pre_yaw = current_yaw;
+       if (rest_yaw < yaw_offset) {
+           start_rotate_flag = false;
+           is_rotate_finished = true;
+           stop_rotate_flag = true;
+           p_chassis_mcu->setTwoWheelSpeed(0.0, 0.0);
+           std_msgs::Int32 msg;
+           msg.data = 1;
+           p_publisher->getRotateFinishedPub().publish(msg);
+
+           timeval tv;
+           gettimeofday(&tv, NULL);
+           last_cmd_vel_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+       }else{
+           double speed_w = p_speed_w->inplace_rotating_theta * rotate_angle/abs(rotate_angle);
+           if (rest_yaw < 0.40) speed_w = fabs(rest_yaw) / 0.4 * speed_w;
+           speed_w = (fabs(speed_w) < 0.07) ? speed_w/fabs(speed_w) * 0.07 : speed_w;
+
+           is_rotate_finished = false;
            p_chassis_mcu->setTwoWheelSpeed(0.0, speed_w);
-         }else{
-           p_chassis_mcu->setTwoWheelSpeed(0.0, -speed_w);
-         }
-       } else {
-         if(rotate_angle > 0) {
-           p_chassis_mcu->setTwoWheelSpeed(0.0, p_speed_w->inplace_rotating_theta);
-         } else {
-           p_chassis_mcu->setTwoWheelSpeed(0.0, -1 * p_speed_w->inplace_rotating_theta);
-         }
        }
-  }
-  return true;
+       return true;
 }
 
+/*
+ * 走直线测试
+*/
+void DoGoLine(void){
+
+    double spe = p_speed_v->m_speed_v;
+    current_pose = sqrt(fabs(g_odom_x*g_odom_x) + fabs(g_odom_y*g_odom_y));
+    double rest_dis = distance - fabs(start_pose - current_pose);
+    if (rest_dis < 0.03) {
+        p_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
+        start_goline_flag = false;
+        stop_goline_flag  = true;
+        p_speed_v->m_speed_v = 0.0;
+    }
+    if (rest_dis < 0.15 && fabs(spe) < 0.3) {
+        spe = rest_dis / 0.15 * spe;
+    } else if(rest_dis < 0.25 && fabs(spe) > 0.3){
+        spe = rest_dis / 0.5 * spe;
+    }
+    spe = (fabs(spe) < 0.04) ? 0.04*spe/fabs(spe) : spe;
+    p_chassis_mcu->setTwoWheelSpeed(spe,0.0);
+}
+
+/*
+ * 自动充电执行
+*/
 void onCharge(void)
 {
     if(sleep_cnt == 0){

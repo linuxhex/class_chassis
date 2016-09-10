@@ -17,9 +17,9 @@ Publisher::Publisher(){
     this->dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
     this->protector_value_pub   = p_device_nh->advertise<std_msgs::UInt32>("protector_status", 50);
     for(int i=0;i<15;i++){
-      if(p_ultrasonic->ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
+      if(p_ultrasonic->ultrasonic.find(ultrasonic_str[i]) != std::string::npos){
         this->ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
-        if(p_ultrasonic->special_ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
+        if(p_ultrasonic->special_ultrasonic.find(ultrasonic_str[i]) != std::string::npos){
           special_ultrasonic_id[i] = i;
         }
         ultrasonic_num ++;

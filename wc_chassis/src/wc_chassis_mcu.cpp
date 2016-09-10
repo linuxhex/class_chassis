@@ -288,7 +288,7 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
       return false;
     }
 
-   // yawSwitch();
+    yawSwitch();
 
     int critical_delta = 2;
 
@@ -359,6 +359,13 @@ bool WC_chassis_mcu::getOdo(double &x, double &y, double &a) {
     last_yaw_angle_ = yaw_angle_;
     return true;
 }
+void WC_chassis_mcu::ReSetOdom(void){
+    this->odom_a_ = 0.0;
+    this->odom_x_ = 0.0;
+    this->odom_y_ = 0.0;
+    this->acc_odom_theta_ = 0.0;
+}
+
 
 void WC_chassis_mcu::getUltra(void) {
   unsigned char send[1024] = {0};

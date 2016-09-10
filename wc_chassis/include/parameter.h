@@ -23,6 +23,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <autoscrubber_services/TestGoLine.h>
+#include <autoscrubber_services/GoLine.h>
+#include <autoscrubber_services/StopGoLine.h>
+#include <autoscrubber_services/CheckGoLine.h>
 #include <pthread.h>
 #include <thread>
 #include <sched.h>
@@ -179,6 +183,15 @@ extern bool outer_relay;  //外部继电器状态
 extern bool user_relay;  //用户继电器状态
 
 extern double pre_mileage;  //
+extern double start_pose;
+extern double current_pose;
+extern double distance ;
+extern bool start_goline_flag;
+extern bool stop_goline_flag ;
+extern double pre_yaw;
+extern double sum_yaw;
+
+
 extern Speed_v   *p_speed_v;
 extern Speed_w   *p_speed_w;
 extern Publisher *p_publisher;

@@ -8,8 +8,8 @@ class Ultrasonicer{
     Ultrasonicer();
     ~Ultrasonicer();
 
-    std::string *ultrasonic;
-    std::string *special_ultrasonic;
+    std::string ultrasonic;
+    std::string special_ultrasonic;
     float  min_range = 0.04;  //超声检测的最小距离  默认值0.04
     float  max_range = 1.0;   //超声检测的最大距离  默认值1.0
     int    num = 0; //超声的数量

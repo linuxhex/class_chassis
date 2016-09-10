@@ -16,6 +16,10 @@ Service::Service(){
     check_protector_status_srv    = p_device_nh->advertiseService("check_protector_status",&Service::checkProtectorStatus,this);
     auto_charge_cmd_srv           = p_device_nh->advertiseService("auto_charge_cmd",&Service::setAutoChargeCmd,this);
     check_auto_charge_status_srv  = p_device_nh->advertiseService("auto_charge_status",&Service::checkAutoChargeStatus,this);
+    test_go_line_srv              = p_device_nh->advertiseService("test_go_line",&Service::testGoLine,this);
+    stop_go_line_srv              = p_device_nh->advertiseService("stop_go_line",&Service::stopGoLine,this);
+    check_go_line_srv             = p_device_nh->advertiseService("check_go_line",&Service::checkGoLine,this);
+
 }
 
 Service::~Service(){}
@@ -110,14 +114,60 @@ bool Service::checkProtectorStatus(autoscrubber_services::CheckProtectorStatus::
 bool Service::startRotate(autoscrubber_services::StartRotate::Request& req,
                  autoscrubber_services::StartRotate::Response& res)
 {
-  rotate_angle = req.rotateAngle.data;
-  start_rotate_flag = true;
-  is_rotate_finished = false;
-  p_speed_v->m_speed_v  = 0.0;
-  p_speed_w->m_speed_w  = 0.0;
-  p_chassis_mcu->acc_odom_theta_ = 0.0;
-  return true;
+    if(stop_rotate_flag) {
+         rotate_angle = req.rotateAngle.data;
+         start_rotate_flag = true;
+         stop_rotate_flag = false;
+         p_speed_v->m_speed_v  = 0.0;
+         p_speed_w->m_speed_w  = 0.0;
+         pre_yaw = 0.0;
+         sum_yaw = 0.0;
+         p_chassis_mcu->acc_odom_theta_ = 0.0;
+         //g_chassis_mcu->ReSetOdom();
+     }
+     return true;
 }
+
+/*
+  *  测试用走直线
+  */
+ bool Service::testGoLine(autoscrubber_services::TestGoLine::Request& req,
+                 autoscrubber_services::TestGoLine::Response& res) {
+      if(stop_goline_flag){
+           start_pose = sqrt(fabs(g_odom_x*g_odom_x) + fabs(g_odom_y*g_odom_y));
+           //g_chassis_mcu->ReSetOdom();
+           double dis_offset = 0.03;
+           autoscrubber_services::GoLine go_line = req.go_line;
+           distance = go_line.distance < dis_offset ? go_line.distance + dis_offset: go_line.distance;
+           p_speed_v->m_speed_v = go_line.line_x;
+           p_speed_w->m_speed_w = 0.0;
+           start_goline_flag = true;
+           stop_goline_flag  = false;
+       }
+       return true;
+ }
+
+ /*
+  *  测试用走直线
+  */
+ bool Service::stopGoLine(autoscrubber_services::StopGoLine::Request& req,
+                  autoscrubber_services::StopGoLine::Response& res) {
+       p_speed_v->m_speed_v = 0.0;
+       p_speed_w->m_speed_w = 0.0;
+       start_goline_flag = false;
+       stop_goline_flag  = true;
+       return true;
+ }
+
+ /*
+  * 初始化　旋转检测
+  */
+ bool Service::checkGoLine(autoscrubber_services::CheckGoLine::Request& req,
+                  autoscrubber_services::CheckGoLine::Response& res) {
+   res.isFinished.data = stop_goline_flag;
+   return true;
+ }
+
 
 /*
  * 初始化　停止旋转

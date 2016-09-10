@@ -27,6 +27,8 @@ unsigned int ultrasonic_bits=0x00;
 
 bool start_rotate_flag    = false;
 bool stop_rotate_flag     = true;
+bool start_goline_flag    = false;
+bool stop_goline_flag     = true;
 bool is_rotate_finished   = false;
 bool old_ultrasonic_      = false;
 unsigned int g_di_data_   = 0;
@@ -90,6 +92,11 @@ bool inner_relay   = true;  //内部继电器状态
 bool outer_relay   = true;  //外部继电器状态
 bool user_relay    = true;  //用户继电器状态
 double pre_mileage = 0.0;  //
+
+double start_pose, current_pose;
+double distance = 0.0;
+double pre_yaw = 0.0;
+double sum_yaw = 0.0;
 
 Speed_w   *p_speed_w = NULL;
 Speed_v   *p_speed_v   = NULL;

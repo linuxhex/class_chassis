@@ -38,7 +38,6 @@ void InitParameter()
     std::string device_params;
     chassis_param_nh.param("device", device_params, std::string(""));
     std::cout<<"device"<<" "<<device_params<<std::endl;
-
     std::stringstream device_ss(device_params);
     std::string device_param;
     while (device_ss >> device_param) {
@@ -88,10 +87,48 @@ void InitParameter()
       }
     }
 
+    if(p_speed_v == NULL){
+        std::cout << "[fatal] must configure speed_v" << std::endl;
+        exit(0);
+    }
+    if(p_speed_w == NULL){
+        std::cout << "[fatal] must configure speed_w" << std::endl;
+        exit(0);
+    }
+    if(p_machine == NULL){
+        std::cout << "[fatal] must configure machine" << std::endl;
+        exit(0);
+    }
+    if(p_battery == NULL){
+        std::cout << "[fatal] must configure battery" << std::endl;
+        exit(0);
+    }
+    if(p_network == NULL){
+        std::cout << "[fatal] must configure network" << std::endl;
+        exit(0);
+    }
+
+    if(p_charger == NULL){
+        std::cout << "[error], not configure auto_charger" << std::endl;
+    }
+    if(p_protector == NULL){
+        std::cout << "[error], not configure protector" << std::endl;
+    }
+    if(p_hand_toucher == NULL){
+        std::cout << "[error], not configure hand_toucher" << std::endl;
+    }
+    if(p_ultrasonic == NULL){
+        std::cout << "[error], not configure ultrasonic" << std::endl;
+    }
+    if(p_checker_id == NULL){
+        std::cout << "[error], not configure checker_id" << std::endl;
+    }
+
+
+
+
     pthread_mutex_init(&speed_mutex, NULL);
-
     p_chassis_mcu->Init();
-
     GS_INFO("[wc_chassis] init param completed");
 }
 
