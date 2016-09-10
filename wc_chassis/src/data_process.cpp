@@ -92,7 +92,7 @@ void chargeValueManage(void)
     //  double current_charge_voltage = 0.2298 * (charge_ADC - 516);
     //  double current_charge_voltage = 0.2352 * (charge_ADC - 507);
     double current_charge_voltage = 0.2398 * (charge_ADC - 512);
-    current_charge_voltage = current_charge_voltage < 10.0 ? 0.0 : current_charge_voltage;
+    current_charge_voltage = current_charge_voltage < 1.5 ? 0.0 : current_charge_voltage;
     current_charge_voltage = current_charge_voltage > 50.0 ? 0.0 : current_charge_voltage;
     if (charger_cmd_ == CMD_CHARGER_MONITOR && charger_voltage_ < p_charger->low_voltage && current_charge_voltage > p_charger->low_voltage) {
       timeval tv;
