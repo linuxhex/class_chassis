@@ -92,7 +92,7 @@ void chargeValueManage(void)
     //  double current_charge_voltage = 0.2298 * (charge_ADC - 516);
     //  double current_charge_voltage = 0.2352 * (charge_ADC - 507);
     double current_charge_voltage = 0.2398 * (charge_ADC - 512);
-    current_charge_voltage = current_charge_voltage < 10.0 ? 0.0 : current_charge_voltage;
+    current_charge_voltage = current_charge_voltage < 1.5 ? 0.0 : current_charge_voltage;
     current_charge_voltage = current_charge_voltage > 50.0 ? 0.0 : current_charge_voltage;
     if (charger_cmd_ == CMD_CHARGER_MONITOR && charger_voltage_ < charger_low_voltage_ && current_charge_voltage > charger_low_voltage_) {
       timeval tv;
@@ -112,7 +112,7 @@ void chargeValueManage(void)
     if (charger_relay) {
       charger_status_ = STA_CHARGER_ON;
       double mileage = (g_chassis_mcu->mileage_right_ + g_chassis_mcu->mileage_left_) / 2;
-      if(charger_voltage_ < charger_low_voltage_ || (fabs(mileage - pre_mileage) >= 0.05)){
+      if(charger_voltage_ < charger_low_voltage_ || (fabs(mileage - pre_mileage) >= 0.03)){
           g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
           charger_cmd_    = CMD_CHARGER_OFF;
           charger_status_ = STA_CHARGER_OFF;
