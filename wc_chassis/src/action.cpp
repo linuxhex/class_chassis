@@ -77,7 +77,7 @@ void DoDIO(void) {
   GS_INFO("[wc_chassis] get_di data: 0x%x", temp_di_data);
   cur_emergency_status = (temp_di_data >> (8 + Emergency_stop)) & 0x01;
   // new version hardware hand touch
-  if (new_hand_touch_) {
+  if (p_hand_toucher->new_hand_touch) {
     temp_di_data = g_ultrasonic[0];
   }
   if (++g_dio_count > 2 && ((g_di_data_ & 0x03) != 0x03) && ((temp_di_data & 0x03) == 0x03)) {

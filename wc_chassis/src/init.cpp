@@ -32,8 +32,6 @@ void InitParameter()
 
     p_chassis_mcu = new WC_chassis_mcu();
     p_odom_broadcaster = new tf::TransformBroadcaster();
-    ultrasonic = new std::string();
-    special_ultrasonic = new std::string();
     double speed_ratio = 1.0;
 
 //    p_nh->param("max_cmd_interval", max_cmd_interval, 1.0);
@@ -94,21 +92,11 @@ void InitParameter()
       if (device_param == "charger") {
           p_charger = new Charger();
       } else if (device_param == "protector") {
-          ros::NodeHandle protector_nh("~/chassis_param/protector");
-          protector_nh.param("protector_num",protector_num,8);//防撞条使用数量
+          p_protector = new Protector();
       } else if (device_param == "hand_touch") {
-          ros::NodeHandle hand_touch_nh("~/chassis_param/hand_touch");
-          hand_touch_nh.param("new_hand_touch", new_hand_touch_, false);//新板子手触开关和防撞条共用一个接口
-
+          p_hand_toucher = new HandToucher();
       } else if (device_param == "ultrasonic") {
-          ros::NodeHandle ultrasonic_nh("~/chassis_param/ultrasonic");
-          ultrasonic_nh.param("name",*ultrasonic,std::string(" "));//配置的超声
-          ultrasonic_nh.param("min_range",ultrasonic_min_range,static_cast<float>(0.04));//超声最小距离
-          ultrasonic_nh.param("max_range",ultrasonic_max_range,static_cast<float>(1.0));//超声最大距离
-          ultrasonic_nh.param("effective_range", ultral_effective_range, static_cast<double>(0.4));//超声有效检测距离
-          ultrasonic_nh.param("specialer",*special_ultrasonic,std::string(" "));//特殊配置的超声
-          ultrasonic_nh.param("specialer_offset_dismeter",special_ultrasonic_offset_dismeter,static_cast<float>(0.15)); //特殊超声偏置距离
-
+          p_ultrasonic = new Ultrasonicer();
       } else if (device_param == "battery") {
           ros::NodeHandle battery_nh("~/chassis_param/battery");
           battery_nh.param("full_level", battery_full_level, static_cast<double>(27.5));
@@ -142,15 +130,6 @@ void InitParameter()
       } else if (strategy_param == "speed_w") {
           p_speed_w = new Speed_w();
       }
-    }
-
-    // 前面防撞条配置
-    if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {
-      GS_ERROR("[SERVICEROBOT] read front_protector_list failed");
-    }
-    // 后面防撞条配置
-    if (!ReadConfigFromParams("rear_protector", p_nh, &rear_protector_list)) {
-      GS_ERROR("[SERVICEROBOT] read rear_protector_list failed");
     }
 
     pthread_mutex_init(&speed_mutex, NULL);

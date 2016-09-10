@@ -42,8 +42,10 @@
 #include "param/network.h"
 #include "param/speed_w.h"
 #include "param/charger.h"
+#include "param/protector.h"
+#include "param/hand_touch.h"
+#include "param/ultrasonic.h"
 
-extern  double ultral_effective_range ;
 extern  double g_odom_x   ;
 extern  double g_odom_y   ;
 extern  double g_odom_tha ;
@@ -116,7 +118,6 @@ extern  int rotate_angle;
 extern bool start_rotate_flag;
 extern bool stop_rotate_flag;
 extern bool is_rotate_finished;
-extern bool new_hand_touch_;
 extern bool old_ultrasonic_;
 extern unsigned int g_di_data_;
 extern unsigned int g_do_data_;
@@ -133,8 +134,6 @@ extern std::string ultrasonic_str[15];
 extern unsigned char special_ultrasonic_id[15];
 
 extern std::vector<int> g_ultrasonic;
-extern std::vector<unsigned int> front_protector_list;
-extern std::vector<unsigned int> rear_protector_list;
 extern pthread_mutex_t speed_mutex;
 extern int battery_count;
 extern int charge_count;
@@ -143,11 +142,6 @@ extern int sum_battery_capacity;
 
 extern bool socket_connection_status;
 extern int ultrasonic_num;
-extern float ultrasonic_min_range;  //超声检测的最小距离  默认值0.04
-extern float ultrasonic_max_range;   //超声检测的最大距离  默认值1.0
-extern float special_ultrasonic_offset_dismeter;
-extern std::string *ultrasonic;
-extern std::string *special_ultrasonic;
 extern double max_speed_w;
 extern double speed_w_acc;
 extern double speed_w_dec;
@@ -163,7 +157,6 @@ extern bool internet_connection_status;
 
 extern std::thread *p_checkConnectionThread;
 extern unsigned int protector_value;
-extern int protector_num;
 extern unsigned int protector_bits;
 extern unsigned int ultrasonic_bits;
 extern bool ultrasonic_board_connection;
@@ -195,5 +188,8 @@ extern WC_chassis_mcu *p_chassis_mcu;
 extern Machine *p_machine;
 extern Network *p_network;
 extern Charger *p_charger;
+extern Protector *p_protector;
+extern HandToucher *p_hand_toucher;
+extern Ultrasonicer *p_ultrasonic;
 
 #endif

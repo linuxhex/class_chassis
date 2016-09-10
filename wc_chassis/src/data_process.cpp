@@ -10,7 +10,7 @@
 */
 void protectorManage(void)
 {
-    if(protector_num <= 0){
+    if(p_protector->protector_num <= 0){
         protector_hit = NONE_HIT;
         protector_value = NONE_HIT;
         return;
@@ -18,17 +18,17 @@ void protectorManage(void)
     // check protector hit
     unsigned int protector_status = g_ultrasonic[0] | protector_bits;
     unsigned int temp_hit = NONE_HIT;
-    for (unsigned int i = 0; i < front_protector_list.size(); ++i) {
-      if (!(protector_status & (1 << front_protector_list.at(i)))) {
+    for (unsigned int i = 0; i < p_protector->front_protector_list.size(); ++i) {
+      if (!(protector_status & (1 << p_protector->front_protector_list.at(i)))) {
         temp_hit |= FRONT_HIT;
-        GS_ERROR("[WC_CHASSIS] front protector bit[%d] hit!!!", front_protector_list.at(i));
+        GS_ERROR("[WC_CHASSIS] front protector bit[%d] hit!!!", p_protector->front_protector_list.at(i));
         break;
       }
     }
-    for (unsigned int i = 0; i < rear_protector_list.size(); ++i) {
-     if (!(protector_status & (1 << rear_protector_list.at(i)))) {
+    for (unsigned int i = 0; i < p_protector->rear_protector_list.size(); ++i) {
+     if (!(protector_status & (1 << p_protector->rear_protector_list.at(i)))) {
         temp_hit |= REAR_HIT;
-        GS_ERROR("[WC_CHASSIS] rear protector bit[%d] hit!!!", rear_protector_list.at(i));
+        GS_ERROR("[WC_CHASSIS] rear protector bit[%d] hit!!!", p_protector->rear_protector_list.at(i));
         break;
       }
     }

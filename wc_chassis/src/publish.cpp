@@ -17,9 +17,9 @@ Publisher::Publisher(){
     this->dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
     this->protector_value_pub   = p_device_nh->advertise<std_msgs::UInt32>("protector_status", 50);
     for(int i=0;i<15;i++){
-      if(ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
+      if(p_ultrasonic->ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
         this->ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
-        if(special_ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
+        if(p_ultrasonic->special_ultrasonic->find(ultrasonic_str[i]) != std::string::npos){
           special_ultrasonic_id[i] = i;
         }
         ultrasonic_num ++;
@@ -42,25 +42,25 @@ void Publisher::publishUltrasonic(ros::Publisher& publisher,const char* frame_id
 
     range.radiation_type = sensor_msgs::Range::ULTRASOUND;
     range.field_of_view = M_PI / 90.0;
-    range.min_range = ultrasonic_min_range;
-    range.max_range = ultrasonic_max_range;
+    range.min_range = p_ultrasonic->min_range;
+    range.max_range = p_ultrasonic->max_range;
 
     float dis_meter = recv_int * 5.44 / 1000.0;
     ultra_range = dis_meter;
 
     if(special_ultrasonic_id[ultrasonic_offset] == ultrasonic_offset){ //特殊位置超声处理
-      dis_meter = dis_meter - special_ultrasonic_offset_dismeter;
+      dis_meter = dis_meter - p_ultrasonic->special_ultrasonic_offset_dismeter;
     }
     if (dis_meter < range.min_range) {
       range.range = range.min_range;
-    } else if (dis_meter > ultral_effective_range) {  // effective range
+    } else if (dis_meter > p_ultrasonic->effective_range) {  // effective range
       range.range = range.max_range;
     } else {
       range.range = dis_meter;
     }
 
     if(((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
-      range.range = ultrasonic_max_range;
+      range.range = p_ultrasonic->max_range;
     }
 
     publisher.publish(range);
@@ -178,7 +178,7 @@ void Publisher::publishDeviceStatus(void) {
 void Publisher::publishProtectorValue(void)
 {
     std_msgs::UInt32 protect_data;
-    if(new_hand_touch_){
+    if(p_hand_toucher->new_hand_touch){
         protector_value = NONE_HIT;
     }
     protect_data.data = protector_value;
@@ -190,7 +190,7 @@ void Publisher::publishProtectorValue(void)
 void Publisher::publishProtectorStatus(void)
 {
 
-  if(protector_num <= 0){
+  if(p_protector->protector_num <= 0){
       return;
   }
   std::bitset<32> status;
@@ -199,7 +199,7 @@ void Publisher::publishProtectorStatus(void)
   status = g_ultrasonic[0] | protector_bits;
   str = status.to_string();
   value.key = std::string("protector_data"); // 0:on 1:off
-  value.value = str.substr((32-protector_num), protector_num);
+  value.value = str.substr((32-p_protector->protector_num), p_protector->protector_num);
 
   for(unsigned int i = 0; i < value.value.length()/2; i++ ){
       char c = value.value[i];

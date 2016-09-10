@@ -8,7 +8,6 @@
 #include "wc_chassis_mcu.h"
 
 
-double ultral_effective_range = 0.4;
 double g_odom_x   = 0;
 double g_odom_y   = 0;
 double g_odom_tha = 0;
@@ -29,7 +28,6 @@ unsigned int ultrasonic_bits=0x00;
 bool start_rotate_flag    = false;
 bool stop_rotate_flag     = true;
 bool is_rotate_finished   = false;
-bool new_hand_touch_      = false;
 bool old_ultrasonic_      = false;
 unsigned int g_di_data_   = 0;
 unsigned int g_do_data_   = 0;
@@ -45,8 +43,6 @@ unsigned int relay_status_ = 0;
 unsigned short remote_index_ = 0;
 pthread_mutex_t speed_mutex;
 std::vector<int> g_ultrasonic(24);
-std::vector<unsigned int> front_protector_list;
-std::vector<unsigned int> rear_protector_list;
 bool socket_connection_status = true; // mcu ethernet connection status: false>bad true>good
 int battery_count = -1;
 int charge_count = -1;
@@ -66,8 +62,6 @@ std::string ultrasonic_str[] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultra
 unsigned char special_ultrasonic_id[15] = {0xff};
 
 
-float ultrasonic_min_range = 0.04;  //超声检测的最小距离  默认值0.04
-float ultrasonic_max_range = 1.0;   //超声检测的最大距离  默认值1.0
 //超声接入的数量
 int ultrasonic_num=0;
 
@@ -78,7 +72,6 @@ double current_charge_value_ = 0.0;
 double charger_voltage_ = 0;
 double charger_full_voltage_ = 27.0;
 int remote_id = 1;
-int protector_num = 8; //防撞条个数
 
 std::string hardware_id;
 std::string internet_url = std::string("www.baidu.com");
@@ -88,9 +81,6 @@ bool internet_connection_status = true;
 
 std::thread *p_checkConnectionThread;
 
-std::string *ultrasonic;
-std::string *special_ultrasonic;
-float special_ultrasonic_offset_dismeter;
 unsigned int protector_value = NONE_HIT; //防撞条的值．0:表示防撞条没有被触发　!0:表示防撞条被触发
 bool ultrasonic_board_connection = true; //true:超声转接板连接正常
 double protector_hit_time = 0.0;  //防撞条触发开始时间
@@ -111,7 +101,13 @@ Publisher *p_publisher = NULL;
 Subscribe *p_subscribe = NULL;
 Service   *p_service   = NULL;
 WC_chassis_mcu *p_chassis_mcu = NULL;
-Machine *p_machine = NULL;
-Network *p_network = NULL;
-Charger *p_charger = NULL;
+Machine     *p_machine = NULL;
+Network     *p_network = NULL;
+Charger     *p_charger = NULL;
+Protector   *p_protector = NULL;
+HandToucher *p_hand_toucher = NULL;
+Ultrasonicer  *p_ultrasonic  = NULL;
+
+
+
 
