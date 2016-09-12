@@ -786,15 +786,23 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
 
   float delta_speed_v = speed_v - last_speed_v_;
   float delta_speed_w = speed_w - last_speed_w_;
-
+  //速度平滑
   if(delta_speed_v > 0.0) {
-    float delta_speed_v_acc = fabs(speed_v) < 0.01 ? 0.25 : p_speed_v->acc;
+    float delta_speed_v_acc = fabs(speed_v) < 0.05 ? 0.25 : p_speed_v->acc;
     speed_v = delta_speed_v > delta_speed_v_acc ? (last_speed_v_ + delta_speed_v_acc) : speed_v;
   } else {
-    float delta_speed_v_dec = fabs(speed_v) < 0.01 ? p_speed_v->dec_to_zero : p_speed_v->dec;
+    float delta_speed_v_dec = fabs(speed_v) < 0.05 ? p_speed_v->dec_to_zero : p_speed_v->dec;
     speed_v = delta_speed_v < delta_speed_v_dec ? (last_speed_v_ + delta_speed_v_dec) : speed_v;
   }
-  speed_w = fabs(delta_speed_w) > p_speed_w->acc ? (last_speed_w_ + sign(delta_speed_w) * p_speed_w->acc) : speed_w;
+  //speed_w = fabs(delta_speed_w) > p_speed_w->acc ? (last_speed_w_ + sign(delta_speed_w) * p_speed_w->acc) : speed_w;
+  //角速度平滑
+  if(delta_speed_w > 0.0) {
+     float delta_speed_w_acc = fabs(speed_w) < 0.05 ? 0.25 : p_speed_w->acc;
+     speed_w = delta_speed_w > delta_speed_w_acc ? (last_speed_w_ + delta_speed_w_acc) : speed_w;
+    } else {
+     float delta_speed_w_dec = fabs(speed_w) < 0.05 ? -0.25 : p_speed_w->dec;
+     speed_w = delta_speed_w < delta_speed_w_dec ? (last_speed_w_ + delta_speed_w_dec) : speed_w;
+  }
 
   speed_v = fabs(speed_v) > p_speed_v->max ?  sign(speed_v) * p_speed_v->max : speed_v;
   speed_w = fabs(speed_w) > p_speed_w->max ?  sign(speed_w) * p_speed_w->max : speed_w;
