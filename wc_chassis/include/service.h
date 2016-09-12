@@ -15,8 +15,8 @@
 #include <autoscrubber_services/CheckProtectorStatus.h>
 #include <autoscrubber_services/CheckChargeStatus.h>
 #include <autoscrubber_services/SetChargeCmd.h>
-class Service{
 
+class Service{
   public:
     Service();
     ~Service();
@@ -45,7 +45,6 @@ class Service{
     ros::ServiceServer test_go_line_srv;
     ros::ServiceServer stop_go_line_srv;
     ros::ServiceServer check_go_line_srv;
-
 };
 
 #endif

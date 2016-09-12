@@ -83,13 +83,13 @@ void Socket::Read_data(unsigned char* r_data, int &len, int need, int timeout) {
     while (1) {
       len_tmp = m_lReadBuffer->Size();
       if (len_tmp >= need){
-         socket_connection_status = true;
+         p_network->socket_connection_status = true;
          break;
       }
       if (timeout--) {
         SLEEP(1);
       } else {
-        socket_connection_status = false;
+        p_network->socket_connection_status = false;
         ROS_INFO("[SOCKET] time out");
         break;
       }

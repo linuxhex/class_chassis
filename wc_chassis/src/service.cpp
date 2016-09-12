@@ -28,11 +28,15 @@ Service::~Service(){}
  *  自动充电 状态查询
  */
 bool Service::checkAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& req,
-                           autoscrubber_services::CheckChargeStatus::Response& res) {
-    res.charge_status.status = charger_status_;
-    res.charge_status.value  = charger_voltage_ >= p_charger->low_voltage ? (short)(charger_voltage_ * 10) : 0;
+                                    autoscrubber_services::CheckChargeStatus::Response& res)
+{
+    if(p_charger == NULL){
+        return false;
+    }
+    res.charge_status.status = p_charger->charger_status;
+    res.charge_status.value  = p_charger->charger_voltage >= p_charger->low_voltage ? (short)(p_charger->charger_voltage * 10) : 0;
     GS_INFO("[CHASSIS] get real charge status = %d, value = %d, raw_voltage = %lf!!!",
-                   res.charge_status.status, res.charge_status.value, charger_voltage_);
+                   res.charge_status.status, res.charge_status.value, p_charger->charger_voltage);
     return true;
 }
 
@@ -40,10 +44,13 @@ bool Service::checkAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Re
  *  自动充电 控制命令  cmd 　01:开始自动充电  02:停止自动充电
  */
 bool Service::setAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req,
-                      autoscrubber_services::SetChargeCmd::Response& res) {
+                               autoscrubber_services::SetChargeCmd::Response& res) {
+  if(p_charger == NULL){
+      return false;
+  }
   unsigned char cmd = req.cmd.data;
   if (cmd == CMD_CHARGER_ON) {
-    if(charger_status_ == STA_CHARGER_ON) {
+    if(p_charger->charger_status == STA_CHARGER_ON) {
         GS_INFO("[CHASSIS] current charger_status_ = STA_CHARGER_ON || charger_cmd_ == CMD_CHARGER_ON");
         return true;
     }
@@ -53,13 +60,13 @@ bool Service::setAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req
     }
   } else if (cmd == CMD_CHARGER_OFF) {
     GS_INFO("[CHASSIS] set charger off!!!");
-    charger_cmd_ = CMD_CHARGER_OFF;
+    p_charger->charger_cmd = CMD_CHARGER_OFF;
     p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
   } else if (cmd == CMD_CHARGER_MONITOR) {
     GS_INFO("[CHASSIS] set charger moniter on!!!");
-    charger_cmd_ = CMD_CHARGER_MONITOR;
+    p_charger->charger_cmd = CMD_CHARGER_MONITOR;
   } else {
-    charger_cmd_ = CMD_CHARGER_STATUS;
+    p_charger->charger_cmd = CMD_CHARGER_STATUS;
   }
   return true;
 }
@@ -69,11 +76,14 @@ bool Service::setAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req
  */
 bool Service::protectorSwitch(autoscrubber_services::ProtectorSwitch::Request& req,
     autoscrubber_services::ProtectorSwitch::Response& res) {
+  if(p_protector == NULL) {
+      return false;
+  }
   std::string protector_str =  req.protectorStr.data;
-  protector_bits = 0x00;  //bit位置　1:屏蔽  0:不屏蔽
+  p_protector->protector_bits = 0x00;  //bit位置　1:屏蔽  0:不屏蔽
   for(unsigned int i = 0; i < protector_str.length(); ++i){
     if(protector_str[i] == '0'){
-      protector_bits |= 0x01<<i;
+      p_protector->protector_bits |= 0x01<<i;
     }
   }
   return true;
@@ -101,10 +111,13 @@ bool Service::ultrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request&
  */
 bool Service::checkProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& req,
                           autoscrubber_services::CheckProtectorStatus::Response& res){
-  if(protector_value != NONE_HIT){
-    res.protector_status.protect_status=true;
-    res.protector_status.protect_value = protector_value;
-    protector_value = NONE_HIT;
+  if(p_protector == NULL){
+      return false;
+  }
+  if(p_protector->protector_value != NONE_HIT){
+    res.protector_status.protect_status = true;
+    res.protector_status.protect_value  = p_protector->protector_value;
+    p_protector->protector_value = NONE_HIT;
   }else{
     res.protector_status.protect_status=false;
     res.protector_status.protect_value = NONE_HIT;
@@ -205,7 +218,7 @@ bool Service::checkHardware(autoscrubber_services::CheckHardware::Request& req, 
   hardware_status.hardware_id = p_checker_id->hardware_id;
 
   value.key = std::string("MCU_connection"); // 0:bad 1:good
-  value.value = socket_connection_status ? std::string("true") : std::string("false");
+  value.value = p_network->socket_connection_status ? std::string("true") : std::string("false");
   hardware_status.values.push_back(value);
 
   value.key = std::string("ultrasonic_board");
@@ -220,18 +233,19 @@ bool Service::checkHardware(autoscrubber_services::CheckHardware::Request& req, 
   value.value = get_key_value(hardware_s, Gyro_board);
   hardware_status.values.push_back(value);
 
-  value.key = std::string("laser_connection");
-  value.value = laser_connection_status ? std::string("true") : std::string("false");
-  hardware_status.values.push_back(value);
+  if(p_network != NULL){
+      value.key = std::string("laser_connection");
+      value.value = p_network->laser_connection_status ? std::string("true") : std::string("false");
+      hardware_status.values.push_back(value);
 
-  value.key = std::string("router_connection");
-  value.value = router_connection_status ? std::string("true") : std::string("false");
-  hardware_status.values.push_back(value);
+      value.key = std::string("router_connection");
+      value.value = p_network->router_connection_status ? std::string("true") : std::string("false");
+      hardware_status.values.push_back(value);
 
-  value.key = std::string("internet_connection");
-  value.value = internet_connection_status ? std::string("true") : std::string("false");
-  hardware_status.values.push_back(value);
-
+      value.key = std::string("internet_connection");
+      value.value = p_network->internet_connection_status ? std::string("true") : std::string("false");
+      hardware_status.values.push_back(value);
+  }
   value.key = std::string("inner_relay_status");
   value.value = inner_relay ? std::string("true") : std::string("false");
   hardware_status.values.push_back(value);
@@ -251,7 +265,7 @@ bool Service::checkHardware(autoscrubber_services::CheckHardware::Request& req, 
   //超声状态
   if(p_ultrasonic != NULL){
       for (int i = 0; i < p_ultrasonic->ultrasonic_num; ++i) {
-        if (g_ultrasonic[i + 1] == 0xff || g_ultrasonic[i + 1] == 0x00 || !ultrasonic_board_connection) {
+        if (g_ultrasonic[i + 1] == 0xff || g_ultrasonic[i + 1] == 0x00 || !p_ultrasonic->ultrasonic_board_connection) {
           value.key  = p_ultrasonic->ultrasonic_str[i];
           value.value = std::string("false");
           hardware_status.values.push_back(value);

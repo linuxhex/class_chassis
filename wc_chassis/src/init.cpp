@@ -65,18 +65,19 @@ void InitParameter()
       } else if (device_param == "checker_id") {
           p_checker_id = new Checker_id();
 
-      } else if (device_param == "footprint") {
+      } /*else if (device_param == "footprint") {
           ros::NodeHandle footprint_nh("~/chassis_param/footprint");
 
       } else if (device_param == "laser") {
           ros::NodeHandle laser_nh("~/chassis_param/laser");
 
-      }
+      }*/
     }
 
     //read strategy param
     std::string strategy_params;
     chassis_param_nh.param("strategy", strategy_params, std::string(""));
+    std::cout<<"strategy"<<" "<<strategy_params<<std::endl;
     std::stringstream strategy_ss(strategy_params);
     std::string strategy_param;
     while (strategy_ss >> strategy_param) {
@@ -155,7 +156,7 @@ void InitDevice(void)
     std::cout << "remote_id = " << remote_id << std::endl;
   }
 #endif
-  p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((p_speed_v->remote_level & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
+  p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((p_speed_v->remote_level & 0x03) << 4) | ((p_battery->battery_level & 0x03) << 6)));
   GS_INFO("[wc_chassis] init device completed");
 }
 

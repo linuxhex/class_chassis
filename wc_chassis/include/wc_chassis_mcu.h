@@ -29,25 +29,25 @@ class WC_chassis_mcu{
   bool  getOdo(double &x, double &y, double &a);  // NOLINT
   bool  getCSpeed(double &v, double &w);  // NOLINT
   void  getRemoteCmd(unsigned char& cmd, unsigned short& index);
-  void getUltra(void);
-  void setRemoteID(unsigned char id);
-  void getYawAngle(short& yaw, short& pitch, short& roll);
-  void comunication(void);
+  void  getUltra(void);
+  void  setRemoteID(unsigned char id);
+  void  getYawAngle(short& yaw, short& pitch, short& roll);
+  void  comunication(void);
   unsigned int checkRemoteVerifyKey(unsigned int seed_key);
   unsigned char setChargeCmd(unsigned char cmd);
   void setShutdownCmd(unsigned char cmd);
   void yawSwitch(void);
   unsigned int getCntTime(void);
-  int V2RPM(float v);
-  int GetCopleySpeed(float v);
-  int GetCopleyAngle(float angle);
+  int  V2RPM(float v);
+  int  GetCopleySpeed(float v);
+  int  GetCopleyAngle(float angle);
   void ReSetOdom(void);
   short yaw_angle_;
   short pre_yaw_angle_;
   short sum_delta_yaw_angle_;
   unsigned int yaw_count_;
-  short pitch_angle_;
-  short roll_angle_;
+  short  pitch_angle_;
+  short  roll_angle_;
   double acc_odom_theta_;
   unsigned int gyro_state_;
   double mileage_left_;

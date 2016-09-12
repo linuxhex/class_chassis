@@ -34,18 +34,18 @@ void checkConnectionHealthThread(void)
         if (!ping(p_network->laser_ip.c_str()) || !ping(p_network->router_ip.c_str()) || !ping(p_network->internet_url.c_str())){
             sleep(3);
             if(!ping(p_network->laser_ip.c_str())){
-                laser_connection_status = false;
+                p_network->laser_connection_status = false;
             }
             if(!ping(p_network->router_ip.c_str())){
-                router_connection_status = false;
+                p_network->router_connection_status = false;
             }
             if(!ping(p_network->internet_url.c_str())){
-                internet_connection_status = false;
+                p_network->internet_connection_status = false;
             }
         } else {
-          laser_connection_status = true;
-          router_connection_status = true;
-          internet_connection_status = true;
+          p_network->laser_connection_status = true;
+          p_network->router_connection_status = true;
+          p_network->internet_connection_status = true;
         }
         sleep(30);
     }

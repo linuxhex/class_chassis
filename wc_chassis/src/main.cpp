@@ -30,35 +30,35 @@ int main(int argc, char **argv) {
     p_chassis_mcu->getCSpeed(g_odom_v, g_odom_w);
     p_chassis_mcu->getUltra();
 
-    if(!old_ultrasonic_){  //旧板子没有这些功能
-        updateDeviceStatus();
-    }
+    updateDeviceStatus();
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
     if(start_rotate_flag) {
-        if (charger_voltage_ > p_charger->low_voltage) {
-             go_forward_start_time_ = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
-             charger_cmd_ = CMD_CHARGER_OFF;
-             p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
-         } else {
-             go_forward_start_time_ = time_now + 1.0;
-         }
-        if (time_now - go_forward_start_time_ > -0.0001 && time_now - go_forward_start_time_ < 1.0 && !(p_protector->protector_hit & FRONT_HIT)) {
+        if(p_charger != NULL){
+            if (p_charger->charger_voltage > p_charger->low_voltage) {
+                 p_charger->go_forward_start_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+                 p_charger->charger_cmd = CMD_CHARGER_OFF;
+                 p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+             } else {
+                 p_charger->go_forward_start_time = time_now + 1.0;
+             }
+        }
+        if ((p_charger !=NULL) && (time_now - p_charger->go_forward_start_time > -0.0001) && time_now - p_charger->go_forward_start_time < 1.0 && !(p_protector->protector_hit & FRONT_HIT)) {
             p_chassis_mcu->setTwoWheelSpeed(0.15, 0.0);
          } else {
             DoRotate();
          }
     } else {
-      if ((!laser_connection_status || !socket_connection_status)
+      if ((!p_network->laser_connection_status || !p_network->socket_connection_status)
           || (time_now - last_cmd_vel_time >= p_machine->max_cmd_interval)
           || ((p_protector !=NULL) && (p_protector->protector_hit & FRONT_HIT) && p_speed_v->m_speed_v > 0.001)
           || ((p_protector !=NULL) && (p_protector->protector_hit & REAR_HIT)  && p_speed_v->m_speed_v < -0.001)
-          || (charger_status_ == STA_CHARGER_ON)
-          || (charger_status_ == STA_CHARGER_TOUCHED && p_speed_v->m_speed_v < -0.001)) {
+          || ((p_charger != NULL) && p_charger->charger_status == STA_CHARGER_ON)
+          || ((p_charger != NULL) && p_charger->charger_status == STA_CHARGER_TOUCHED && p_speed_v->m_speed_v < -0.001)) {
 
-          if (charger_status_ == STA_CHARGER_ON && p_speed_v->m_speed_v > 0.001) {
-                 charger_cmd_ = CMD_CHARGER_OFF;
+          if ((p_charger != NULL) && (p_charger->charger_status == STA_CHARGER_ON) && p_speed_v->m_speed_v > 0.001) {
+                 p_charger->charger_cmd = CMD_CHARGER_OFF;
                  p_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
           }
           p_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
       p_publisher->publishDeviceStatus();
     }
     if (loop_count % 10) {//设置遥控器id
-      p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((p_speed_v->remote_level & 0x03) << 4) | ((battery_level_ & 0x03) << 6)));
+      p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((p_speed_v->remote_level & 0x03) << 4) | ((p_battery->battery_level & 0x03) << 6)));
       loop_count = 0;
     }
     p_publisher->publishDIO();

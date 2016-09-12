@@ -119,10 +119,6 @@ void WC_chassis_mcu::setRemoteID(unsigned char id)
       GS_INFO("[CHASSIS-ETHERNET] setRemoteID: recv time = %lf", recv_time - send_time);
 #endif
   }
-
-//  std::string str = cComm::ByteToHexString(send, len);
-//  std::cout << "send remote id: " << str << std::endl;
-
   usleep(1000);
 }
 

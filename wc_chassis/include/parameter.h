@@ -111,71 +111,31 @@ typedef enum Relay_Status_ {
   STA_CUSTERM_PWR_OFF = 0x02 << 6,
 } Relay_Status;
 
-extern unsigned int protector_hit;
 extern unsigned int g_dio_count ;
 extern unsigned int g_ret_count ;
 extern unsigned int g_pc_control;
 extern double last_cmd_vel_time ;
-extern int current_v_index;
-extern int current_w_index;
-
 extern unsigned int loop_count;
 extern  int rotate_angle;
 extern bool start_rotate_flag;
 extern bool stop_rotate_flag;
 extern bool is_rotate_finished;
-extern bool old_ultrasonic_;
 extern unsigned int g_di_data_;
 extern unsigned int g_do_data_;
 extern unsigned int cur_emergency_status;
 extern unsigned int remote_ret_;
-extern unsigned int charger_cmd_;
-extern double charger_full_voltage_;
 extern unsigned int remote_ret_cnt_;
 extern unsigned char remote_cmd_;
 extern unsigned short remote_index_;
-extern std::string ultrasonic_str[15];
-extern unsigned char special_ultrasonic_id[15];
 
 extern std::vector<int> g_ultrasonic;
 extern pthread_mutex_t speed_mutex;
-extern int battery_count;
-extern int charge_count;
-extern int display_battery_capacity ;
-extern int sum_battery_capacity;
 
-extern bool socket_connection_status;
-extern int ultrasonic_num;
-extern double max_speed_w;
-extern double speed_w_acc;
-extern double speed_w_dec;
-extern int    delta_counts_th;
-extern int battery_level_;
-extern double charger_voltage_;
-extern double current_charge_value_;
 extern int remote_id ;
-extern std::string hardware_id;
-extern bool laser_connection_status;
-extern bool router_connection_status;
-extern bool internet_connection_status;
 
 extern std::thread *p_checkConnectionThread;
-extern unsigned int protector_value;
-extern unsigned int protector_bits;
-extern unsigned int ultrasonic_bits;
-extern bool ultrasonic_board_connection;
-extern bool on_charge; //在充电true 停止充电false
 
-extern unsigned int charger_status_;
 extern unsigned int relay_status_;
-extern double battery_value_;
-extern double sum_battery_value_;
-extern double charge_on_time_;
-extern double go_forward_start_time_;
-extern double protector_hit_time;  //防撞条触发开始时间
-extern int charger_delay_time_;
-extern std::string internet_url;
-extern unsigned int sleep_cnt;
 
 extern bool charger_relay; //充电继电器状态　false:打开，　true:闭合
 extern bool inner_relay;  //内部继电器状态
@@ -206,7 +166,5 @@ extern HandToucher *p_hand_toucher;
 extern Ultrasonicer    *p_ultrasonic;
 extern Param::Battery  *p_battery;
 extern Checker_id      *p_checker_id;
-
-
 
 #endif

@@ -24,6 +24,9 @@ class Ultrasonicer{
                                     "ultrasonic10","ultrasonic11","ultrasonic12","ultrasonic13","ultrasonic14"};
     //特殊超声下标位置
     unsigned char special_ultrasonic_id[15] = {0xff};
+
+    bool ultrasonic_board_connection = true; //true:超声转接板连接正常
+
 };
 
 #endif // ULTRASONIC_H

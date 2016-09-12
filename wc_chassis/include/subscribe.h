@@ -25,6 +25,4 @@ private:
     ros::Subscriber    shutdown_sub;
 };
 
-
-
 #endif

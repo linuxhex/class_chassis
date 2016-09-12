@@ -37,35 +37,36 @@ Publisher::~Publisher(){}
  */
 void Publisher::publishUltrasonic(ros::Publisher& publisher,const char* frame_id, int recv_int,unsigned int ultrasonic_offset, double& ultra_range){
 
-    if( p_ultrasonic != NULL){
-        sensor_msgs::Range range;
-        range.header.seq = 0;
-        range.header.stamp = ros::Time::now();
-        range.header.frame_id = frame_id;
+    if( p_ultrasonic == NULL){
+        return;
+    }
+    sensor_msgs::Range range;
+    range.header.seq = 0;
+    range.header.stamp = ros::Time::now();
+    range.header.frame_id = frame_id;
 
-        range.radiation_type = sensor_msgs::Range::ULTRASOUND;
-        range.field_of_view = M_PI / 90.0;
-        range.min_range = p_ultrasonic->min_range;
-        range.max_range = p_ultrasonic->max_range;
+    range.radiation_type = sensor_msgs::Range::ULTRASOUND;
+    range.field_of_view = M_PI / 90.0;
+    range.min_range = p_ultrasonic->min_range;
+    range.max_range = p_ultrasonic->max_range;
 
-        float dis_meter = recv_int * 5.44 / 1000.0;
-        ultra_range = dis_meter;
+    float dis_meter = recv_int * 5.44 / 1000.0;
+    ultra_range = dis_meter;
 
-        if(p_ultrasonic->special_ultrasonic_id[ultrasonic_offset] == ultrasonic_offset){ //特殊位置超声处理
-          dis_meter = dis_meter - p_ultrasonic->special_ultrasonic_offset_dismeter;
-        }
-        if (dis_meter < range.min_range) {
-          range.range = range.min_range;
-        } else if (dis_meter > p_ultrasonic->effective_range) {  // effective range
-          range.range = range.max_range;
-        } else {
-          range.range = dis_meter;
-        }
-        if(((p_ultrasonic->ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
-          range.range = p_ultrasonic->max_range;
-        }
-        publisher.publish(range);
-     }
+    if(p_ultrasonic->special_ultrasonic_id[ultrasonic_offset] == ultrasonic_offset){ //特殊位置超声处理
+      dis_meter = dis_meter - p_ultrasonic->special_ultrasonic_offset_dismeter;
+    }
+    if (dis_meter < range.min_range) {
+      range.range = range.min_range;
+    } else if (dis_meter > p_ultrasonic->effective_range) {  // effective range
+      range.range = range.max_range;
+    } else {
+      range.range = dis_meter;
+    }
+    if(((p_ultrasonic->ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !p_ultrasonic->ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
+      range.range = p_ultrasonic->max_range;
+    }
+    publisher.publish(range);
 }
 
 
@@ -110,64 +111,68 @@ void Publisher::publishDeviceStatus(void) {
     device_value.value = cur_emergency_status == 0 ? std::string("true") : std::string("false");
     device_status.values.push_back(device_value);
 
-    unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
-//    double battery_value = 0.2298 * (battery_ADC - 516);
-//    double battery_value = 0.2352 * (battery_ADC - 507);
-    double battery_value = 0.2460 * (battery_ADC - 516);
-    battery_value = battery_value < 0.0 ? 0.0 : battery_value;
-    battery_value = battery_value > 35.0 ? 0.0 : battery_value;
-    int current_battery_capacity;
-    current_battery_capacity = (battery_value - p_battery->battery_empty_level) / (p_battery->battery_full_level - p_battery->battery_empty_level) * 100;
-    if(current_battery_capacity < 0) current_battery_capacity = 0;
-    if(current_battery_capacity > 100) current_battery_capacity = 100;
-    // do battery voltage filter
-    ++battery_count;
-    if(battery_count == 0) {
-      battery_value_ = battery_value;
-      display_battery_capacity = current_battery_capacity;
-    } else if(battery_count > 0) {
-      sum_battery_capacity += current_battery_capacity;
-      sum_battery_value_ += battery_value;
-      if(battery_count == 300) {
-        display_battery_capacity = sum_battery_capacity / 300;
-        battery_value_ = sum_battery_value_ / 300;
-        battery_count = 0;
-        sum_battery_capacity = 0;
-        sum_battery_value_ = 0.0;
-      }
+    if(p_battery != NULL){
+        unsigned int battery_ADC = (g_ultrasonic[20] << 8) | (g_ultrasonic[21] & 0xff);
+    //    double battery_value = 0.2298 * (battery_ADC - 516);
+    //    double battery_value = 0.2352 * (battery_ADC - 507);
+        double battery_value = 0.2460 * (battery_ADC - 516);
+        battery_value = battery_value < 0.0 ? 0.0 : battery_value;
+        battery_value = battery_value > 35.0 ? 0.0 : battery_value;
+        int current_battery_capacity;
+        current_battery_capacity = (battery_value - p_battery->battery_empty_level) / (p_battery->battery_full_level - p_battery->battery_empty_level) * 100;
+        if(current_battery_capacity < 0) current_battery_capacity = 0;
+        if(current_battery_capacity > 100) current_battery_capacity = 100;
+        // do battery voltage filter
+        (p_battery->battery_count)++;
+        if(p_battery->battery_count == 0) {
+          p_battery->battery_value = battery_value;
+          p_battery->display_battery_capacity = current_battery_capacity;
+        } else if(p_battery->battery_count > 0) {
+          p_battery->sum_battery_capacity += current_battery_capacity;
+          p_battery->sum_battery_value += battery_value;
+          if(p_battery->battery_count == 300) {
+            p_battery->display_battery_capacity = p_battery->sum_battery_capacity / 300;
+            p_battery->battery_value = p_battery->sum_battery_value / 300;
+            p_battery->battery_count = 0;
+            p_battery->sum_battery_capacity = 0;
+            p_battery->sum_battery_value = 0.0;
+          }
+        }
+
+        if (p_battery->display_battery_capacity < 10) {
+          p_battery->battery_level = 0;
+        } else if (p_battery->display_battery_capacity < 40) {
+          p_battery->battery_level = 1;
+        } else if (p_battery->display_battery_capacity < 75) {
+          p_battery->battery_level = 2;
+        } else {
+          p_battery->battery_level = 3;
+        }
+
+        GS_INFO("[wc_chassis] battery_ADC: %d; battery_value: %lf;display_battery_capacity: %d; battery_level_: %d", battery_ADC, battery_value, display_battery_capacity, p_battery->battery_level);
+    //    std::cout << "battery_ADC " << battery_ADC << "; battery_value " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << " battery_level_" << battery_level_ << std::endl;
+        device_value.key = std::string("battery");
+        device_value.value = std::to_string(p_battery->display_battery_capacity);
+        device_status.values.push_back(device_value);
+
+        device_value.key = std::string("battery_voltage");
+        device_value.value = std::to_string(p_battery->battery_value);
+        device_status.values.push_back(device_value);
     }
 
-    if (display_battery_capacity < 10) {
-      battery_level_ = 0;
-    } else if (display_battery_capacity < 40) {
-      battery_level_ = 1;
-    } else if (display_battery_capacity < 75) {
-      battery_level_ = 2;
-    } else {
-      battery_level_ = 3;
+    if(p_charger != NULL){
+        device_value.key = std::string("charger_status");
+        if (p_charger->charger_status == STA_CHARGER_ON) {
+           device_value.value = std::string("true");
+        } else {
+           device_value.value = std::string("false");
+        }
+        device_status.values.push_back(device_value);
+
+        device_value.key = std::string("charger_voltage");
+        device_value.value = std::to_string(p_charger->charger_voltage);
+        device_status.values.push_back(device_value);
     }
-
-    GS_INFO("[wc_chassis] battery_ADC: %d; battery_value: %lf;display_battery_capacity: %d; battery_level_: %d", battery_ADC, battery_value, display_battery_capacity, battery_level_);
-//    std::cout << "battery_ADC " << battery_ADC << "; battery_value " << battery_value << "; current_battery_capacity " << current_battery_capacity << "; display_battery_capacity " << display_battery_capacity << " battery_level_" << battery_level_ << std::endl;
-    device_value.key = std::string("battery");
-    device_value.value = std::to_string(display_battery_capacity);
-    device_status.values.push_back(device_value);
-
-    device_value.key = std::string("battery_voltage");
-    device_value.value = std::to_string(battery_value_);
-    device_status.values.push_back(device_value);
-
-    device_value.key = std::string("charger_status");
-    if (charger_status_ == STA_CHARGER_ON) {
-       device_value.value = std::string("true");
-    } else {
-       device_value.value = std::string("false");
-    }
-    device_status.values.push_back(device_value);
-
-    device_value.key = std::string("charger_voltage");
-    device_value.value = std::to_string(charger_voltage_);
-    device_status.values.push_back(device_value);
 
     device_value.key = std::string("mileage");
     double mileage = (p_chassis_mcu->mileage_right_ + p_chassis_mcu->mileage_left_) / 2;
@@ -181,11 +186,14 @@ void Publisher::publishDeviceStatus(void) {
  */
 void Publisher::publishProtectorValue(void)
 {
-    std_msgs::UInt32 protect_data;
-    if(p_hand_toucher->new_hand_touch){
-        protector_value = NONE_HIT;
+    if(p_protector == NULL){
+        return;
     }
-    protect_data.data = protector_value;
+    std_msgs::UInt32 protect_data;
+    if(p_hand_toucher != NULL && p_hand_toucher->new_hand_touch){
+        p_protector->protector_value = NONE_HIT;
+    }
+    protect_data.data = p_protector->protector_value;
     protector_value_pub.publish(protect_data);
 }
 /*
@@ -194,13 +202,13 @@ void Publisher::publishProtectorValue(void)
 void Publisher::publishProtectorStatus(void)
 {
 
-  if(p_protector->protector_num <= 0){
+  if((p_protector == NULL) || p_protector->protector_num <= 0){
       return;
   }
   std::bitset<32> status;
   std::string str;
   diagnostic_msgs::KeyValue value;
-  status = g_ultrasonic[0] | protector_bits;
+  status = g_ultrasonic[0] | p_protector->protector_bits;
   str = status.to_string();
   value.key = std::string("protector_data"); // 0:on 1:off
   value.value = str.substr((32-p_protector->protector_num), p_protector->protector_num);
