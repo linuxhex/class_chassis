@@ -124,9 +124,6 @@ void InitParameter()
         std::cout << "[error], not configure checker_id" << std::endl;
     }
 
-
-
-
     pthread_mutex_init(&speed_mutex, NULL);
     p_chassis_mcu->Init();
     GS_INFO("[wc_chassis] init param completed");
@@ -182,8 +179,8 @@ bool InitChassis(int argc, char **argv,const char *node_name)
      p_device_nh = new ros::NodeHandle("device");
      p_loop_rate =  new ros::Rate(10);
 
-     InitService();
      InitParameter();
+     InitService();
      InitDevice();
      InitSchedule();
      return true;

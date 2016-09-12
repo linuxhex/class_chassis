@@ -48,7 +48,9 @@ bool Service::setAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req
         return true;
     }
     // start a thread to handle auto charger
-    onCharge();
+    if(p_charger != NULL){
+        p_charger->onCharge();
+    }
   } else if (cmd == CMD_CHARGER_OFF) {
     GS_INFO("[CHASSIS] set charger off!!!");
     charger_cmd_ = CMD_CHARGER_OFF;
@@ -81,13 +83,15 @@ bool Service::protectorSwitch(autoscrubber_services::ProtectorSwitch::Request& r
  *  提供给上层应用，屏蔽特定的超声
  */
 bool Service::ultrasonicSwitch(autoscrubber_services::UltrasonicSwitch::Request& req,
-    autoscrubber_services::UltrasonicSwitch::Response& res) {
+                               autoscrubber_services::UltrasonicSwitch::Response& res) {
   std::string ultrasonic_str = req.ultrasonicStr.data;
-  ultrasonic_bits = 0x00;  //bit位置　1:屏蔽  0：不屏蔽
-  for(unsigned int i = 0; i < ultrasonic_str.length(); ++i){
-    if(ultrasonic_str[i] == '0'){
-      ultrasonic_bits |= 0x01<<i;
-    }
+  if(p_ultrasonic != NULL){
+      p_ultrasonic->ultrasonic_bits = 0x00;  //bit位置　1:屏蔽  0：不屏蔽
+      for(unsigned int i = 0; i < ultrasonic_str.length(); ++i){
+        if(ultrasonic_str[i] == '0'){
+          p_ultrasonic->ultrasonic_bits |= 0x01<<i;
+        }
+      }
   }
   return true;
 }
@@ -245,16 +249,18 @@ bool Service::checkHardware(autoscrubber_services::CheckHardware::Request& req, 
   hardware_status.values.push_back(value);
 
   //超声状态
-  for (int i = 0; i < ultrasonic_num; ++i) {
-    if (g_ultrasonic[i + 1] == 0xff || g_ultrasonic[i + 1] == 0x00 || !ultrasonic_board_connection) {
-      value.key  = ultrasonic_str[i];
-      value.value = std::string("false");
-      hardware_status.values.push_back(value);
-    } else{
-      value.key   = ultrasonic_str[i];
-      value.value = std::string("true");
-      hardware_status.values.push_back(value);
-    }
+  if(p_ultrasonic != NULL){
+      for (int i = 0; i < p_ultrasonic->ultrasonic_num; ++i) {
+        if (g_ultrasonic[i + 1] == 0xff || g_ultrasonic[i + 1] == 0x00 || !ultrasonic_board_connection) {
+          value.key  = p_ultrasonic->ultrasonic_str[i];
+          value.value = std::string("false");
+          hardware_status.values.push_back(value);
+        } else{
+          value.key   = p_ultrasonic->ultrasonic_str[i];
+          value.value = std::string("true");
+          hardware_status.values.push_back(value);
+        }
+      }
   }
   res.hardwareStatus = hardware_status;
   return true;

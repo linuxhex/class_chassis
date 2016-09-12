@@ -96,12 +96,29 @@ void freeResource(void){
   GS_ERROR("[chassis] closed %d", system((std::string("kill -9 ") + str).c_str()));
 
   delete p_checkConnectionThread;
+
   delete p_chassis_mcu;
   delete p_odom_broadcaster;
   delete p_n;
   delete p_nh;
   delete p_device_nh;
   delete p_loop_rate;
+
+
+  if(p_speed_w != NULL) delete p_speed_w;
+  if(p_speed_v != NULL) delete p_speed_v;
+  if(p_publisher != NULL) delete p_publisher;
+  if(p_subscribe != NULL) delete p_subscribe;
+  if(p_service != NULL) delete p_service;
+  if(p_machine != NULL) delete p_machine;
+  if(p_network != NULL) delete p_network;
+  if(p_charger != NULL) delete p_charger;
+  if(p_protector != NULL) delete p_protector;
+  if(p_hand_toucher != NULL) delete p_hand_toucher;
+  if(p_ultrasonic  != NULL) delete p_ultrasonic;
+  if(p_battery != NULL) delete p_battery;
+  if(p_checker_id != NULL) delete p_checker_id;
+
 
   ros::shutdown();
 }

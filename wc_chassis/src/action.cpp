@@ -70,33 +70,33 @@ void DoGoLine(void){
 /*
  * 自动充电执行
 */
-void onCharge(void)
-{
-    if(sleep_cnt == 0){
-        charger_cmd_ = CMD_CHARGER_ON;
-        std::thread([&](){
-          GS_INFO("[CHASSIS] start to check charger volatage = %d", charger_voltage_);
-          sleep(3);
-          int check_charger_cnt = 0;
-          while(++sleep_cnt  < 60 && charger_cmd_ == CMD_CHARGER_ON) {
-           GS_INFO("[CHASSIS] checking charger volatage = %d", charger_voltage_);
-           if (charger_voltage_ >= p_charger->low_voltage) {
-             ++check_charger_cnt;
-           } else {
-             check_charger_cnt = 0;
-           }
-           if (check_charger_cnt > p_charger->delay_time && charger_cmd_ == CMD_CHARGER_ON) {
-             GS_INFO("[CHASSIS] check charger voltage normal > 30s, set charger relay on!!!");
-             p_chassis_mcu->setChargeCmd(CMD_CHARGER_ON);
-             pre_mileage = (p_chassis_mcu->mileage_right_ + p_chassis_mcu->mileage_left_) / 2;
-             break;
-           }
-            sleep(1);
-          }
-          sleep_cnt = 0; //允许下次线程能够进入
-        }).detach();
-    }
-}
+//void onCharge(void)
+//{
+//    if(sleep_cnt == 0){
+//        charger_cmd_ = CMD_CHARGER_ON;
+//        std::thread([&](){
+//          GS_INFO("[CHASSIS] start to check charger volatage = %d", charger_voltage_);
+//          sleep(3);
+//          int check_charger_cnt = 0;
+//          while(++sleep_cnt  < 60 && charger_cmd_ == CMD_CHARGER_ON) {
+//           GS_INFO("[CHASSIS] checking charger volatage = %d", charger_voltage_);
+//           if (charger_voltage_ >= p_charger->low_voltage) {
+//             ++check_charger_cnt;
+//           } else {
+//             check_charger_cnt = 0;
+//           }
+//           if (check_charger_cnt > p_charger->delay_time && charger_cmd_ == CMD_CHARGER_ON) {
+//             GS_INFO("[CHASSIS] check charger voltage normal > 30s, set charger relay on!!!");
+//             p_chassis_mcu->setChargeCmd(CMD_CHARGER_ON);
+//             pre_mileage = (p_chassis_mcu->mileage_right_ + p_chassis_mcu->mileage_left_) / 2;
+//             break;
+//           }
+//            sleep(1);
+//          }
+//          sleep_cnt = 0; //允许下次线程能够进入
+//        }).detach();
+//    }
+//}
 
 /*
  * IO口控制，手触等

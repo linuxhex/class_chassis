@@ -16,16 +16,18 @@ Publisher::Publisher(){
     this->going_back_pub  = p_device_nh->advertise<std_msgs::UInt32>("cmd_going_back", 50);
     this->dio_pub         = p_device_nh->advertise<std_msgs::UInt32>("dio_data", 50);
     this->protector_value_pub   = p_device_nh->advertise<std_msgs::UInt32>("protector_status", 50);
-    for(int i=0;i<15;i++){
-      if(p_ultrasonic->ultrasonic.find(ultrasonic_str[i]) != std::string::npos){
-        this->ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(ultrasonic_str[i].c_str(), 50);
-        if(p_ultrasonic->special_ultrasonic.find(ultrasonic_str[i]) != std::string::npos){
-          special_ultrasonic_id[i] = i;
-        }
-        ultrasonic_num ++;
-      }
-    }
 
+    if(p_ultrasonic != NULL){
+        for(int i=0;i<15;i++){
+          if(p_ultrasonic->ultrasonic.find(p_ultrasonic->ultrasonic_str[i]) != std::string::npos){
+            this->ultrasonic_pub[i] = p_n->advertise<sensor_msgs::Range>(p_ultrasonic->ultrasonic_str[i].c_str(), 50);
+            if(p_ultrasonic->special_ultrasonic.find(p_ultrasonic->ultrasonic_str[i]) != std::string::npos){
+              p_ultrasonic->special_ultrasonic_id[i] = i;
+            }
+            p_ultrasonic->ultrasonic_num ++;
+          }
+        }
+     }
 }
 
 Publisher::~Publisher(){}
@@ -35,44 +37,46 @@ Publisher::~Publisher(){}
  */
 void Publisher::publishUltrasonic(ros::Publisher& publisher,const char* frame_id, int recv_int,unsigned int ultrasonic_offset, double& ultra_range){
 
-    sensor_msgs::Range range;
-    range.header.seq = 0;
-    range.header.stamp = ros::Time::now();
-    range.header.frame_id = frame_id;
+    if( p_ultrasonic != NULL){
+        sensor_msgs::Range range;
+        range.header.seq = 0;
+        range.header.stamp = ros::Time::now();
+        range.header.frame_id = frame_id;
 
-    range.radiation_type = sensor_msgs::Range::ULTRASOUND;
-    range.field_of_view = M_PI / 90.0;
-    range.min_range = p_ultrasonic->min_range;
-    range.max_range = p_ultrasonic->max_range;
+        range.radiation_type = sensor_msgs::Range::ULTRASOUND;
+        range.field_of_view = M_PI / 90.0;
+        range.min_range = p_ultrasonic->min_range;
+        range.max_range = p_ultrasonic->max_range;
 
-    float dis_meter = recv_int * 5.44 / 1000.0;
-    ultra_range = dis_meter;
+        float dis_meter = recv_int * 5.44 / 1000.0;
+        ultra_range = dis_meter;
 
-    if(special_ultrasonic_id[ultrasonic_offset] == ultrasonic_offset){ //特殊位置超声处理
-      dis_meter = dis_meter - p_ultrasonic->special_ultrasonic_offset_dismeter;
-    }
-    if (dis_meter < range.min_range) {
-      range.range = range.min_range;
-    } else if (dis_meter > p_ultrasonic->effective_range) {  // effective range
-      range.range = range.max_range;
-    } else {
-      range.range = dis_meter;
-    }
-
-    if(((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
-      range.range = p_ultrasonic->max_range;
-    }
-
-    publisher.publish(range);
-
+        if(p_ultrasonic->special_ultrasonic_id[ultrasonic_offset] == ultrasonic_offset){ //特殊位置超声处理
+          dis_meter = dis_meter - p_ultrasonic->special_ultrasonic_offset_dismeter;
+        }
+        if (dis_meter < range.min_range) {
+          range.range = range.min_range;
+        } else if (dis_meter > p_ultrasonic->effective_range) {  // effective range
+          range.range = range.max_range;
+        } else {
+          range.range = dis_meter;
+        }
+        if(((p_ultrasonic->ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
+          range.range = p_ultrasonic->max_range;
+        }
+        publisher.publish(range);
+     }
 }
 
 
 void Publisher::publishUltrasonics(void) {
+  if(p_ultrasonic == NULL){
+      return;
+  }
   double raw_range;
   for(int i=0;i<15;i++){
     if(this->ultrasonic_pub[i] != 0){  //==0表示不是文件里配置的超声
-      publishUltrasonic(this->ultrasonic_pub[i], ultrasonic_str[i].c_str(), g_ultrasonic[1+i], i, raw_range);
+      publishUltrasonic(this->ultrasonic_pub[i], p_ultrasonic->ultrasonic_str[i].c_str(), g_ultrasonic[1+i], i, raw_range);
       GS_INFO("[wc chassis] get ultra[%d] raw range = %lf", i, raw_range);
     }
   }

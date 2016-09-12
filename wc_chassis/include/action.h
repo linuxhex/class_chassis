@@ -5,7 +5,7 @@
  bool DoRotate(void);
  void DoDIO(void);
  void DoRemoteRet(void);
- void onCharge(void);
+// void onCharge(void);
  void DoGoLine(void);
 
 #endif

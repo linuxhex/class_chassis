@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
          } else {
              go_forward_start_time_ = time_now + 1.0;
          }
-        if (time_now - go_forward_start_time_ > -0.0001 && time_now - go_forward_start_time_ < 1.0 && !(protector_hit & FRONT_HIT)) {
+        if (time_now - go_forward_start_time_ > -0.0001 && time_now - go_forward_start_time_ < 1.0 && !(p_protector->protector_hit & FRONT_HIT)) {
             p_chassis_mcu->setTwoWheelSpeed(0.15, 0.0);
          } else {
             DoRotate();
@@ -52,8 +52,8 @@ int main(int argc, char **argv) {
     } else {
       if ((!laser_connection_status || !socket_connection_status)
           || (time_now - last_cmd_vel_time >= p_machine->max_cmd_interval)
-          || ((protector_hit & FRONT_HIT) && p_speed_v->m_speed_v > 0.001)
-          || ((protector_hit & REAR_HIT)  && p_speed_v->m_speed_v < -0.001)
+          || ((p_protector !=NULL) && (p_protector->protector_hit & FRONT_HIT) && p_speed_v->m_speed_v > 0.001)
+          || ((p_protector !=NULL) && (p_protector->protector_hit & REAR_HIT)  && p_speed_v->m_speed_v < -0.001)
           || (charger_status_ == STA_CHARGER_ON)
           || (charger_status_ == STA_CHARGER_TOUCHED && p_speed_v->m_speed_v < -0.001)) {
 

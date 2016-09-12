@@ -7,6 +7,9 @@ class Charger
 public:
     Charger();
     ~Charger();
+    void onCharge(void);
+    void chargeValueManage(void);
+
 
     double low_voltage  = 0.0;
     double full_voltage = 27.0;

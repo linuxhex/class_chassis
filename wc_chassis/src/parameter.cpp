@@ -23,7 +23,6 @@ int current_w_index       = 0;
 unsigned int loop_count   = 0;
 int rotate_angle = 0;
 unsigned int protector_bits=0x00;
-unsigned int ultrasonic_bits=0x00;
 
 bool start_rotate_flag    = false;
 bool stop_rotate_flag     = true;
@@ -52,18 +51,6 @@ int sum_battery_capacity = 0;
 unsigned int protector_hit;
 double battery_value_ = 0.0;
 double sum_battery_value_ = 0.0;
-
-//超声可配的比较
-std::string ultrasonic_str[] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
-                                "ultrasonic5","ultrasonic6","ultrasonic7","ultrasonic8","ultrasonic9",
-                                "ultrasonic10","ultrasonic11","ultrasonic12","ultrasonic13","ultrasonic14"};
-
-//特殊超声下标位置
-unsigned char special_ultrasonic_id[15] = {0xff};
-
-
-//超声接入的数量
-int ultrasonic_num=0;
 
 double speed_w_acc, speed_w_dec; //角速度加速度，减速度
 int delta_counts_th; //满盘变化阀值（用于码盘防抖动）

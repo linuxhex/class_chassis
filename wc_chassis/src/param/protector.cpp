@@ -16,6 +16,53 @@ Protector::Protector()
     }
 }
 
+
+/*
+ * 防撞条数据处理
+*/
+void Protector::protectorManage(void)
+{
+    if(protector_num <= 0){
+        protector_hit = NONE_HIT;
+        protector_value = NONE_HIT;
+        return;
+    }
+    // check protector hit
+    unsigned int protector_status = g_ultrasonic[0] | protector_bits;
+    unsigned int temp_hit = NONE_HIT;
+    for (unsigned int i = 0; i < front_protector_list.size(); ++i) {
+      if (!(protector_status & (1 << front_protector_list.at(i)))) {
+        temp_hit |= FRONT_HIT;
+        GS_ERROR("[WC_CHASSIS] front protector bit[%d] hit!!!", front_protector_list.at(i));
+        break;
+      }
+    }
+    for (unsigned int i = 0; i < rear_protector_list.size(); ++i) {
+     if (!(protector_status & (1 << rear_protector_list.at(i)))) {
+        temp_hit |= REAR_HIT;
+        GS_ERROR("[WC_CHASSIS] rear protector bit[%d] hit!!!", rear_protector_list.at(i));
+        break;
+      }
+    }
+    if (temp_hit != NONE_HIT) {
+       timeval tv;
+       protector_value |= temp_hit;
+       gettimeofday(&tv, NULL);
+       protector_hit_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+     }
+
+    timeval tv;
+    gettimeofday(&tv, NULL);
+    double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+    //超过１秒，自动清除给导航的状态
+    if((protector_value != NONE_HIT) && (time_now - protector_hit_time > p_machine->max_cmd_interval)){
+      protector_value = NONE_HIT;
+    }
+
+    protector_hit = temp_hit;
+
+}
+
 Protector::~Protector()
 {
 
