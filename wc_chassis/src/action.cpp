@@ -68,11 +68,11 @@ void onCharge(void)
     if(sleep_cnt == 0){
         charger_cmd_ = CMD_CHARGER_ON;
         std::thread([&](){
-          GS_INFO("[CHASSIS] start to check charger volatage = %d", charger_voltage_);
+          GS_INFO("[CHASSIS] start to check charger volatage = %lf", charger_voltage_);
           sleep(3);
           int check_charger_cnt = 0;
           while(++sleep_cnt  < 60 && charger_cmd_ == CMD_CHARGER_ON) {
-           GS_INFO("[CHASSIS] checking charger volatage = %d", charger_voltage_);
+           GS_INFO("[CHASSIS] checking charger volatage = %lf", charger_voltage_);
            if (charger_voltage_ >= charger_low_voltage_) {
              ++check_charger_cnt;
            } else {
