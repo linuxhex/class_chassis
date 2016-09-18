@@ -54,6 +54,7 @@ void InitService()
     test_go_line_srv              = p_device_nh->advertiseService("test_go_line",&TestGoLine);
     stop_go_line_srv              = p_device_nh->advertiseService("stop_go_line",&StopGoLine);
     check_go_line_srv             = p_device_nh->advertiseService("check_go_line",&CheckGoLine);
+    down_breaker_srv              = p_device_nh->advertiseService("breaker_down",&SetBreakerDown);
 
 
     Navi_sub              = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);
