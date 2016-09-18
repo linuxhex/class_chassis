@@ -68,7 +68,12 @@ int main(int argc, char **argv) {
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
-    if(start_goline_flag){
+    if(breaker_down){
+        g_chassis_mcu->setBreaker();
+        if(time_now - breaker_start_time >= 1.0){
+            breaker_down = false;
+        }
+    }else if(start_goline_flag){
        DoGoLine();
     }else if(start_rotate_flag) {
         if (charger_voltage_ > charger_low_voltage_) {
@@ -84,7 +89,7 @@ int main(int argc, char **argv) {
             DoRotate(rotate_finished_pub);
          }
     } else {
-      if ((!laser_connection_status || !socket_connection_status)
+     if ((!laser_connection_status || !socket_connection_status)
           || (time_now - last_cmd_vel_time >= max_cmd_interval)
           || ((protector_hit & FRONT_HIT) && m_speed_v > 0.001)
           || ((protector_hit & REAR_HIT)  && m_speed_v < -0.001)

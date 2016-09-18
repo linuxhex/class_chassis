@@ -29,6 +29,7 @@ ros::ServiceServer check_auto_charge_status_srv;
 ros::ServiceServer test_go_line_srv;
 ros::ServiceServer stop_go_line_srv;
 ros::ServiceServer check_go_line_srv;
+ros::ServiceServer down_breaker_srv;
 
 
 /***Subscriber***/

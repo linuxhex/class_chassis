@@ -120,3 +120,5 @@ double start_pose, current_pose;
 double distance = 0.0;
 double pre_yaw = 0.0;
 double sum_yaw = 0.0;
+bool breaker_down = false;
+double breaker_start_time = 0.0;

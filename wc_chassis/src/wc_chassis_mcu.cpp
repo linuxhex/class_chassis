@@ -787,6 +787,21 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
   return 0xffffffff;
 }
 
+//急停放刹车
+void WC_chassis_mcu::setBreaker(void)
+{
+    unsigned char send[1024] = {0};
+    int len = 0;
+    unsigned char rec[1024] = {0};
+    int rlen = 0;
+
+    CreateTwoWheelSpeed(send, &len, 200, 200);
+    if (transfer_) {
+      transfer_->Send_data(send, len);
+      transfer_->Read_data(rec, rlen, 23, 500);
+    }
+}
+
 void WC_chassis_mcu::setRemoteRet(unsigned short ret) {
   if (ret == 0) {
     GS_INFO("[wc_chassis] send remote ret == 0!");

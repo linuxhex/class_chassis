@@ -22,6 +22,7 @@ class WC_chassis_mcu{
 
   void setThaZero(double zero);
   void setThaLeft(double left);
+  void setBreaker();
 
   unsigned int doDIO(unsigned int usdo);
   void setRemoteRet(unsigned short ret);
