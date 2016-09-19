@@ -15,6 +15,6 @@ bool CheckAutoChargeStatus(autoscrubber_services::CheckChargeStatus::Request& re
 bool TestGoLine(autoscrubber_services::TestGoLine::Request& req,autoscrubber_services::TestGoLine::Response& res);
 bool StopGoLine(autoscrubber_services::StopGoLine::Request& req,autoscrubber_services::StopGoLine::Response& res);
 bool CheckGoLine(autoscrubber_services::CheckGoLine::Request& req,autoscrubber_services::CheckGoLine::Response& res);
-bool SetBreakerDown(autoscrubber_services::BrakerDown::Request& req,autoscrubber_services::BrakerDown::Response& res);
+bool SetBrakerDown(autoscrubber_services::BrakerDown::Request& req,autoscrubber_services::BrakerDown::Response& res);
 
 #endif

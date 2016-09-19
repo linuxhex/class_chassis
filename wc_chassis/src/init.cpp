@@ -29,7 +29,7 @@ ros::ServiceServer check_auto_charge_status_srv;
 ros::ServiceServer test_go_line_srv;
 ros::ServiceServer stop_go_line_srv;
 ros::ServiceServer check_go_line_srv;
-ros::ServiceServer down_breaker_srv;
+ros::ServiceServer down_braker_srv;
 
 
 /***Subscriber***/
@@ -54,7 +54,7 @@ void InitService()
     test_go_line_srv              = p_device_nh->advertiseService("test_go_line",&TestGoLine);
     stop_go_line_srv              = p_device_nh->advertiseService("stop_go_line",&StopGoLine);
     check_go_line_srv             = p_device_nh->advertiseService("check_go_line",&CheckGoLine);
-    down_breaker_srv              = p_device_nh->advertiseService("breaker_down",&SetBreakerDown);
+    down_braker_srv              = p_device_nh->advertiseService("braker_down",&SetBrakerDown);
 
 
     Navi_sub              = p_n->subscribe("cmd_vel", 10, DoNavigationCallback);

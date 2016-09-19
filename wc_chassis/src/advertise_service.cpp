@@ -51,11 +51,11 @@ bool CheckGoLine(autoscrubber_services::CheckGoLine::Request& req,
 /*
  * 急停
  */
-bool SetBreakerDown(autoscrubber_services::BrakerDown::Request& req,
+bool SetBrakerDown(autoscrubber_services::BrakerDown::Request& req,
                     autoscrubber_services::BrakerDown::Response& res) {
     timeval tv;
-    breaker_start_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
-    breaker_down = true;
+    braker_start_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+    braker_down = true;
     return true;
 }
 

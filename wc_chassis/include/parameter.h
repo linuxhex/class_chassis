@@ -205,8 +205,8 @@ extern bool start_goline_flag;
 extern bool stop_goline_flag ;
 extern double pre_yaw;
 extern double sum_yaw;
-extern bool breaker_down;
-extern double breaker_start_time;
+extern bool braker_down;
+extern double braker_start_time;
 
 
 #endif

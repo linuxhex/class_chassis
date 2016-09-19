@@ -68,10 +68,10 @@ int main(int argc, char **argv) {
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
-    if(breaker_down){
-        g_chassis_mcu->setBreaker();
-        if(time_now - breaker_start_time >= 1.0){
-            breaker_down = false;
+    if(braker_down){
+        g_chassis_mcu->setBraker();
+        if(time_now - braker_start_time >= 1.0){
+            braker_down = false;
         }
     }else if(start_goline_flag){
        DoGoLine();

@@ -788,7 +788,7 @@ unsigned int WC_chassis_mcu::doDIO(unsigned int usdo) {
 }
 
 //急停放刹车
-void WC_chassis_mcu::setBreaker(void)
+void WC_chassis_mcu::setBraker(void)
 {
     unsigned char send[1024] = {0};
     int len = 0;
