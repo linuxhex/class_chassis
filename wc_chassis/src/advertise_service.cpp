@@ -139,7 +139,6 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
 bool StartRotate(autoscrubber_services::StartRotate::Request& req,
                  autoscrubber_services::StartRotate::Response& res)
 {
-  if(stop_rotate_flag) {
       rotate_angle = req.rotateAngle.data;
       start_rotate_flag = true;
       stop_rotate_flag = false;
@@ -149,7 +148,6 @@ bool StartRotate(autoscrubber_services::StartRotate::Request& req,
       sum_yaw = 0.0;
       g_chassis_mcu->acc_odom_theta_ = 0.0;
       //g_chassis_mcu->ReSetOdom();
-  }
   return true;
 }
 
