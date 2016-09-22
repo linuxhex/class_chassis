@@ -4,6 +4,7 @@
 #include"parameter.h"
 
 double ultral_effective_range = 0.4;
+double special_ultrasonic_effective_range = 0.4;
 double g_odom_x   = 0;
 double g_odom_y   = 0;
 double g_odom_tha = 0;
@@ -122,3 +123,4 @@ double pre_yaw = 0.0;
 double sum_yaw = 0.0;
 bool braker_down = false;
 double braker_start_time = 0.0;
+double braker_delay_time = 0.0;

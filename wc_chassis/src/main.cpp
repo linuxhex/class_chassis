@@ -69,8 +69,10 @@ int main(int argc, char **argv) {
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
     if(braker_down){
+        m_speed_v = 0.0;
+        m_speed_w = 0.0;
         g_chassis_mcu->setBraker();
-        if(time_now - braker_start_time >= 1.0){
+        if(time_now - braker_start_time >= braker_delay_time){
             braker_down = false;
         }
     }else if(start_goline_flag){

@@ -207,6 +207,7 @@ extern double pre_yaw;
 extern double sum_yaw;
 extern bool braker_down;
 extern double braker_start_time;
-
+extern double braker_delay_time;
+extern double special_ultrasonic_effective_range;
 
 #endif

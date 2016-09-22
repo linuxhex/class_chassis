@@ -102,6 +102,7 @@ void InitParameter()
     p_nh->param("ultrasonic_min_range",ultrasonic_min_range,static_cast<float>(0.04));//超声最小距离
     p_nh->param("ultrasonic_max_range",ultrasonic_max_range,static_cast<float>(1.0));//超声最大距离
     p_nh->param("ultral_effective_range", ultral_effective_range, static_cast<double>(0.4));//超声有效检测距离
+    p_nh->param("special_ultrasonic_effective_range",special_ultrasonic_effective_range,static_cast<double>(0.4));
     p_nh->param("special_ultrasonic",*special_ultrasonic,std::string(" "));//特殊配置的超声
     p_nh->param("special_ultrasonic_offset_dismeter",special_ultrasonic_offset_dismeter,static_cast<float>(0.15)); //特殊超声偏置距离
 
@@ -126,6 +127,7 @@ void InitParameter()
     p_nh->param("new_hand_touch", new_hand_touch_, false);//新板子手触开关和防撞条共用一个接口
     p_nh->param("old_ultrasonic", old_ultrasonic_, false);//旧板子里面没有超声板状态
     p_nh->param("charger_delay_time",charger_delay_time_,30);//充电继电器打开延时时间
+    p_nh->param("braker_delay_time",braker_delay_time,static_cast<double>(1.5));//急停等待时间
 
     // 前面防撞条配置
     if (!ReadConfigFromParams("front_protector", p_nh, &front_protector_list)) {
