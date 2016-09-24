@@ -14,17 +14,15 @@
  */
 bool TestGoLine(autoscrubber_services::TestGoLine::Request& req,
                 autoscrubber_services::TestGoLine::Response& res) {
-     if(stop_goline_flag){
-          start_pose = sqrt(fabs(g_odom_x*g_odom_x) + fabs(g_odom_y*g_odom_y));
-          //g_chassis_mcu->ReSetOdom();
-          double dis_offset = 0.03;
-          autoscrubber_services::GoLine go_line = req.go_line;
-          distance = go_line.distance < dis_offset ? go_line.distance + dis_offset: go_line.distance;
-          m_speed_v = go_line.line_x;
-          m_speed_w = 0.0;
-          start_goline_flag = true;
-          stop_goline_flag  = false;
-      }
+      start_pose = sqrt(fabs(g_odom_x*g_odom_x) + fabs(g_odom_y*g_odom_y));
+      //g_chassis_mcu->ReSetOdom();
+      double dis_offset = 0.03;
+      autoscrubber_services::GoLine go_line = req.go_line;
+      distance = go_line.distance < dis_offset ? go_line.distance + dis_offset: go_line.distance;
+      m_speed_v = go_line.line_x;
+      m_speed_w = 0.0;
+      start_goline_flag = true;
+      stop_goline_flag  = false;
       return true;
 }
 
