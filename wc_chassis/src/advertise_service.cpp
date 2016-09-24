@@ -46,6 +46,16 @@ bool CheckGoLine(autoscrubber_services::CheckGoLine::Request& req,
   res.isFinished.data = stop_goline_flag;
   return true;
 }
+/*
+ * 急停
+ */
+bool SetBrakerDown(autoscrubber_services::BrakerDown::Request& req,
+                    autoscrubber_services::BrakerDown::Response& res) {
+    timeval tv;
+    braker_start_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+    braker_down = true;
+    return true;
+}
 
 /*
  *  自动充电 状态查询

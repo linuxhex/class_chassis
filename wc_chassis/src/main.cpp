@@ -68,7 +68,14 @@ int main(int argc, char **argv) {
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
-    if(start_goline_flag){
+    if(braker_down){
+        m_speed_v = 0.0;
+        m_speed_w = 0.0;
+        g_chassis_mcu->setBraker();
+        if(time_now - braker_start_time >= braker_delay_time){
+            braker_down = false;
+        }
+    }else if(start_goline_flag){
        DoGoLine();
     }else if(start_rotate_flag) {
         if (charger_voltage_ > charger_low_voltage_) {
@@ -84,21 +91,21 @@ int main(int argc, char **argv) {
             DoRotate(rotate_finished_pub);
          }
     } else {
-      if ((time_now - last_cmd_vel_time >= max_cmd_interval)
-          || ((protector_hit & FRONT_HIT) && m_speed_v > 0.001)
-          || ((protector_hit & REAR_HIT)  && m_speed_v < -0.001)
-          || (charger_status_ == STA_CHARGER_ON)
-          || (charger_status_ == STA_CHARGER_TOUCHED && m_speed_v < -0.001)) {
+         if ( (time_now - last_cmd_vel_time >= max_cmd_interval)
+              || ((protector_hit & FRONT_HIT) && m_speed_v > 0.001)
+              || ((protector_hit & REAR_HIT)  && m_speed_v < -0.001)
+              || (charger_status_ == STA_CHARGER_ON)
+              || (charger_status_ == STA_CHARGER_TOUCHED && m_speed_v < -0.001)) {
 
-          if (charger_status_ == STA_CHARGER_ON && m_speed_v > 0.001) {
-                 charger_cmd_ = CMD_CHARGER_OFF;
-                 g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+              if (charger_status_ == STA_CHARGER_ON && m_speed_v > 0.001) {
+                     charger_cmd_ = CMD_CHARGER_OFF;
+                     g_chassis_mcu->setChargeCmd(CMD_CHARGER_OFF);
+              }
+              g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
+
+          } else {
+              g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
           }
-          g_chassis_mcu->setTwoWheelSpeed(0.0,0.0);
-
-      } else {
-          g_chassis_mcu->setTwoWheelSpeed(m_speed_v, m_speed_w);
-      }
     }
 
     DoDIO(going_back_pub);

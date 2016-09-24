@@ -34,7 +34,7 @@ function test() {
     bazel build //:wc_chassis --cpu=k8 --host_cpu=k8 -c dbg --curses=no
     rm output -rf && mkdir output
     cp bazel-bin/wc_chassis output
-    strip output/wc_chassis
+    sudo strip output/wc_chassis
 }
 
 function release() {

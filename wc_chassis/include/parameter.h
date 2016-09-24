@@ -23,6 +23,7 @@
 #include <autoscrubber_services/StopGoLine.h>
 #include <autoscrubber_services/CheckGoLine.h>
 #include <autoscrubber_services/SetChargeCmd.h>
+#include <autoscrubber_services/BrakerDown.h>
 #include <gs/logging.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -204,4 +205,9 @@ extern bool start_goline_flag;
 extern bool stop_goline_flag ;
 extern double pre_yaw;
 extern double sum_yaw;
+extern bool braker_down;
+extern double braker_start_time;
+extern double braker_delay_time;
+extern double special_ultrasonic_effective_range;
+
 #endif
