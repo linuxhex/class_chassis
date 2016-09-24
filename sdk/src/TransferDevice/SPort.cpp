@@ -74,6 +74,7 @@ void Socket::read_callback(const boost::system::error_code& error, std::size_t b
   }
   if(m_lReadBuffer!=NULL)
   m_lReadBuffer->Write(m_szReadTemp, bytes_transferred);
+  usleep(10000);
   read();
 }
 
