@@ -14,17 +14,15 @@
  */
 bool TestGoLine(autoscrubber_services::TestGoLine::Request& req,
                 autoscrubber_services::TestGoLine::Response& res) {
-     if(stop_goline_flag){
-          start_pose = sqrt(fabs(g_odom_x*g_odom_x) + fabs(g_odom_y*g_odom_y));
-          //g_chassis_mcu->ReSetOdom();
-          double dis_offset = 0.03;
-          autoscrubber_services::GoLine go_line = req.go_line;
-          distance = go_line.distance < dis_offset ? go_line.distance + dis_offset: go_line.distance;
-          m_speed_v = go_line.line_x;
-          m_speed_w = 0.0;
-          start_goline_flag = true;
-          stop_goline_flag  = false;
-      }
+      start_pose = sqrt(fabs(g_odom_x*g_odom_x) + fabs(g_odom_y*g_odom_y));
+      //g_chassis_mcu->ReSetOdom();
+      double dis_offset = 0.03;
+      autoscrubber_services::GoLine go_line = req.go_line;
+      distance = go_line.distance < dis_offset ? go_line.distance + dis_offset: go_line.distance;
+      m_speed_v = go_line.line_x;
+      m_speed_w = 0.0;
+      start_goline_flag = true;
+      stop_goline_flag  = false;
       return true;
 }
 
@@ -149,7 +147,6 @@ bool CheckProtectorStatus(autoscrubber_services::CheckProtectorStatus::Request& 
 bool StartRotate(autoscrubber_services::StartRotate::Request& req,
                  autoscrubber_services::StartRotate::Response& res)
 {
-  if(stop_rotate_flag) {
       rotate_angle = req.rotateAngle.data;
       start_rotate_flag = true;
       stop_rotate_flag = false;
@@ -159,7 +156,6 @@ bool StartRotate(autoscrubber_services::StartRotate::Request& req,
       sum_yaw = 0.0;
       g_chassis_mcu->acc_odom_theta_ = 0.0;
       //g_chassis_mcu->ReSetOdom();
-  }
   return true;
 }
 
