@@ -34,7 +34,14 @@ int main(int argc, char **argv) {
     gettimeofday(&tv, NULL);
     double time_now = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
 
-    if(start_goline_flag){
+    if(p_machine->braker_down){
+        p_speed_v->m_speed_v = 0.0;
+        p_speed_w->m_speed_w = 0.0;
+        g_chassis_mcu->setBraker();
+        if(time_now - p_machine->braker_start_time >= p_machine->braker_delay_time){
+            p_machine->braker_down = false;
+        }
+   }else if(start_goline_flag){
         DoGoLine();
     }else if(start_rotate_flag) {
         if(p_charger != NULL){
@@ -52,8 +59,7 @@ int main(int argc, char **argv) {
             DoRotate();
          }
     } else {
-      if ((!p_network->laser_connection_status || !p_network->socket_connection_status)
-          || (time_now - last_cmd_vel_time >= p_machine->max_cmd_interval)
+      if ((time_now - last_cmd_vel_time >= p_machine->max_cmd_interval)
           || ((p_protector !=NULL) && (p_protector->protector_hit & FRONT_HIT) && p_speed_v->m_speed_v > 0.001)
           || ((p_protector !=NULL) && (p_protector->protector_hit & REAR_HIT)  && p_speed_v->m_speed_v < -0.001)
           || ((p_charger != NULL) && p_charger->charger_status == STA_CHARGER_ON)

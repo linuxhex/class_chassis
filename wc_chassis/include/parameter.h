@@ -18,6 +18,7 @@
 #include <autoscrubber_services/CheckRotate.h>
 #include <autoscrubber_services/CheckProtectorStatus.h>
 #include <autoscrubber_services/CheckChargeStatus.h>
+#include <autoscrubber_services/BrakerDown.h>
 #include <autoscrubber_services/SetChargeCmd.h>
 #include <gs/logging.h>
 #include <stdio.h>

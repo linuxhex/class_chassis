@@ -50,11 +50,26 @@ void Publisher::publishUltrasonic(ros::Publisher& publisher,const char* frame_id
     range.min_range = p_ultrasonic->min_range;
     range.max_range = p_ultrasonic->max_range;
 
+    if(((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
+       range.range = ultrasonic_max_range;
+       publisher.publish(range);
+       return;
+     }
+
     float dis_meter = recv_int * 5.44 / 1000.0;
     ultra_range = dis_meter;
 
     if(p_ultrasonic->special_ultrasonic_id[ultrasonic_offset] == ultrasonic_offset){ //特殊位置超声处理
       dis_meter = dis_meter - p_ultrasonic->special_ultrasonic_offset_dismeter;
+      if (dis_meter < range.min_range) {
+        range.range = range.min_range;
+      } else if (dis_meter > special_ultrasonic_effective_range) {  // effective range
+        range.range = range.max_range;
+      } else {
+        range.range = dis_meter;
+      }
+      publisher.publish(range);
+      return;
     }
     if (dis_meter < range.min_range) {
       range.range = range.min_range;
@@ -63,9 +78,7 @@ void Publisher::publishUltrasonic(ros::Publisher& publisher,const char* frame_id
     } else {
       range.range = dis_meter;
     }
-    if(((p_ultrasonic->ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !p_ultrasonic->ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
-      range.range = p_ultrasonic->max_range;
-    }
+
     publisher.publish(range);
 }
 

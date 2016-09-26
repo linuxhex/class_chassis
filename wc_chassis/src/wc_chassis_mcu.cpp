@@ -81,6 +81,22 @@ WC_chassis_mcu::~WC_chassis_mcu()
     }
 }
 
+//急停放刹车
+void WC_chassis_mcu::setBraker(void)
+{
+    unsigned char send[1024] = {0};
+    int len = 0;
+    unsigned char rec[1024] = {0};
+    int rlen = 0;
+
+    CreateTwoWheelSpeed(send, &len, 200, 200);
+    if (transfer_) {
+      transfer_->Send_data(send, len);
+      transfer_->Read_data(rec, rlen, 23, 500);
+    }
+}
+
+
 void WC_chassis_mcu::Init()
 {
     transfer_->Init();

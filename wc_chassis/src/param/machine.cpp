@@ -11,6 +11,7 @@ Machine::Machine()
     machine_nh.param("max_cmd_interval", this->max_cmd_interval, 1.0);
     machine_nh.param("TimeWidth", this->timeWidth, static_cast<double>(0.1));
     machine_nh.param("delta_counts_th",this->delta_counts_th,800); //码盘防抖动阈值
+    machine_nh.param("braker_delay_time",braker_delay_time,static_cast<double>(1.5));//急停等待时间
 
 }
 Machine::~Machine(){}

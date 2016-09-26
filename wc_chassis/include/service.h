@@ -32,7 +32,9 @@ class Service{
     bool testGoLine(autoscrubber_services::TestGoLine::Request& req,autoscrubber_services::TestGoLine::Response& res);
     bool stopGoLine(autoscrubber_services::StopGoLine::Request& req,autoscrubber_services::StopGoLine::Response& res);
     bool checkGoLine(autoscrubber_services::CheckGoLine::Request& req,autoscrubber_services::CheckGoLine::Response& res);
-  private:
+    bool setBrakerDown(autoscrubber_services::BrakerDown::Request& req,autoscrubber_services::BrakerDown::Response& res);
+
+private:
     ros::ServiceServer start_rotate_srv;
     ros::ServiceServer stop_rotate_srv;
     ros::ServiceServer check_rotate_srv;
@@ -45,6 +47,7 @@ class Service{
     ros::ServiceServer test_go_line_srv;
     ros::ServiceServer stop_go_line_srv;
     ros::ServiceServer check_go_line_srv;
+    ros::ServiceServer down_braker_srv;
 };
 
 #endif

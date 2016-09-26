@@ -17,6 +17,8 @@ class Ultrasonicer{
     float  special_ultrasonic_offset_dismeter;
     int ultrasonic_num=0;//超声接入的数量
     unsigned int ultrasonic_bits=0x00;
+    double special_ultrasonic_effective_range;
+
 
     //超声可配的比较
     std::string ultrasonic_str[15] = {"ultrasonic0","ultrasonic1","ultrasonic2","ultrasonic3","ultrasonic4",
