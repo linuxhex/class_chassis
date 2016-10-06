@@ -19,7 +19,7 @@ Service::Service(){
     test_go_line_srv              = p_device_nh->advertiseService("test_go_line",&Service::testGoLine,this);
     stop_go_line_srv              = p_device_nh->advertiseService("stop_go_line",&Service::stopGoLine,this);
     check_go_line_srv             = p_device_nh->advertiseService("check_go_line",&Service::checkGoLine,this);
-    down_braker_srv               = p_device_nh->advertiseService("braker_down",&Service::SetBrakerDown,this);
+    down_braker_srv               = p_device_nh->advertiseService("braker_down",&Service::setBrakerDown,this);
 
 }
 
@@ -77,8 +77,8 @@ bool Service::setAutoChargeCmd(autoscrubber_services::SetChargeCmd::Request& req
 bool Service::setBrakerDown(autoscrubber_services::BrakerDown::Request& req,
                             autoscrubber_services::BrakerDown::Response& res) {
     timeval tv;
-    braker_start_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
-    braker_down = true;
+    p_machine->braker_start_time = static_cast<double>(tv.tv_sec) + 0.000001 * tv.tv_usec;
+    p_machine->braker_down = true;
     return true;
 }
 /*

@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     if(p_machine->braker_down){
         p_speed_v->m_speed_v = 0.0;
         p_speed_w->m_speed_w = 0.0;
-        g_chassis_mcu->setBraker();
+        p_chassis_mcu->setBraker();
         if(time_now - p_machine->braker_start_time >= p_machine->braker_delay_time){
             p_machine->braker_down = false;
         }
@@ -78,12 +78,12 @@ int main(int argc, char **argv) {
 
     DoDIO();
     DoRemoteRet();
-    if (++loop_count % 2) {
+    if (++loop_count % 4) {
       p_chassis_mcu->getRemoteCmd(remote_cmd_, remote_index_);
       p_publisher->publishRemoteCmd(remote_cmd_, remote_index_);
       p_publisher->publishDeviceStatus();
     }
-    if (loop_count % 10) {//设置遥控器id
+    if (loop_count % 20) {//设置遥控器id
       p_chassis_mcu->setRemoteID((unsigned char)((remote_id & 0x0f) | ((p_speed_v->remote_level & 0x03) << 4) | ((p_battery->battery_level & 0x03) << 6)));
       loop_count = 0;
     }

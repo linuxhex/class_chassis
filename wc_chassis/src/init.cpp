@@ -178,7 +178,7 @@ bool InitChassis(int argc, char **argv,const char *node_name)
      p_n = new ros::NodeHandle();
      p_nh = new ros::NodeHandle("~");
      p_device_nh = new ros::NodeHandle("device");
-     p_loop_rate =  new ros::Rate(10);
+     p_loop_rate =  new ros::Rate(25);
 
      InitParameter();
      InitService();

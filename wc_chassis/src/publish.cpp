@@ -50,8 +50,8 @@ void Publisher::publishUltrasonic(ros::Publisher& publisher,const char* frame_id
     range.min_range = p_ultrasonic->min_range;
     range.max_range = p_ultrasonic->max_range;
 
-    if(((ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
-       range.range = ultrasonic_max_range;
+    if(((p_ultrasonic->ultrasonic_bits & (0x01<<ultrasonic_offset)) != 0x00) || !p_ultrasonic->ultrasonic_board_connection){ //应用层屏蔽超声的作用 或者超声转接板断开连接
+       range.range = p_ultrasonic->max_range;
        publisher.publish(range);
        return;
      }
@@ -63,7 +63,7 @@ void Publisher::publishUltrasonic(ros::Publisher& publisher,const char* frame_id
       dis_meter = dis_meter - p_ultrasonic->special_ultrasonic_offset_dismeter;
       if (dis_meter < range.min_range) {
         range.range = range.min_range;
-      } else if (dis_meter > special_ultrasonic_effective_range) {  // effective range
+      } else if (dis_meter > p_ultrasonic->effective_range) {  // effective range
         range.range = range.max_range;
       } else {
         range.range = dis_meter;
