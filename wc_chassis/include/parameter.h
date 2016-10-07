@@ -52,6 +52,7 @@
 #include "param/ultrasonic.h"
 #include "param/battery.h"
 #include "param/checker_id.h"
+#include "param/chassis_time.h"
 
 extern  double g_odom_x   ;
 extern  double g_odom_y   ;
@@ -167,5 +168,6 @@ extern HandToucher *p_hand_toucher;
 extern Ultrasonicer    *p_ultrasonic;
 extern Param::Battery  *p_battery;
 extern Checker_id      *p_checker_id;
+extern ChassisTime     *p_chassis_time;
 
 #endif

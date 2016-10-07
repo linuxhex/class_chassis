@@ -1,7 +1,7 @@
 #include "param/speed_w.h"
 
 Speed_w::Speed_w(){
-    ros::NodeHandle speed_w_nh("~/chassis_param/speed_w");
+    ros::NodeHandle speed_w_nh("~/strategy/chassis/speed_w");
     speed_w_nh.param("max", this->max, static_cast<double>(0.6));//最大角速度
     speed_w_nh.param("acc", this->acc, static_cast<double>(0.25));//角速度加速度
     speed_w_nh.param("dec", this->dec, static_cast<double>(-0.25));//角速度减速度

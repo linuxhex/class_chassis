@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
             DoRotate();
          }
     } else {
-      if ((time_now - last_cmd_vel_time >= p_machine->max_cmd_interval)
+      if ((time_now - last_cmd_vel_time >= p_chassis_time->max_cmd_interval)
           || ((p_protector !=NULL) && (p_protector->protector_hit & FRONT_HIT) && p_speed_v->m_speed_v > 0.001)
           || ((p_protector !=NULL) && (p_protector->protector_hit & REAR_HIT)  && p_speed_v->m_speed_v < -0.001)
           || ((p_charger != NULL) && p_charger->charger_status == STA_CHARGER_ON)

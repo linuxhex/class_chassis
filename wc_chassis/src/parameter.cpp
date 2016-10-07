@@ -52,20 +52,21 @@ double distance = 0.0;
 double pre_yaw = 0.0;
 double sum_yaw = 0.0;
 
-Speed_w   *p_speed_w = NULL;
+Speed_w   *p_speed_w   = NULL;
 Speed_v   *p_speed_v   = NULL;
 Publisher *p_publisher = NULL;
 Subscribe *p_subscribe = NULL;
 Service   *p_service   = NULL;
 WC_chassis_mcu  *p_chassis_mcu = NULL;
-Machine         *p_machine = NULL;
-Network         *p_network = NULL;
-Charger         *p_charger = NULL;
-Protector       *p_protector = NULL;
+Machine         *p_machine     = NULL;
+Network         *p_network     = NULL;
+Charger         *p_charger     = NULL;
+Protector       *p_protector   = NULL;
 HandToucher     *p_hand_toucher = NULL;
-Ultrasonicer    *p_ultrasonic  = NULL;
-Param::Battery  *p_battery = NULL;
-Checker_id      *p_checker_id = NULL;
+Ultrasonicer    *p_ultrasonic   = NULL;
+Param::Battery  *p_battery      = NULL;
+Checker_id      *p_checker_id   = NULL;
+ChassisTime     *p_chassis_time = NULL;
 
 
 

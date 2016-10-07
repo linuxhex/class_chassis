@@ -2,7 +2,7 @@
 
 Network::Network()
 {
-    ros::NodeHandle network_nh("~/chassis_param/network");
+    ros::NodeHandle network_nh("~/device/network");
     network_nh.param("host_name", this->host_name, std::string("10.7.5.199"));
     network_nh.param("port", this->port, std::string("5000"));
     network_nh.param("router_ip", this->router_ip, std::string("10.7.5.1"));//路由ip

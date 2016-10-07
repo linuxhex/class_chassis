@@ -2,7 +2,7 @@
 
 Ultrasonicer::Ultrasonicer()
 {
-    ros::NodeHandle ultrasonic_nh("~/chassis_param/ultrasonic");
+    ros::NodeHandle ultrasonic_nh("~/device/ultrasonic");
     ultrasonic_nh.param("name",ultrasonic,std::string(" "));//配置的超声
     ultrasonic_nh.param("min_range",min_range,static_cast<float>(0.04));//超声最小距离
     ultrasonic_nh.param("max_range",max_range,static_cast<float>(1.0));//超声最大距离

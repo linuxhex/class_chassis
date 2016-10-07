@@ -783,7 +783,7 @@ int WC_chassis_mcu::GetCopleyAngle(float angle) {
 short WC_chassis_mcu::getMotorSpeed(float speed) {
 
   // transfer real speed to motor comond
-  short ret = (short)(speed / (p_machine->b_dia * M_PI) * p_machine->reduction_ratio / p_speed_v->full * 60.0);
+  short ret = (short)(speed / (p_machine->b_dia * M_PI) * p_machine->reduction_ratio / (p_machine->max_rpm / 1000) *  60.0);
   ret = ret > SPEED_TH ? SPEED_TH : ret;
   ret = ret < ((-1) * SPEED_TH) ? ((-1) * SPEED_TH) : ret;
   return ret;
@@ -827,7 +827,7 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
 
   //calculate angle and speed
   if (IsInPlaceRotation(speed_v, speed_w))  {
-    speed_right = p_machine->axle * tan(speed_w * p_machine->timeWidth) / (2 * p_machine->timeWidth);
+    speed_right = p_machine->axle * tan(speed_w *  1.0/p_chassis_time->sample_rate) / (2 *  1.0/p_chassis_time->sample_rate);
     speed_left = -1.0 * speed_right;
   } else if (IsStop(speed_v, speed_w)) {
     speed_left = 0.0;
@@ -835,11 +835,11 @@ void WC_chassis_mcu::setTwoWheelSpeed(float speed_v, float speed_w)  {
   } else {
     if (speed_w > 0.0) {
       //speed_left = speed_v - (speed_w * Axle_* H_ ) / (2 * speed_v * p_machine->timeWidth);
-      speed_left = speed_v - (p_machine->axle * tan(speed_w * p_machine->timeWidth)) / (2 * p_machine->timeWidth);
+      speed_left = speed_v - (p_machine->axle * tan(speed_w *  1.0/p_chassis_time->sample_rate)) / (2 *  1.0/p_chassis_time->sample_rate);
       speed_right = 2 * speed_v - speed_left;
     } else {
       //speed_right = speed_v + (speed_w * Axle_* H_ ) / (2 * speed_v * p_machine->timeWidth);
-      speed_right = speed_v + (p_machine->axle * tan(speed_w * p_machine->timeWidth)) / (2 * p_machine->timeWidth);
+      speed_right = speed_v + (p_machine->axle * tan(speed_w *  1.0/p_chassis_time->sample_rate)) / (2 *  1.0/p_chassis_time->sample_rate);
       speed_left = 2 * speed_v - speed_right;
     }
   }

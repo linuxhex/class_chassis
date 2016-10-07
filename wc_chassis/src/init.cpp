@@ -34,10 +34,10 @@ void InitParameter()
     p_odom_broadcaster = new tf::TransformBroadcaster();
 
     //read device param
-    ros::NodeHandle chassis_param_nh("~/chassis_param");
+    ros::NodeHandle chassis_param_nh("~/device");
     std::string device_params;
-    chassis_param_nh.param("device", device_params, std::string(""));
-    std::cout<<"device"<<" "<<device_params<<std::endl;
+    chassis_param_nh.param("devices", device_params, std::string(""));
+    std::cout<<"devices"<<" "<<device_params<<std::endl;
     std::stringstream device_ss(device_params);
     std::string device_param;
     while (device_ss >> device_param) {
@@ -75,8 +75,9 @@ void InitParameter()
     }
 
     //read strategy param
+    ros::NodeHandle strategy_nh("~/strategy/chassis");
     std::string strategy_params;
-    chassis_param_nh.param("strategy", strategy_params, std::string(""));
+    strategy_nh.param("strategies", strategy_params, std::string(""));
     std::cout<<"strategy"<<" "<<strategy_params<<std::endl;
     std::stringstream strategy_ss(strategy_params);
     std::string strategy_param;
@@ -85,9 +86,15 @@ void InitParameter()
           p_speed_v = new Speed_v();
       } else if (strategy_param == "speed_w") {
           p_speed_w = new Speed_w();
+      } else if (strategy_param == "time") {
+          p_chassis_time = new ChassisTime();
       }
     }
 
+    if(p_chassis_time == NULL){
+        std::cout << "[fatal] must configure chassis_time" << std::endl;
+        exit(0);
+    }
     if(p_speed_v == NULL){
         std::cout << "[fatal] must configure speed_v" << std::endl;
         exit(0);
@@ -108,6 +115,7 @@ void InitParameter()
         std::cout << "[fatal] must configure network" << std::endl;
         exit(0);
     }
+
 
     if(p_charger == NULL){
         std::cout << "[error], not configure auto_charger" << std::endl;
@@ -171,18 +179,19 @@ void InitSchedule(void)
 /* chassis的初始化*/
 bool InitChassis(int argc, char **argv,const char *node_name)
 {
+   GS_INFO("[wc_chassis] init ros!");
+   ros::init(argc, argv, node_name);
 
-     GS_INFO("[wc_chassis] init ros!");
-     ros::init(argc, argv, node_name);
+   p_n = new ros::NodeHandle();
+   p_nh = new ros::NodeHandle("~");
+   p_device_nh = new ros::NodeHandle("device");
 
-     p_n = new ros::NodeHandle();
-     p_nh = new ros::NodeHandle("~");
-     p_device_nh = new ros::NodeHandle("device");
-     p_loop_rate =  new ros::Rate(25);
+   InitParameter();
 
-     InitParameter();
-     InitService();
-     InitDevice();
-     InitSchedule();
-     return true;
+   p_loop_rate =  new ros::Rate(p_chassis_time->controller_rate);
+
+   InitService();
+   InitDevice();
+   InitSchedule();
+   return true;
 }
