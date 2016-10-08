@@ -11,8 +11,8 @@
 /***ros 相关****/
 tf::TransformBroadcaster *p_odom_broadcaster = NULL;
 ros::Rate *p_loop_rate = NULL;
-ros::NodeHandle *p_n = NULL;
-ros::NodeHandle *p_nh = NULL;
+ros::NodeHandle *p_n   = NULL;
+ros::NodeHandle *p_nh  = NULL;
 ros::NodeHandle *p_device_nh =NULL;
 
 /***
@@ -30,7 +30,7 @@ void InitService()
 void InitParameter()
 {
 
-    p_chassis_mcu = new WC_chassis_mcu();
+    p_chassis_mcu      = new WC_chassis_mcu();
     p_odom_broadcaster = new tf::TransformBroadcaster();
 
     //read device param
